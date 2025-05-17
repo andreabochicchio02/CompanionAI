@@ -1,6 +1,6 @@
 # NOTES
 
-# MODELLO: Llama3.1:8b
+## MODELLO: Llama3.2:3b
 
 Make sure that if there is no similarity between questions and RAG context, it should not insert anything into the prompt
 
