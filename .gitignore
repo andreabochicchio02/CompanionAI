@@ -1,0 +1,5 @@
+# python virtual environment
+env_llm
+
+# data structure index
+faiss_index
