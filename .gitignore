@@ -1,5 +1,7 @@
 # python virtual environment
 env_llm
+.venv
 
 # data structure index
 faiss_index
+qdrant_data
