@@ -1,3 +1,5 @@
+__pycache__/
+
 # python virtual environment
 env_llm
 .venv
