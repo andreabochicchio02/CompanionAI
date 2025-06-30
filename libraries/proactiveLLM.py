@@ -19,7 +19,7 @@ def evaluate_response_relevance(question, user_response, current_topic, model):
         f"Answer with only: CONTINUE_TOPIC, CHANGE_TOPIC, or END_CONVERSATION"
     )
 
-    answer = ollama.query_ollama_no_stream(prompt, model)
+    answer = ollama.query_ollama_no_stream(prompt, model).strip().upper()
     
     # Simple parsing of the response
     if "CONTINUE_TOPIC" in answer:
@@ -32,6 +32,7 @@ def evaluate_response_relevance(question, user_response, current_topic, model):
         return {"action": "CONTINUE_TOPIC", "reason": "Unclear response, defaulting to continue"}
 
 def find_the_topic(activities, model, text_to_speech, speech_to_text):
+    user_input = ""
     remaining_activities = activities.copy()
     while True:
         if remaining_activities:
@@ -40,13 +41,13 @@ def find_the_topic(activities, model, text_to_speech, speech_to_text):
             print(f"\nAssistant (Answer about topic): Would you like to {activity.lower()}?\n\nYou: ", end="")
             if text_to_speech:
                 textSpeech.text_to_speech_locally(f"Would you like to {activity.lower()}?")
-            else: 
-                if speech_to_text:
-                    print("\nUser (Speak now...): ")
-                    user_input = textSpeech.speech_to_text_locally()
-                    print(user_input)    
-                else:
-                    user_input = input("").strip()
+             
+            if speech_to_text:
+                print("\nUser (Speak now...): ")
+                user_input = textSpeech.speech_to_text_locally()
+                print(user_input)    
+            else:
+                user_input = input("").strip()
             
             # Use evaluate_response_relevance to determine if user wants this activity
             evaluation = evaluate_response_relevance(f"Would you like to {activity.lower()}?", user_input, activity, model)

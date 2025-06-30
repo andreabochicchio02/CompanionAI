@@ -3,6 +3,7 @@ import scipy.io.wavfile as wavfile
 import whisper
 import torch
 import os
+import numpy as np
 from TTS.api import TTS
 
 import logging
@@ -36,7 +37,7 @@ def speech_to_text_locally():
 
 def text_to_speech_locally(text):
     wav = text_to_speech_tts.tts(text=text)
-
+    wav = wav / np.max(np.abs(wav))
     # Play the generated audio
     sd.play(wav, samplerate=text_to_speech_tts.synthesizer.output_sample_rate)
     sd.wait()

@@ -73,66 +73,56 @@ def main():
     print("\nChat with Ollama is active! (type 'exit' to quit)")
     
     while True:
-        # If we don't have a current activity, suggest one
-        if current_activity is None:
-            current_activity, prompt = proactiveLLM.find_the_topic(ACTIVITIES, MAIN_MODEL, TEXT_TO_SPEECH, SPEECH_TO_TEXT)
-            if not current_activity:
-                print(prompt)
-                break
-
-        # Generate response and get user reply
-        response = ollama.query_ollama_streaming(prompt, MAIN_MODEL)    # If current_activity was None: prompt = "Let's have a conversation about this topic: ..."
-
-        if TEXT_TO_SPEECH:
-            textSpeech.text_to_speech_locally(response)
-
-        user_input = f"I would like to {current_activity}"
-        shortTermMemory.update_history(user_input, response, MAX_TURNS, SUMMARIZER_MODEL)
-        
-        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        with open("log.txt", "a", encoding="utf-8") as f:
-            f.write(
-                f"[{timestamp}]\n"
-                f"********** USER INPUT **********:\n{user_input}\n\n"
-                f"********** FULL PROMPT **********:\n{prompt}\n"
-                f"{'='*40}\n\n"
-            )
-        
-        user_input = ""
-
+        print("\nWrite a free-form question, or press Enter to let the system choose a topic for you.")
         if SPEECH_TO_TEXT:
             print("\nUser (Speak now...): ")
             user_input = textSpeech.speech_to_text_locally()
             print(user_input)
         else:
-            user_input = input("\nUser: ")
+            user_input = input("\nUser: ").strip()
 
-        if user_input.lower() == "exit" or not user_input:
+        if user_input.lower() == "exit":
             print("Chat ended.")
             break
-        
-        # Evaluate response relevance
-        evaluation = proactiveLLM.evaluate_response_relevance(prompt, user_input, current_activity, MAIN_MODEL)
-        print(f"\n[Debug: Action: {evaluation['action']}, Reason: {evaluation['reason']}]")
-        
-        if evaluation['action'] == "END_CONVERSATION":
-            break
-        elif evaluation['action'] == "CHANGE_TOPIC":
-            current_activity = None
-            shortTermMemory.clean_history()
-        elif evaluation['action'] == "CONTINUE_TOPIC":
-            prompt = INITIAL_PROMPT + "\n\n"
 
-            prompt += rag.get_relevant_chunks(qdrant_client, COLLECTION_NAME, EMBEDDING_MODEL, user_input, TOP_K, MIN_SCORE)
+        if not user_input:
+            # Nessuna preferenza: il sistema propone un topic
+            current_activity, prompt = proactiveLLM.find_the_topic(ACTIVITIES, MAIN_MODEL, TEXT_TO_SPEECH, SPEECH_TO_TEXT)
+            if not current_activity:
+                print(prompt)
+                break
+            response = ollama.query_ollama_streaming(prompt, MAIN_MODEL)
+            if TEXT_TO_SPEECH:
+                textSpeech.text_to_speech_locally(response)
+            print(response)
+            continue
 
-            prompt += shortTermMemory.get_recent_messages(MAX_TURNS)
-
-            prompt += (
-                f"User: {user_input}\n"
-                "Assistant:\n"
-                f"Continue the conversation about '{current_activity}' with a new question or comment. Keep the conversation engaging and natural."
+        # Se l'utente ha scritto una domanda, controlla la similarità con i chunk del documento
+        relevant_chunks = rag.get_relevant_chunks(qdrant_client, COLLECTION_NAME, EMBEDDING_MODEL, user_input, TOP_K, MIN_SCORE)
+        if relevant_chunks.strip():
+            # Usa RAG: costruisci il prompt con il contesto
+            prompt = (
+                INITIAL_PROMPT + "\n\n"
+                + relevant_chunks
+                + shortTermMemory.get_recent_messages(MAX_TURNS)
+                + f"User: {user_input}\nAssistant:\n"
             )
-        
+            response = ollama.query_ollama_streaming(prompt, MAIN_MODEL)
+        else:
+            # Nessun chunk rilevante: domanda generica a Ollama
+            prompt = (
+                INITIAL_PROMPT + "\n\n"
+                + shortTermMemory.get_recent_messages(MAX_TURNS)
+                + f"User: {user_input}\nAssistant:\n"
+            )
+            response = ollama.query_ollama_streaming(prompt, MAIN_MODEL)
+
+        if TEXT_TO_SPEECH:
+            textSpeech.text_to_speech_locally(response)
+        print(response)
+
+        # Aggiorna la memoria breve
+        shortTermMemory.update_history(user_input, response, MAX_TURNS, SUMMARIZER_MODEL)
 
 if __name__ == "__main__":
     main()
