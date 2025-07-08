@@ -3,7 +3,6 @@
     padding: 0;
     box-sizing: border-box;
     font-family: "Montserrat", sans-serif;
-    font-size: 95%;
 }
 
 html, body {
@@ -14,11 +13,83 @@ body {
     display: flex;
 }
 
-header {
-    width: 15%;
+#sideBar {
+    width: 20%;
     height: 100vh;
-    border: 1px solid red;
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    box-sizing: border-box;
+    background-color: rgb(238, 238, 238);
 }   
+
+.app-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.app-icon {
+    width: 32px;
+    height: 32px;
+    margin-right: 8px;
+}
+
+.app-name {
+    margin: 0;
+    font-size: x-large;
+}
+
+.new-chat-btn {
+    background-color: #36679B;
+    color: white;
+    border: none;
+    padding: 10px;
+    border-radius: 6px;
+    cursor: pointer;
+    margin-top: 40px;
+    margin-bottom: 30px;
+    font-size: large;
+}
+
+.new-chat-btn:hover {
+    background-color: #4b7bb5;
+}
+
+#chat-history-title {
+    font-size: medium;
+}
+
+.chat-list {
+    flex-grow: 1;
+    overflow-y: auto;
+}
+
+.chat-item {
+    margin-top: 10px;
+    padding: 8px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: small;
+}
+
+.chat-item:hover {
+    background-color: lightgray;
+}
+
+.clear-history-btn {
+    background-color: #e74c3c;
+    color: white;
+    border: none;
+    padding: 8px;
+    border-radius: 6px;
+    cursor: pointer;
+    margin-top: 16px;
+}
+
+.clear-history-btn:hover {
+    background-color: #c0392b;
+}
 
 main {
     flex: 1;
@@ -107,7 +178,6 @@ main {
     width: 70%;
     margin-bottom: 1rem;
     overflow-y: auto;
-    border: 1px solid red;
     transition: height 0.7s ease;
 }
 
@@ -128,6 +198,6 @@ main {
 
 .message.received {
     align-self: flex-start;
-    background-color: #e0e0e0;
+    background-color: rgb(238, 238, 238);
     color: black;
 }

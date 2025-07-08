@@ -30,9 +30,16 @@ async function submitButton(event){
         textAreaResize(textArea);
         addMessage(text, 'sent');
 
-        setTimeout(() => {
-            addMessage("Echo: " + text, 'received');
-        }, 1000);
+        const response = await fetch('/chatLLM/responseLLM', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ message: text })
+        });
+        const data = await response.json();
+
+        addMessage(data.response, 'received');
     }
 }
 

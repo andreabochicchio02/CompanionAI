@@ -11,16 +11,30 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
     <link rel="icon" href="{{ url_for('static', filename='img/chip.png') }}">
-    <link rel="stylesheet" href="../static/css/index.css">
-    <script src="../static/js/script.js"></script>
+    <link rel="stylesheet" href="../static/css/chatLLM.css">
+    <script src="../static/js/chatLLM.js"></script>
 </head>
 <body>
-    <header>
-        <h1>Side Bar</h1>
-    </header>
-
     <main>
-         <div id="chatArea">
+        <div id="sideBar">
+            <div class="app-header">
+                <img src="{{ url_for('static', filename='img/chip.png') }}" alt="App Icon" class="app-icon" />
+                <h1 class="app-name">AssistantAI</h1>
+            </div>
+
+            <button class="new-chat-btn">New chat</button>
+            <h3 id="chat-history-title">Chat History</h3>
+            <div class="chat-list">
+                <div class="chat-item">Chat with Mario</div>
+                <div class="chat-item">Work chat</div>
+                <div class="chat-item">Trip 2025</div>
+            </div>
+
+            <button class="clear-history-btn">Clear history</button>
+
+        </div>
+        
+        <div id="chatArea">
             <div id="subTitle">Chat with your personal AI assistant!</div>
             <div class="messages" id="messages"></div>
             <div class="container" id="container">
