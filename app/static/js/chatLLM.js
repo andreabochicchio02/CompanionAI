@@ -28,19 +28,53 @@ async function submitButton(event){
         chatArea.style.justifyContent = 'normal'
         textArea.value = '';
         textAreaResize(textArea);
-        addMessage(text, 'sent');
+        addMessage(text, 'sent', 0);
 
-        const response = await fetch('/chatLLM/responseLLM', {
+        first_token = true;
+
+        fetch('/chatLLM/start', {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ message: text })
-        });
-        const data = await response.json();
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ prompt: text })
+        })
+        .then(res => res.json())
+        .then(data => {
+            const sessionId = data.session_id;
+            const evtSource = new EventSource('/chatLLM/responseLLM?session=' + encodeURIComponent(sessionId));
 
-        addMessage(data.response, 'received');
+            evtSource.onmessage = (e) => {
+                if(first_token){
+                    addMessage(e.data, 'received', sessionId);
+                }
+                else{
+                    const message = document.getElementById('' + sessionId);
+                    message.textContent = message.textContent + e.data;
+                }
+
+                first_token = false;
+            }
+            evtSource.onerror = (e) => {
+                console.error("EventSource failed:", e);
+                evtSource.close();
+            };
+        });
     }
+}
+
+function sendPrompt() {
+    const prompt = document.getElementById('prompt').value;
+    document.getElementById('output').textContent = ''; // clear previous response
+
+    const evtSource = new EventSource('/chatLLM/responseLLM?prompt=' + encodeURIComponent(prompt));
+
+    evtSource.onmessage = (e) => {
+    document.getElementById('output').textContent += e.data;
+    };
+
+    evtSource.onerror = (e) => {
+    console.error("EventSource failed:", e);
+    evtSource.close();
+    };
 }
 
 function textAreaResize(textArea){
@@ -53,10 +87,14 @@ function resetTextAreaPosition() {
     container.style.transform = 'translateY(0)';
 }
 
-function addMessage(text, type) {
+function addMessage(text, type, sessionId) {
     const messages = document.getElementById('messages');
     const message = document.createElement('div');
     message.classList.add('message', type);
     message.textContent = text;
+    if(type == 'received'){
+        message.id = '' + sessionId;
+    }
     messages.append(message);
+    return;
 }
