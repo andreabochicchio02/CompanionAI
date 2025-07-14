@@ -1,15 +1,27 @@
-SESSION_KEY = 0
+let SESSION_KEY = 0
+let N_MESSAGES = 0
+let ENABLE_TTS = false;
 
 document.addEventListener('DOMContentLoaded', async () => {
-    let textArea = document.getElementById('textarea');
-    let form = document.getElementById('form');
+    const textArea = document.getElementById('textarea');
+    const sendButton = document.getElementById('send-button');
+    const micButton = document.getElementById('mic-button');
+    const ttsToggle = document.querySelector('.tts-toggle');
 
-    textArea.addEventListener('input', () => textAreaResize(textArea));
+    textArea.addEventListener('input', () => textAreaResize());
 
-    form.addEventListener('submit', (event) => submitButton(event));
+    sendButton.addEventListener('click', (event) => handleClickButton(event));
+
+    micButton.addEventListener('click', (event) => handleClickMic(event));
+
+    ttsToggle.addEventListener('change', (event) => handleTTSToggle(event));
 
     SESSION_KEY = await createSessionKey();
 });
+
+function handleTTSToggle(event) {
+    ENABLE_TTS = event.target.checked;
+}
 
 async function createSessionKey() {
     const res = await fetch('/chatLLM/start', {
@@ -18,6 +30,52 @@ async function createSessionKey() {
     });
     const data = await res.json();
     return data.session_id;
+}
+
+function handleClickButton(event){
+    event.preventDefault();
+
+    const textArea = document.getElementById('textarea');
+    const text = textArea.value.trim(); // trim()-> remove whitespace from the beginning and end of the input text.
+
+    if(text == ""){
+        return;
+    }
+
+    sendMessageToLLM(text);    
+}
+
+function handleClickMic(event) {
+    event.preventDefault();
+
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+    if (!SpeechRecognition) {
+        alert("Sorry, your browser does not support speech recognition.");
+        return;
+    }
+
+    const recognition = new SpeechRecognition();
+    recognition.lang = 'en-US';
+    recognition.interimResults = false;
+    recognition.maxAlternatives = 1;
+
+    recognition.start();
+
+    recognition.addEventListener('result', (event) => {
+        const transcript = event.results[0][0].transcript;
+        console.log("You said:", transcript);
+        sendMessageToLLM(transcript);
+    });
+
+    recognition.addEventListener('speechend', () => {
+        recognition.stop();
+    });
+
+    recognition.addEventListener('error', (event) => {
+        alert("Voice recognition error!")
+        console.error("Recognition error:", event.error);
+    });
 }
 
 function moveDownTextArea() {
@@ -36,27 +94,20 @@ function moveDownTextArea() {
     chatArea.style.justifyContent = 'normal'
     textArea.value = '';
 
-    textAreaResize(textArea);
+    textAreaResize();
 }
 
-async function submitButton(event){
-    event.preventDefault();
-
-    const textArea = document.getElementById('textarea');
-    const text = textArea.value.trim(); // trim()-> remove whitespace from the beginning and end of the input text.
-
-    if(text == ""){
-        return;
+async function sendMessageToLLM(text) {
+    if(N_MESSAGES == 0){
+        moveDownTextArea();
+        N_MESSAGES++;
     }
 
-    moveDownTextArea();
     disableSendButtons();
 
     addMessage(text, 'sent');
 
     first_token = true;
-
-    console.log(SESSION_KEY)
 
     fetch('/chatLLM/sendPrompt', {
         method: 'POST',
@@ -82,6 +133,9 @@ async function submitButton(event){
         };
 
         evtSource.onerror = (e) => {
+            if(ENABLE_TTS){
+                textToSpeech(document.getElementById('messages').lastElementChild.textContent);
+            }
             console.error("EventSource failed:", e);
             evtSource.close();
         };
@@ -109,7 +163,8 @@ function activateSendButtons(){
     micButton.disabled = false;
 }
 
-function textAreaResize(textArea){
+function textAreaResize(){
+    const textArea = document.getElementById('textarea');
     textArea.style.height = 'auto';
     textArea.style.height = (textArea.scrollHeight) + 'px';
 }
@@ -125,5 +180,14 @@ function addMessage(text, type) {
     message.classList.add('message', type);
     message.textContent = text;
     messages.append(message);
-    return;
+}
+
+function textToSpeech(text) {
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = 'en-US';
+    utterance.rate = 1;       // speed (1 = normal)
+    utterance.pitch = 1;      // pitch (1 = normal)
+    utterance.volume = 1;     // volume (0 to 1)
+
+    speechSynthesis.speak(utterance);
 }

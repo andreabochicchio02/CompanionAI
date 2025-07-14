@@ -1,0 +1,6 @@
+[2025-07-14 22:32:44]	Error: Cannot connect to Ollama. Is it running?
+[2025-07-14 22:33:17]	Response generated and sent successfully (stream=True)
+[2025-07-14 22:41:21]	Response generated and sent successfully (stream=True)
+[2025-07-14 22:41:37]	Response generated and sent successfully (stream=True)
+[2025-07-14 22:43:58]	Response generated and sent successfully (stream=True)
+[2025-07-14 22:45:12]	Response generated and sent successfully (stream=True)
