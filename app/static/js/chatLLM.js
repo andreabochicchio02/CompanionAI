@@ -1,80 +1,112 @@
-document.addEventListener('DOMContentLoaded', () => {
+SESSION_KEY = 0
+
+document.addEventListener('DOMContentLoaded', async () => {
     let textArea = document.getElementById('textarea');
     let form = document.getElementById('form');
 
     textArea.addEventListener('input', () => textAreaResize(textArea));
 
     form.addEventListener('submit', (event) => submitButton(event));
+
+    SESSION_KEY = await createSessionKey();
 });
+
+async function createSessionKey() {
+    const res = await fetch('/chatLLM/start', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+    });
+    const data = await res.json();
+    return data.session_id;
+}
+
+function moveDownTextArea() {
+    const textArea = document.getElementById('textarea');
+    const subTile = document.getElementById('subTitle');
+    const chatArea = document.getElementById('chatArea');
+    const messageArea = document.getElementById('messages');
+    const container = document.getElementById('container');
+
+    subTile.style.display = 'none'
+    messageArea.style.display = 'flex'
+    messageArea.style.height = '85%'
+    messageArea.style.marginTop = '5px'
+    container.style.marginTop = '5px'
+    container.style.marginBottom = '5px'
+    chatArea.style.justifyContent = 'normal'
+    textArea.value = '';
+
+    textAreaResize(textArea);
+}
 
 async function submitButton(event){
     event.preventDefault();
 
-    let textArea = document.getElementById('textarea');
-    let subTile = document.getElementById('subTitle');
-    let chatArea = document.getElementById('chatArea');
-    let messageArea = document.getElementById('messages');
-    let container = document.getElementById('container');
-    
+    const textArea = document.getElementById('textarea');
     const text = textArea.value.trim(); // trim()-> remove whitespace from the beginning and end of the input text.
 
-    if (text !== "") {
-        subTile.style.display = 'none'
-        messageArea.style.display = 'flex'
-        messageArea.style.height = '85%'
-        messageArea.style.marginTop = '5px'
-        container.style.marginTop = '5px'
-        container.style.marginBottom = '5px'
-        chatArea.style.justifyContent = 'normal'
-        textArea.value = '';
-        textAreaResize(textArea);
-        addMessage(text, 'sent', 0);
-
-        first_token = true;
-
-        fetch('/chatLLM/start', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ prompt: text })
-        })
-        .then(res => res.json())
-        .then(data => {
-            const sessionId = data.session_id;
-            const evtSource = new EventSource('/chatLLM/responseLLM?session=' + encodeURIComponent(sessionId));
-
-            evtSource.onmessage = (e) => {
-                if(first_token){
-                    addMessage(e.data, 'received', sessionId);
-                }
-                else{
-                    const message = document.getElementById('' + sessionId);
-                    message.textContent = message.textContent + e.data;
-                }
-
-                first_token = false;
-            }
-            evtSource.onerror = (e) => {
-                console.error("EventSource failed:", e);
-                evtSource.close();
-            };
-        });
+    if(text == ""){
+        return;
     }
+
+    moveDownTextArea();
+    disableSendButtons();
+
+    addMessage(text, 'sent');
+
+    first_token = true;
+
+    console.log(SESSION_KEY)
+
+    fetch('/chatLLM/sendPrompt', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ prompt: text, sessionId: SESSION_KEY })
+    })
+    .then(() => {
+        const evtSource = new EventSource('/chatLLM/responseLLM?session_id=' + encodeURIComponent(SESSION_KEY));
+
+        let first_token = true;
+
+        evtSource.onmessage = (e) => {
+            if (!e.data) return;  // salta se non arriva nulla
+            if (first_token) {
+                addMessage(e.data, 'received');
+                first_token = false;
+            } else {
+                const lastMessage = document.getElementById('messages').lastElementChild;
+                if (lastMessage) {
+                    lastMessage.textContent += e.data;
+                }
+            }
+        };
+
+        evtSource.onerror = (e) => {
+            console.error("EventSource failed:", e);
+            evtSource.close();
+        };
+    })
+    .catch(err => {
+        console.error("Fetch failed:", err);
+    });
+
+    activateSendButtons();
 }
 
-function sendPrompt() {
-    const prompt = document.getElementById('prompt').value;
-    document.getElementById('output').textContent = ''; // clear previous response
+function disableSendButtons(){
+    const sendButton = document.getElementById('send-button');
+    const micButton = document.getElementById('mic-button');
 
-    const evtSource = new EventSource('/chatLLM/responseLLM?prompt=' + encodeURIComponent(prompt));
+    sendButton.disabled = true;
+    micButton.disabled = true;
+}
 
-    evtSource.onmessage = (e) => {
-    document.getElementById('output').textContent += e.data;
-    };
+function activateSendButtons(){
+    const sendButton = document.getElementById('send-button');
+    const micButton = document.getElementById('mic-button');
 
-    evtSource.onerror = (e) => {
-    console.error("EventSource failed:", e);
-    evtSource.close();
-    };
+    sendButton.disabled = false;
+    micButton.disabled = false;
 }
 
 function textAreaResize(textArea){
@@ -87,14 +119,11 @@ function resetTextAreaPosition() {
     container.style.transform = 'translateY(0)';
 }
 
-function addMessage(text, type, sessionId) {
+function addMessage(text, type) {
     const messages = document.getElementById('messages');
     const message = document.createElement('div');
     message.classList.add('message', type);
     message.textContent = text;
-    if(type == 'received'){
-        message.id = '' + sessionId;
-    }
     messages.append(message);
     return;
 }
