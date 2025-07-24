@@ -7,16 +7,42 @@ document.addEventListener('DOMContentLoaded', async () => {
     const sendButton = document.getElementById('send-button');
     const micButton = document.getElementById('mic-button');
     const ttsToggle = document.querySelector('.tts-toggle');
+    const form = document.getElementById('form');
 
     textArea.addEventListener('input', () => textAreaResize());
 
     sendButton.addEventListener('click', (event) => handleClickButton(event));
-
     micButton.addEventListener('click', (event) => handleClickMic(event));
-
     ttsToggle.addEventListener('change', (event) => handleTTSToggle(event));
 
+    // Invio con Enter, a capo con Shift+Enter
+    textArea.addEventListener('keydown', function(event) {
+        if (event.key === 'Enter' && !event.shiftKey) {
+            event.preventDefault();
+            sendMessageToLLM(textArea.value.trim());
+        }
+    });
+
+    form.addEventListener('submit', (event) => {
+        event.preventDefault();
+        sendMessageToLLM(textArea.value.trim());
+    });
+
+    // Cancella la cronologia della memoria della chat
+    await fetch('/chatLLM/clearMemory', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+    });
+
+    // Ottieni la chiave di sessione e poi avvia la chat automaticamente
     SESSION_KEY = await createSessionKey();
+    
+    // Mostra subito la UI come se avessimo già inviato un messaggio
+    moveDownTextArea();
+    N_MESSAGES++;
+    
+    // Fai partire il primo messaggio del bot automaticamente
+    getFirstBotMessage();
 });
 
 function handleTTSToggle(event) {
@@ -85,13 +111,13 @@ function moveDownTextArea() {
     const messageArea = document.getElementById('messages');
     const container = document.getElementById('container');
 
-    subTile.style.display = 'none'
-    messageArea.style.display = 'flex'
-    messageArea.style.height = '85%'
-    messageArea.style.marginTop = '5px'
-    container.style.marginTop = '5px'
-    container.style.marginBottom = '5px'
-    chatArea.style.justifyContent = 'normal'
+    subTile.style.display = 'none';
+    messageArea.style.display = 'flex';
+    messageArea.style.height = '80%';
+    messageArea.style.marginTop = '5px';
+    container.style.marginTop = '5px';
+    container.style.marginBottom = '5px';
+    chatArea.style.justifyContent = 'normal';
     textArea.value = '';
 
     textAreaResize();
@@ -107,7 +133,12 @@ async function sendMessageToLLM(text) {
 
     addMessage(text, 'sent');
 
-    first_token = true;
+    // Pulisce la text area dopo l'invio del messaggio
+    const textArea = document.getElementById('textarea');
+    textArea.value = '';
+
+    // Aggiungi puntini di ragionamento
+    addThinkingDots();
 
     fetch('/chatLLM/sendPrompt', {
         method: 'POST',
@@ -122,6 +153,7 @@ async function sendMessageToLLM(text) {
         evtSource.onmessage = (e) => {
             if (!e.data) return;  // salta se non arriva nulla
             if (first_token) {
+                removeThinkingDots();
                 addMessage(e.data, 'received');
                 first_token = false;
             } else {
@@ -133,19 +165,60 @@ async function sendMessageToLLM(text) {
         };
 
         evtSource.onerror = (e) => {
+            removeThinkingDots();
             if(ENABLE_TTS){
                 textToSpeech(document.getElementById('messages').lastElementChild.textContent);
             }
+            activateSendButtons();
             console.error("EventSource failed:", e);
             evtSource.close();
         };
     })
     .catch(err => {
+        removeThinkingDots();
         console.error("Fetch failed:", err);
     });
 
-    activateSendButtons();
 }
+
+// Aggiunge un messaggio "sta pensando..." con puntini animati
+function addThinkingDots() {
+    const messages = document.getElementById('messages');
+    const thinking = document.createElement('div');
+    thinking.classList.add('message', 'thinking', 'received'); // aggiunta classe received
+    thinking.id = 'thinking-dots';
+    thinking.textContent = 'I am thinking';
+    messages.append(thinking);
+    animateDots(thinking);
+}
+
+// Rimuove il messaggio "sta pensando..."
+function removeThinkingDots() {
+    const thinking = document.getElementById('thinking-dots');
+    if (thinking) thinking.remove();
+}
+
+// Anima i puntini dopo "sta pensando"
+function animateDots(element) {
+    let dots = 0;
+    element._dotsInterval = setInterval(() => {
+        dots = (dots + 1) % 4;
+        element.textContent = 'I am thinking' + '.'.repeat(dots);
+    }, 500);
+    element._dotsCount = dots;
+}
+
+// Ferma l'animazione dei puntini quando l'elemento viene rimosso
+const observer = new MutationObserver((mutations) => {
+    mutations.forEach((mutation) => {
+        mutation.removedNodes.forEach((node) => {
+            if (node.id === 'thinking-dots' && node._dotsInterval) {
+                clearInterval(node._dotsInterval);
+            }
+        });
+    });
+});
+observer.observe(document.getElementById('messages'), { childList: true });
 
 function disableSendButtons(){
     const sendButton = document.getElementById('send-button');
@@ -190,4 +263,12 @@ function textToSpeech(text) {
     utterance.volume = 1;     // volume (0 to 1)
 
     speechSynthesis.speak(utterance);
+}
+
+// Funzione per ottenere automaticamente il primo messaggio del bot
+function getFirstBotMessage() {
+    removeThinkingDots();
+
+    const welcomeMessage = "Hello! I'm your companion. Would you like to ask me something specific, or would you prefer me to suggest a topic for our conversation?";
+    addMessage(welcomeMessage, 'received');
 }
