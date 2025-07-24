@@ -6,7 +6,7 @@ import re
 NUM_LAST_MESS = 0
 
 # Conversation history as list of (user_input, assistant_response) tuples
-history = []
+history = {'user': [], 'assistantAI': []}
 # Current summarized context of the conversation
 summary = ""
 
@@ -20,24 +20,20 @@ is_summarizing = False
 
 
 def summarize_history_async(history_snapshot, current_summary, model):
-    """
-    Asynchronously summarize the conversation history plus the existing summary
-    using a lighter summarization model. Updates the shared summary_result dictionary.
-    Calls the optional callback once the summary is ready.
-    """
     global is_summarizing
     if is_summarizing:
         return
     is_summarizing = True
 
     def worker():
-        global is_summarizing, summary_result, history
+        global is_summarizing, summary_result
         try:
             print("\n[DEBUG] Starting conversation summarization...")
             text_to_summarize = ""
             if current_summary:
                 text_to_summarize += f"{current_summary}\n\n"
-            for user, assistant in history_snapshot:
+            
+            for user, assistant in zip(history_snapshot['user'], history_snapshot['assistantAI']):
                 text_to_summarize += f"User: {user}\nAssistant: {assistant}\n"
             text_to_summarize += "\n"
 
@@ -63,14 +59,9 @@ def clean_text(text):
 
 
 def summary_messages(current_summary, history, max_turns):
-    """
-    Build the prompt for the main chat model by combining the summarized context,
-    the last few turns of conversation history, and the current user input.
-    Instruct the assistant to respond concisely and gently, suitable for elderly users.
-    """
     prompt = ""
 
-    if len(history) > 0:
+    if len(history['user']) > 0:
         prompt += (
             "Note: You have access to a summarized context of the conversation as well as the last "
             f"{max_turns} exchanges between the user and assistant. "
@@ -80,7 +71,7 @@ def summary_messages(current_summary, history, max_turns):
     if current_summary:
         prompt += f"{current_summary}\n\n"
 
-    for user, assistant in history[-max_turns:]:
+    for user, assistant in zip(history['user'][-max_turns:], history['assistantAI'][-max_turns:]):
         clean_user = clean_text(user)
         clean_assistant = clean_text(assistant)
         prompt += f"User: {clean_user}\nAssistant: {clean_assistant}\n"
@@ -100,17 +91,21 @@ def get_recent_messages(max_turns):
 
 def update_history(user_input, response, max_turns, summarizer_model):
     global NUM_LAST_MESS
-    history.append((user_input, response))
+    history['user'].append(user_input)
+    history['assistantAI'].append(response)
     NUM_LAST_MESS += 1
     if (NUM_LAST_MESS >= max_turns) and not is_summarizing:
-            recent_history = history[-max_turns:]
-            summarize_history_async(recent_history, summary, summarizer_model)
-            NUM_LAST_MESS = 0
+        recent_history = {
+            'user': history['user'][-max_turns:],
+            'assistantAI': history['assistantAI'][-max_turns:]
+        }
+        summarize_history_async(recent_history, summary, summarizer_model)
+        NUM_LAST_MESS = 0
 
 def clean_history():
     global NUM_LAST_MESS, history, summary, summary_result
 
     NUM_LAST_MESS = 0
-    history = []
+    history = {'user': [], 'assistantAI': []}
     summary = ""
     summary_result = ""
