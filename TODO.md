@@ -25,3 +25,8 @@
 - [ ] alcune volte non capisce che la risposta è una domanda aperta, e risponde con un topic da suggerire
 - [ ] alcune volte si è rifiutato di cambiare argomento, anche se l'utente lo ha chiesto esplicitamente
 - [ ] alcune volte sembra non ritrovare elementi in rag, ma questo capitato raramente.
+
+
+
+**NOTE ANDREA**
+1. Se vogliamo mettere il Welcome message non lo deve inviare direttamente il JS (deve sempre venire dal backend)

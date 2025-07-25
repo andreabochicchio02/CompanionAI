@@ -105,11 +105,11 @@ def format_rag_prompt(initial_prompt, relevant_chunks, recent_messages, user_pro
             + relevant_chunks
             + "\nRemember to incorporate the above document information in your response when relevant.\n"
             + recent_messages
-            + f"User: {user_prompt}\nAssistant:\n"
+            + f"User: {user_prompt}\n"
         )
     else:
         return (
             initial_prompt + "\n\n"
             + recent_messages
-            + f"User: {user_prompt}\nAssistant:\n"
+            + f"User: {user_prompt}\n"
         )

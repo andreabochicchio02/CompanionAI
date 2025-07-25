@@ -13,24 +13,17 @@ from sentence_transformers import SentenceTransformer
 
 bp = Blueprint('chatLLM', __name__)
 
-INITIAL_PROMPT = """
-You are a virtual assistant designed to keep company and help elderly people or those with memory problems.
-
+INITIAL_PROMPT = """ You are a virtual assistant designed to keep company and help elderly people or those with memory problems.
 Your role is to always respond in a calm, reassuring, and gentle tone.
 Speak as you would to a loved one: be patient, never rushed or formal.
-
 When you speak:
 - Use simple, warm, and positive sentences.
 - Don't worry about repeating yourself if the user asks.
 - If the user seems confused or anxious, respond calmly and try to reassure them.
-
 Never give dry or cold answers.
 Remember that your main purpose is to provide companionship, reassurance, and help the user feel less alone.
-
 If the user asks you to remember something, kindly confirm that you will, even if technically you cannot store it forever.
-
 Always keep a calm, affectionate, and understanding tone, like a trusted friend or a caring family member.
-
 If the user asks a direct question, answer it directly without suggesting new topics unless explicitly requested.
 """
 
@@ -89,8 +82,11 @@ except Exception as e:
 CHATS = {}
 
 activities = [
-    "talk about the past", "talk about what you ate today", "talk about your children", 
-    "talk about music", "talk about sports"
+    "talk about the past", 
+    "talk about what you ate today", 
+    "talk about your children", 
+    "talk about music", 
+    "talk about sports"
 ]
 
 @bp.route('/chatLLM')
@@ -110,6 +106,9 @@ def start_chat():
     # Assicurati che la memoria sia completamente pulita per ogni nuova sessione
     #! da rimuovere se vogliamo localstorage della conversazione
     shortTermMemory.clean_history()
+
+    utilis.append_log(f"START")
+    utilis.clear_log_complete_file()
     return jsonify({'session_id': session_id})
 
 @bp.route('/chatLLM/sendPrompt', methods=['POST'])
@@ -122,6 +121,7 @@ def send_prompt():
         return jsonify({'error': 'Invalid session_id'}), 400
 
     CHATS[session_id]['user'].append(prompt)
+    utilis.append_log(f"USER: {prompt}")
     return jsonify({'error': 'None'})
 
 # Funzione per gestire il flusso di eventi
@@ -197,6 +197,7 @@ def event_stream(session_id, prompt):
             prompt, 
             MAIN_MODEL
         )
+
         if evaluation == "END_CONVERSATION":
             yield f"data: Goodbye! It was nice chatting with you. Take care!\n\n"
             return
@@ -231,12 +232,14 @@ def event_stream(session_id, prompt):
     else:
         ollama_prompt = rag.format_rag_prompt(context_prompt, relevant_chunks, recent_messages, prompt)
 
+
     for chunk in ollama.query_ollama_streaming(ollama_prompt, MAIN_MODEL):
         full_response += chunk
         yield f"data: {chunk}\n\n"
 
     CHATS[session_id]['assistantAI'].append(full_response)
     shortTermMemory.update_history(CHATS[session_id]['user'][-1], full_response, MAX_TURNS, SUMMARIZER_MODEL)
+    
 
 @bp.route('/chatLLM/clearMemory', methods=['POST'])
 def clear_memory():

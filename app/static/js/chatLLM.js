@@ -146,6 +146,8 @@ async function sendMessageToLLM(text) {
         body: JSON.stringify({ prompt: text, sessionId: SESSION_KEY })
     })
     .then(() => {
+        // EventSource ESTABLISHES A PERMANENT ONE-WAY CONNECTION (SERVER - CLIENT) WHERE THE SERVER CAN SEND EVENTS AS THEY BECOME AVAILABLE.
+        // PERFECT FOR CHAT WITH PROGRESSIVE RESPONSE, DATA STREAMING
         const evtSource = new EventSource('/chatLLM/responseLLM?session_id=' + encodeURIComponent(SESSION_KEY));
 
         let first_token = true;

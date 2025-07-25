@@ -1,4 +1,4 @@
-import libraries.ollama as ollama
+import app.services.ollama as ollama
 import libraries.textSpeech as textSpeech
 import app.services.utilis as utilis
 
@@ -51,8 +51,9 @@ def evaluate_user_message(recent_messages, user_response, model):
         f"If the user simply says 'yes', 'ok', 'sure', 'let's talk about it', 'sounds good', and there is a topic suggested, classify as CONTINUE_TOPIC.\n"
         f"Reply with only one of the following words (in English): END_CONVERSATION, SUGGEST_TOPIC, OWN_QUESTION, CONTINUE_TOPIC"
     )
+
     answer = ollama.query_ollama_no_stream(prompt, model).strip().upper()
-    utilis.append_log(f"Evaluation: {answer}, User Response: {user_response}, Context: {context}")
+    utilis.append_log(f"Context: {context}. User Response: {user_response}. Evaluation: {answer}")
     if "END_CONVERSATION" in answer:
         return "END_CONVERSATION"
     elif "SUGGEST_TOPIC" in answer:
