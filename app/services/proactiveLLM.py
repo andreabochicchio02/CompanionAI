@@ -4,6 +4,79 @@ import app.services.utilis as utilis
 
 import random
 
+def evaluate_init_msg(user_input, model):
+    prompt = (  
+                f"Determine whether the user's message is just a greeting to start a conversation or a question that requires a response. \n"
+                f"Respond only with:\n"
+                f"INITIAL — if it is a simple greeting or conversation starter.\n"
+                f"QUESTION — if it is a question or a message introducing a topic the user wants to discuss.\n"
+                f"Do not include anything else in your reply, only INITIAL or QUESTION.\n"
+
+                f"User message: {user_input}"
+            )
+
+    answer = ollama.query_ollama_no_stream(prompt, model).strip().upper()
+    utilis.append_log(f"User Response: {user_input}. Evaluation: {answer}")
+    return answer
+
+
+def evaluate_type_topic(user_input, model):
+    prompt = ( 
+                f"Determine whether the user is asking you to suggest a topic to talk about, or if the user is proposing a topic themselves. \n"
+                f"Respond only with:\n"
+                f"LLM_TOPIC — if the user is asking for a suggestion about what to talk about.\n"
+                f"USER_TOPIC — If they introduce a topic they want to discuss or ask a question. \n"
+                f"Do not include anything else in your reply, only LLM_TOPIC or USER_TOPIC.\n"
+
+                f"User message: {user_input}"
+            )
+
+    answer = ollama.query_ollama_no_stream(prompt, model).strip().upper()
+    utilis.append_log(f"User Response: {user_input}. Evaluation: {answer}")
+    return answer
+
+
+def evaluate_choose_topic(user_input, topic, model):
+    prompt = ( 
+                f"Determine whether the user is wants to continue the conversation, or if they want to talk about something else.\n"
+                f"The user might say yes, express interest, or simply start responding with something related to the topic — all of these mean they want to continue.\n"
+                f"Respond only with:\n"
+                f"CONTINUE_TOPIC — if the user is fine with the suggested topic and either agrees explicitly or begins discussing something related to it.\n"
+                f"CHANGE_TOPIC — If the user asks you to suggest another topic to talk about.\n"
+                f"Do not include anything else in your reply, only CONTINUE_TOPIC or CHANGE_TOPIC.\n"
+
+                f"Topic proposed: {topic}\n"
+
+                f"User message: {user_input}"
+            )
+
+    answer = ollama.query_ollama_no_stream(prompt, model).strip().upper()
+    utilis.append_log(f"User Response: {user_input}. Evaluation: {answer}")
+    return answer
+
+
+def evaluate_general_msg(user_input, topic, short_memory, model):
+    prompt = ( 
+                f"Based on the user's message and the context of the ongoing conversation, determine what the user intends to do next.\n"
+                f"Respond only with one of the following options\n"
+                f"CONTINUE_TOPIC — If the user is continuing the current topic, expanding on it, replying to a question, or asking a related follow-up.\n"
+                f"CHANGE_TOPIC — If the user explicitly asks you to suggest a new topic to talk about.\n"
+                f"END — if the user wants to end or close the conversation.\n"
+                f"NEW_QUESTION — if the user asks a new, open-ended question that is unrelated to the current topic.\n"
+                f"Do not include anything else in your reply, only CONTINUE_TOPIC, END or NEW_QUESTION\n"
+
+                f"Current topic: {topic}\n"
+
+                f"Here is the conversation so far with the user: {short_memory}\n"
+
+                f"User message: {user_input}"
+            )
+
+    answer = ollama.query_ollama_no_stream(prompt, model).strip().upper()
+    utilis.append_log(f"User Response: {user_input}. Evaluation: {answer}")
+    return answer
+
+
 def find_the_topic(activities, text_to_speech=False, speech_to_text=False):
     """
     Suggest a topic from predefined activities for web interface.
@@ -13,6 +86,7 @@ def find_the_topic(activities, text_to_speech=False, speech_to_text=False):
     activity = random.choice(activities)
     question = f"Would you like to {activity.lower()}?"
     return activity, question
+
 
 def suggest_new_topic(activities, model, current_topic=None, asked_topics=None):
     """
@@ -31,6 +105,10 @@ def suggest_new_topic(activities, model, current_topic=None, asked_topics=None):
     question = f"Would you like to {activity.lower()}?"
     return activity, question
 
+
+
+
+'''
 def evaluate_user_message(recent_messages, user_response, model):
     """
     Valuta la risposta dell'utente nel contesto dei messaggi recenti e determina se vuole:
@@ -91,3 +169,4 @@ def evaluate_topic_continuation(user_response, current_topic, model, recent_mess
         return "END_CONVERSATION"
     else:
         return "CONTINUE_TOPIC"  # Default
+'''

@@ -27,7 +27,6 @@ Always keep a calm, affectionate, and understanding tone, like a trusted friend 
 If the user asks a direct question, answer it directly without suggesting new topics unless explicitly requested.
 """
 
-
 MAIN_MODEL = "llama3.2:3b"
 SUMMARIZER_MODEL = "gemma3:1b"
 MAX_TURNS = 10
@@ -37,12 +36,22 @@ EMBEDDING_MODEL = SentenceTransformer("all-MiniLM-L6-v2")
 COLLECTION_NAME = "document_chunks"
 DOCUMENT_PATH = "document.txt"
 TOP_K = 3
-MIN_SCORE = 0.2
+MIN_SCORE = 0.20
 
 # Inizializza Qdrant tramite funzione utility in rag
 #DB_PATH = "qdrant_data"
 EMBEDDING_MODEL_NAME = "all-MiniLM-L6-v2"
 MAX_TOKENS = 500
+
+
+from enum import Enum, auto
+
+class State(Enum):
+    START = auto()
+    CHOOSING = auto()
+    TOPIC = auto()
+    CONVERSATION = auto()
+
 
 # --- Qdrant in-memory initialization ---
 # Prova diversi approcci per inizializzare Qdrant
@@ -100,8 +109,8 @@ def start_chat():
         CHATS[session_id] = {
             'user': [], 
             'assistantAI': [],
-            'topic': None,
-            # 'topic_suggested': False
+            'topic': '',
+            'state': State.START
         }
     # Assicurati che la memoria sia completamente pulita per ogni nuova sessione
     #! da rimuovere se vogliamo localstorage della conversazione
@@ -134,9 +143,186 @@ def responseLLM():
     prompt = CHATS[session_id]['user'][-1]
     return Response(event_stream(session_id, prompt), mimetype='text/event-stream')
 
-def event_stream(session_id, prompt):
-    full_response = ''
 
+def event_stream(session_id, prompt):
+
+    if CHATS[session_id]['state'] == State.START:             # STARTING MESSAGE
+        evaluation = proactiveLLM.evaluate_init_msg(
+            prompt, 
+            MAIN_MODEL
+        )
+
+        if "INITIAL" in evaluation:
+            yield f"data: Hello! I'm your companion. Would you like to ask me something specific, or would you prefer me to suggest a topic for our conversation?\n\n"
+            CHATS[session_id]['state'] = State.CHOOSING
+            return
+        elif "QUESTION" in evaluation:
+            CHATS[session_id]['state'] = State.CONVERSATION
+            CHATS[session_id]['topic'] = ""
+            ollama_prompt = conversation_llm(prompt)
+
+            full_response = ''
+            for chunk in ollama.query_ollama_streaming(ollama_prompt, MAIN_MODEL):
+                full_response += chunk
+                yield f"data: {chunk}\n\n"
+
+            CHATS[session_id]['assistantAI'].append(full_response)
+            shortTermMemory.update_history(CHATS[session_id]['user'][-1], full_response, MAX_TURNS, SUMMARIZER_MODEL)
+        # else: # TODO
+
+    elif CHATS[session_id]['state'] == State.CHOOSING:          #CHOOSING TYPE OF TIPIC
+        evaluation = proactiveLLM.evaluate_type_topic(
+            prompt, 
+            MAIN_MODEL
+        )
+
+        if "LLM_TOPIC" in evaluation:
+            topic, topic_question = proactiveLLM.find_the_topic(activities)
+            if topic:
+                CHATS[session_id]['topic'] = topic
+                CHATS[session_id]['state'] = State.TOPIC
+                yield f"data: {topic_question}\n\n"
+                return
+            else:
+                # TODO no more topic
+                return
+        elif "USER_TOPIC" in evaluation:
+            CHATS[session_id]['state'] = State.CONVERSATION
+            CHATS[session_id]['topic'] = ""
+            ollama_prompt = conversation_llm(prompt)
+
+            full_response = ''
+            for chunk in ollama.query_ollama_streaming(ollama_prompt, MAIN_MODEL):
+                full_response += chunk
+                yield f"data: {chunk}\n\n"
+
+            CHATS[session_id]['assistantAI'].append(full_response)
+            shortTermMemory.update_history(CHATS[session_id]['user'][-1], full_response, MAX_TURNS, SUMMARIZER_MODEL)
+        # else: # TODO
+
+    elif CHATS[session_id]['state'] == State.TOPIC:             # PROPOSING A TOPIC
+        evaluation = proactiveLLM.evaluate_choose_topic(
+            prompt, 
+            CHATS[session_id]['topic'],
+            MAIN_MODEL
+        )
+
+        if "CONTINUE_TOPIC" in evaluation:
+            CHATS[session_id]['state'] = State.CONVERSATION
+            ollama_prompt = conversation_llm(prompt)
+
+            full_response = ''
+            for chunk in ollama.query_ollama_streaming(ollama_prompt, MAIN_MODEL):
+                full_response += chunk
+                yield f"data: {chunk}\n\n"
+
+            CHATS[session_id]['assistantAI'].append(full_response)
+            shortTermMemory.update_history(CHATS[session_id]['user'][-1], full_response, MAX_TURNS, SUMMARIZER_MODEL)
+        elif "CHANGE_TOPIC" in evaluation:
+            topic, topic_question = proactiveLLM.find_the_topic(activities)
+            if topic:
+                CHATS[session_id]['topic'] = topic
+                CHATS[session_id]['state'] = State.TOPIC
+                yield f"data: {topic_question}\n\n"
+                return
+            else:
+                # TODO no more topic
+                return
+        # else: # TODO
+
+    elif CHATS[session_id]['state'] == State.CONVERSATION:          # CONVERSATION
+        recent_messages = shortTermMemory.get_recent_messages(MAX_TURNS)
+
+        evaluation = proactiveLLM.evaluate_general_msg(
+            prompt, 
+            CHATS[session_id]['topic'],
+            recent_messages,
+            MAIN_MODEL
+        )
+
+
+
+        if "CONTINUE_TOPIC" in evaluation:
+            CHATS[session_id]['state'] = State.CONVERSATION
+            ollama_prompt = conversation_llm(prompt)
+
+            full_response = ''
+            for chunk in ollama.query_ollama_streaming(ollama_prompt, MAIN_MODEL):
+                full_response += chunk
+                yield f"data: {chunk}\n\n"
+
+            CHATS[session_id]['assistantAI'].append(full_response)
+            shortTermMemory.update_history(CHATS[session_id]['user'][-1], full_response, MAX_TURNS, SUMMARIZER_MODEL)
+        elif "CHANGE_TOPIC" in evaluation:
+            topic, topic_question = proactiveLLM.find_the_topic(activities)
+            if topic:
+                CHATS[session_id]['topic'] = topic
+                CHATS[session_id]['state'] = State.TOPIC
+                yield f"data: {topic_question}\n\n"
+                return
+            else:
+                # TODO no more topic
+                return
+        elif "END" in evaluation:
+            yield f"data: Goodbye! It was nice chatting with you. Take care!\n\n"
+            return
+        elif "NEW_QUESTION" in evaluation:
+            CHATS[session_id]['state'] = State.CONVERSATION
+            CHATS[session_id]['topic'] = ""
+            ollama_prompt = conversation_llm(prompt)
+
+            full_response = ''
+            for chunk in ollama.query_ollama_streaming(ollama_prompt, MAIN_MODEL):
+                full_response += chunk
+                yield f"data: {chunk}\n\n"
+
+            CHATS[session_id]['assistantAI'].append(full_response)
+            shortTermMemory.update_history(CHATS[session_id]['user'][-1], full_response, MAX_TURNS, SUMMARIZER_MODEL)
+        # else: # TODO
+
+
+
+def conversation_llm(input):
+
+    prompt = INITIAL_PROMPT
+
+    relevant_chunks = ""
+    if qdrant_client:
+        try:
+            relevant_chunks = rag.get_relevant_chunks(qdrant_client, COLLECTION_NAME, EMBEDDING_MODEL, prompt, TOP_K, MIN_SCORE)
+
+            prompt += (
+                f"\nThese are some pieces of information you can base your response on, and the information refers to the person you are talking to:\n"
+                f"{relevant_chunks}"
+            )
+
+            print("Successfully retrieved relevant chunks from RAG")
+        except Exception as e:
+            print(f"Error retrieving chunks: {e}")
+    else:
+        print("Skipping RAG retrieval - Qdrant client not available")
+
+    recent_messages = shortTermMemory.get_recent_messages(MAX_TURNS)
+
+    prompt += (
+        f"\nHere is the conversation so far with the user:\n"
+        f"{recent_messages}"
+    )
+
+    prompt += (
+        f"\nHere is the user's latest message that you need to reply to:\n"
+        f"{input}"
+    )
+
+    return prompt
+
+
+
+
+
+
+'''
+def event_stream(session_id, prompt):
     # Inizializza stati della sessione se non presenti
     if 'topic' not in CHATS[session_id]:
         CHATS[session_id]['topic'] = None
@@ -232,14 +418,14 @@ def event_stream(session_id, prompt):
     else:
         ollama_prompt = rag.format_rag_prompt(context_prompt, relevant_chunks, recent_messages, prompt)
 
-
+    full_response = ''
     for chunk in ollama.query_ollama_streaming(ollama_prompt, MAIN_MODEL):
         full_response += chunk
         yield f"data: {chunk}\n\n"
 
     CHATS[session_id]['assistantAI'].append(full_response)
     shortTermMemory.update_history(CHATS[session_id]['user'][-1], full_response, MAX_TURNS, SUMMARIZER_MODEL)
-    
+'''    
 
 @bp.route('/chatLLM/clearMemory', methods=['POST'])
 def clear_memory():

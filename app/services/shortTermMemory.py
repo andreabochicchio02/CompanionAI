@@ -75,7 +75,7 @@ def summary_messages(current_summary, history, max_turns):
         clean_user = clean_text(user)
         clean_assistant = clean_text(assistant)
         prompt += f"User: {clean_user}\nAssistant: {clean_assistant}\n"
-
+        
     return prompt
 
 def get_recent_messages(max_turns):

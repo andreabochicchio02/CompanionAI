@@ -40,9 +40,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Mostra subito la UI come se avessimo già inviato un messaggio
     moveDownTextArea();
     N_MESSAGES++;
-    
-    // Fai partire il primo messaggio del bot automaticamente
-    getFirstBotMessage();
 });
 
 function handleTTSToggle(event) {
@@ -265,12 +262,4 @@ function textToSpeech(text) {
     utterance.volume = 1;     // volume (0 to 1)
 
     speechSynthesis.speak(utterance);
-}
-
-// Funzione per ottenere automaticamente il primo messaggio del bot
-function getFirstBotMessage() {
-    removeThinkingDots();
-
-    const welcomeMessage = "Hello! I'm your companion. Would you like to ask me something specific, or would you prefer me to suggest a topic for our conversation?";
-    addMessage(welcomeMessage, 'received');
 }

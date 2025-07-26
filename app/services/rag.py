@@ -84,32 +84,3 @@ def get_relevant_chunks(qdrant_client, collection_name, embedding_model, query, 
         for i, (chunk, score) in enumerate(zip(selected_chunks, selected_scores)):
             formatted_chunks.append(f"[DOCUMENT EXCERPT {i+1} (relevance: {score:.2f})]:\n{chunk}\n")
         return "\n".join(formatted_chunks)
-
-def format_rag_prompt(initial_prompt, relevant_chunks, recent_messages, user_prompt):
-    """
-    Format a complete prompt with RAG information for the LLM.
-    
-    Args:
-        initial_prompt: Base system prompt
-        relevant_chunks: Document chunks from RAG
-        recent_messages: Recent conversation history
-        user_prompt: Current user question
-        
-    Returns:
-        Formatted prompt for the model
-    """
-    if relevant_chunks.strip():
-        return (
-            initial_prompt + "\n\n"
-            + "IMPORTANT CONTEXT FROM DOCUMENT (use this information to answer accurately):\n" 
-            + relevant_chunks
-            + "\nRemember to incorporate the above document information in your response when relevant.\n"
-            + recent_messages
-            + f"User: {user_prompt}\n"
-        )
-    else:
-        return (
-            initial_prompt + "\n\n"
-            + recent_messages
-            + f"User: {user_prompt}\n"
-        )
