@@ -63,12 +63,15 @@ body {
 .chat-list {
     flex-grow: 1;
     overflow-y: auto;
+    display: flex;
+    flex-direction: column;
 }
 
 .chat-item {
     margin-top: 10px;
     padding: 8px;
-    border-radius: 4px;
+    border-radius: 10px;
+    border: 1px solid lightgray;
     cursor: pointer;
     font-size: small;
 }
@@ -185,8 +188,6 @@ main {
     border: 1px solid #e0e0e0;
     background: white;
     transition: bottom 0.7s ease;
-    position: fixed;
-    bottom: 40px;
 }
 
 .form {

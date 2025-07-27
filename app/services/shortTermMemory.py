@@ -1,111 +1,146 @@
 import libraries.ollama as ollama
-
 import threading
-import re
+import re, os, json
+import datetime
 
-NUM_LAST_MESS = 0
+class ChatManager:
+    def __init__(self, summarizer_model, state, max_turns=6, user_history=None, assistant_history=None, topic=''):
+        self.model = summarizer_model
+        self.max_turns = max_turns
 
-# Conversation history as list of (user_input, assistant_response) tuples
-history = {'user': [], 'assistantAI': []}
-# Current summarized context of the conversation
-summary = ""
+        self.chat = {
+            'user': user_history if user_history is not None else [],
+            'assistantAI': assistant_history if assistant_history is not None else [],
+            'topic': topic,
+            'state': state
+        }
 
-# Lock to safely update the shared summary across threads
-summary_lock = threading.Lock()
-# Shared dictionary to hold the latest summary value
-summary_result = ""
+        self.summary = ""
+        self.summary_result = ""
 
-# Flag to avoid multiple simultaneous summarizations
-is_summarizing = False
+        self.num_last_messages = 0
+        self.summary_lock = threading.Lock()
+        self.is_summarizing = False
 
+    def add_user_message(self, user_message):
+        self.chat['user'].append(user_message)
 
-def summarize_history_async(history_snapshot, current_summary, model):
-    global is_summarizing
-    if is_summarizing:
-        return
-    is_summarizing = True
+    def add_assistant_message(self, assistant_message, session_id, file_path):
+        self.chat['assistantAI'].append(assistant_message)
+        self.num_last_messages += 1
+        self.save_to_file(session_id, file_path)
+        self.check_to_summarize()
 
-    def worker():
-        global is_summarizing, summary_result
-        try:
-            print("\n[DEBUG] Starting conversation summarization...")
-            text_to_summarize = ""
-            if current_summary:
-                text_to_summarize += f"{current_summary}\n\n"
-            
-            for user, assistant in zip(history_snapshot['user'], history_snapshot['assistantAI']):
-                text_to_summarize += f"User: {user}\nAssistant: {assistant}\n"
-            text_to_summarize += "\n"
+    def get_last_user_message(self):
+        return self.chat['user'][-1]
+    
+    def set_chat_state(self, state):
+        self.chat['state'] = state
 
-            summarizing_prompt = (
-                f"Summarize concisely and precisely the following conversation including all key facts:\n\n"
-                f"{text_to_summarize.strip()}\n\nSummary:"
-            )
-            new_summary = ollama.query_ollama_no_stream(summarizing_prompt, model=model)
-            with summary_lock:
-                summary_result = new_summary.strip()
-        finally:
-            is_summarizing = False
-            print("\n[DEBUG] Summarization completed and ready.")
+    def set_chat_topic(self, topic):
+        self.chat['topic'] = topic
 
-    thread = threading.Thread(target=worker, daemon=True)
-    thread.start()
+    def get_chat_topic(self):
+        return self.chat['topic']
+    
+    def get_chat_state(self):
+        return self.chat['state']
 
-
-def clean_text(text):
+    def clean_text(self, text):
         text = text.replace('\n', ' ')
         text = re.sub(r'\s+', ' ', text)
         return text.strip()
 
+    def summarize_history_async(self, history_snapshot, current_summary):
+        if self.is_summarizing:
+            return
+        self.is_summarizing = True
 
-def summary_messages(current_summary, history, max_turns):
-    prompt = ""
+        def worker():
+            try:
+                text_to_summarize = f"{current_summary}\n\n" if current_summary else ""
 
-    if len(history['user']) > 0:
-        prompt += (
-            "Note: You have access to a summarized context of the conversation as well as the last "
-            f"{max_turns} exchanges between the user and assistant. "
-            "Use this information to answer only if necessary.\n\n"
-        )
+                for user, assistant in zip(history_snapshot['user'], history_snapshot['assistantAI']):
+                    text_to_summarize += f"User: {user}\nAssistant: {assistant}\n"
+                text_to_summarize += "\n"
 
-    if current_summary:
-        prompt += f"{current_summary}\n\n"
+                summarizing_prompt = (
+                    "Summarize concisely and precisely the following conversation including all key facts:\n\n"
+                    f"{text_to_summarize.strip()}\n\nSummary:"
+                )
 
-    for user, assistant in zip(history['user'][-max_turns:], history['assistantAI'][-max_turns:]):
-        clean_user = clean_text(user)
-        clean_assistant = clean_text(assistant)
-        prompt += f"User: {clean_user}\nAssistant: {clean_assistant}\n"
-        
-    return prompt
+                new_summary = ollama.query_ollama_no_stream(summarizing_prompt, model=self.model)
 
-def get_recent_messages(max_turns):
-    global summary
-    if summary_lock.acquire(blocking=False):
-        try:
-            if summary_result and summary_result != summary:
-                summary = summary_result
-        finally:
-            summary_lock.release()
-    
-    return summary_messages(summary, history, max_turns)
+                with self.summary_lock:
+                    self.summary_result = new_summary.strip()
 
-def update_history(user_input, response, max_turns, summarizer_model):
-    global NUM_LAST_MESS
-    history['user'].append(user_input)
-    history['assistantAI'].append(response)
-    NUM_LAST_MESS += 1
-    if (NUM_LAST_MESS >= max_turns) and not is_summarizing:
-        recent_history = {
-            'user': history['user'][-max_turns:],
-            'assistantAI': history['assistantAI'][-max_turns:]
+            finally:
+                self.is_summarizing = False
+
+        threading.Thread(target=worker, daemon=True).start()
+
+    def get_recent_messages(self):
+        # Aggiorna il contesto con l’ultimo summary generato se disponibile
+        if self.summary_lock.acquire(blocking=False):
+            try:
+                if self.summary_result and self.summary_result != self.summary:
+                    self.summary = self.summary_result
+            finally:
+                self.summary_lock.release()
+
+        return self.build_prompt()
+
+    def build_prompt(self):
+        prompt = ""
+
+        if self.chat['user']:
+            prompt += (
+                "Note: You have access to a summarized context of the conversation as well as the last "
+                f"{self.max_turns} exchanges between the user and assistant. "
+                "Use this information to answer only if necessary.\n\n"
+            )
+
+        if self.summary:
+            prompt += f"{self.summary}\n\n"
+
+        for user, assistant in zip(self.chat['user'][-self.max_turns:], self.chat['assistantAI'][-self.max_turns:]):
+            prompt += f"User: {user}\nAssistant: {assistant}\n"
+
+        return prompt
+
+    def check_to_summarize(self):
+        if self.num_last_messages >= self.max_turns and not self.is_summarizing:
+            recent_history = {
+                'user': self.chat['user'][-self.max_turns:],
+                'assistantAI': self.chat['assistantAI'][-self.max_turns:]
+            }
+            self.summarize_history_async(recent_history, self.summary)
+            self.num_last_messages = 0
+
+    def save_to_file(self, session_id, file_path):
+        # Assicurati che la directory esista
+        os.makedirs(os.path.dirname(file_path), exist_ok=True)
+
+        # Carica il file se esiste, altrimenti inizializza un dizionario vuoto
+        if os.path.exists(file_path):
+            with open(file_path, 'r', encoding='utf-8') as f:
+                try:
+                    all_chats = json.load(f)
+                except json.JSONDecodeError:
+                    all_chats = {}
+        else:
+            all_chats = {}
+
+        # Salva o sovrascrive la chat per session_id
+        all_chats[session_id] = {
+            'user': self.chat['user'],
+            'assistantAI': self.chat['assistantAI'],
+            'topic': self.chat['topic'],
+            'state': self.chat['state'].name,  # salva come stringa es: "START"
+            'summary': self.summary,
+            'timestamp': datetime.datetime.now().isoformat()
         }
-        summarize_history_async(recent_history, summary, summarizer_model)
-        NUM_LAST_MESS = 0
 
-def clean_history():
-    global NUM_LAST_MESS, history, summary, summary_result
-
-    NUM_LAST_MESS = 0
-    history = {'user': [], 'assistantAI': []}
-    summary = ""
-    summary_result = ""
+        # Scrive il file aggiornato
+        with open(file_path, 'w', encoding='utf-8') as f:
+            json.dump(all_chats, f, indent=4, ensure_ascii=False)

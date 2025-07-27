@@ -1,7 +1,5 @@
 from qdrant_client import QdrantClient
 from qdrant_client.models import PointStruct, VectorParams, Distance
-from FlagEmbedding import BGEM3FlagModel
-from transformers import AutoTokenizer
 
 #! potrebbe essere da modificare in base al modello di embedding utilizzato
 def load_chunks(file_path):
