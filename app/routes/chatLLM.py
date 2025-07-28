@@ -8,16 +8,16 @@ import app.services.config as config
 from app.services.config import State as State
 
 # --- Standard library imports ---
-import uuid, json
+import uuid, json, random
 from datetime import datetime
 from flask import Blueprint, render_template, request, jsonify, Response
 
 bp = Blueprint('chatLLM', __name__)
 
 # Initialize vector database for RAG service
-utils.append_log("Initializing RAG service...")
+utils.append_server_log("Initializing RAG service...")
 rag.initialize_db()
-utils.append_log("RAG service initialized successfully.")
+utils.append_server_log("RAG service initialized successfully.")
 
 # Dictionary to store chat sessions.
 # Each key is a session ID, and each value is an instance of the ChatManager class (from shortTermMemory.py).
@@ -37,8 +37,8 @@ def chatLLM():
     # ollama.preload_model(SUMMARIZER_MODEL)
 
     # Clear previous log files to start fresh for the new session
-    utils.clear_log_file()
-    utils.clear_log_complete_file()
+    utils.clear_server_log()
+    utils.clear_conversation_log()
 
     # Render the chat interface template
     return render_template('chatLLM.html')
@@ -60,7 +60,7 @@ def new_session_id():
     CHATS[session_id] = ChatManager(config.SUMMARIZER_MODEL, State.START, config.MAX_TURNS)
 
     # Log that the start request has been successfully processed
-    utils.append_log("/chatLLM/start request completed successfully.")
+    utils.append_server_log("/chatLLM/start request completed successfully.")
 
     # Return a structured JSON response with success and session ID
     return jsonify({'success': True, 'message': session_id})
@@ -218,46 +218,27 @@ def clean_chats():
         # Return success response
         return jsonify({'success': True, 'message': 'Chats cleaned successfully.'})
     
-    except Exception as e:
+    except Exception:
         # Return error response with exception message
         return jsonify({'success': False, 'message': 'Failed to clean chats.'})
 
 
+def event_stream(session_id, prompt, retry=False):
+    '''
+    Depending on the current state of the conversation between the user and the AI assistant, 
+    we perform different actions.
+    '''
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-def event_stream(session_id, prompt):
-
-    if CHATS[session_id].get_chat_state() == State.START:             # STARTING MESSAGE
-        evaluation = proactiveLLM.evaluate_init_msg(
-            prompt, 
-            config.MAIN_MODEL
-        )
+    # If the conversation hasn't started yet (receiving the user's first message),
+    # we check whether the user has already asked a specific question or just greeted.
+    if CHATS[session_id].get_chat_state() == State.START:
+        evaluation = proactiveLLM.evaluate_init_msg(prompt, config.MAIN_MODEL)
 
         if "INITIAL" in evaluation:
-            yield f"data: Hello! I'm your companion. Would you like to ask me something specific, or would you prefer me to suggest a topic for our conversation?\n\n"
+            suggest_topic_sentence = random.choice(config.SUGGEST_TOPIC_SENTENCES)
+            yield f"data: {suggest_topic_sentence}\n\n"
             CHATS[session_id].set_chat_state(State.CHOOSING)
-            CHATS[session_id].add_assistant_message("Hello! I'm your companion. Would you like to ask me something specific, or would you prefer me to suggest a topic for our conversation?", session_id, config.CHATS_FILE)
+            CHATS[session_id].add_assistant_message(suggest_topic_sentence, session_id, config.CHATS_FILE)
             return
         elif "QUESTION" in evaluation:
             CHATS[session_id].set_chat_state(State.CONVERSATION)
@@ -270,28 +251,38 @@ def event_stream(session_id, prompt):
                 yield f"data: {chunk}\n\n"
 
             CHATS[session_id].add_assistant_message(full_response, session_id, config.CHATS_FILE)
-        # else: # TODO
+        else:
+            if not retry:
+                yield from event_stream(session_id, prompt, retry=True)
+            else:
+                fallback_msg = "Sorry, I'm not sure how to respond. Could you please rephrase your message?"
+                yield f"data: {fallback_msg}\n\n"
+                CHATS[session_id].add_assistant_message(fallback_msg, session_id, config.CHATS_FILE)
+            return
 
-    elif CHATS[session_id].get_chat_state() == State.CHOOSING:          #CHOOSING TYPE OF TIPIC
-        evaluation = proactiveLLM.evaluate_type_topic(
-            prompt, 
-            config.MAIN_MODEL
-        )
+    # If the user is in the decision-making phase, we check whether they are asking the assistant
+    # to suggest some topics to talk about, or if they are specifying a topic themselves.
+    elif CHATS[session_id].get_chat_state() == State.CHOOSING:
+        evaluation = proactiveLLM.evaluate_type_topic(prompt, config.MAIN_MODEL)
 
         if "LLM_TOPIC" in evaluation:
             topic, topic_question = proactiveLLM.find_the_topic(config.ACTIVITIES)
             if topic:
-                CHATS[session_id].set_chat_topic(topic)
                 CHATS[session_id].set_chat_state(State.TOPIC)
+                CHATS[session_id].set_chat_topic(topic)
                 yield f"data: {topic_question}\n\n"
                 CHATS[session_id].add_assistant_message(topic_question, session_id, config.CHATS_FILE)
                 return
             else:
-                # TODO no more topic
+                fallback_message = "I think I've run out of ideas for now but I'd love to hear from you! Is there anything you'd like to talk about?"
+                CHATS[session_id].set_chat_state(State.CONVERSATION)
+                CHATS[session_id].set_chat_topic('')
+                yield f"data: {fallback_message}\n\n"
+                CHATS[session_id].add_assistant_message(fallback_message, session_id, config.CHATS_FILE)
                 return
         elif "USER_TOPIC" in evaluation:
-            CHATS[session_id].set_chat_topic('')
             CHATS[session_id].set_chat_state(State.CONVERSATION)
+            CHATS[session_id].set_chat_topic('')
             ollama_prompt = conversation_llm(prompt, session_id)
 
             full_response = ''
@@ -301,14 +292,19 @@ def event_stream(session_id, prompt):
 
             CHATS[session_id].add_assistant_message(full_response, session_id, config.CHATS_FILE)
             return
-        # else: # TODO
+        else:
+            if not retry:
+                yield from event_stream(session_id, prompt, retry=True)
+            else:
+                fallback_msg = "Sorry, I'm not sure how to respond. Could you please rephrase your message?"
+                yield f"data: {fallback_msg}\n\n"
+                CHATS[session_id].add_assistant_message(fallback_msg, session_id, config.CHATS_FILE)
+            return
 
-    elif CHATS[session_id].get_chat_state() == State.TOPIC:             # PROPOSING A TOPIC
-        evaluation = proactiveLLM.evaluate_choose_topic(
-            prompt, 
-            CHATS[session_id].get_chat_topic(),
-            config.MAIN_MODEL
-        )
+    # In the case where a TOPIC has been suggested to the user, we need to check whether the user agrees with the topic or not.
+    # For example, they might say they don't enjoy talking about that subject.
+    elif CHATS[session_id].get_chat_state() == State.TOPIC:
+        evaluation = proactiveLLM.evaluate_choose_topic(prompt, CHATS[session_id].get_chat_topic(), config.MAIN_MODEL)
 
         if "CONTINUE_TOPIC" in evaluation:
             CHATS[session_id].set_chat_state(State.CONVERSATION)
@@ -324,33 +320,35 @@ def event_stream(session_id, prompt):
         elif "CHANGE_TOPIC" in evaluation:
             topic, topic_question = proactiveLLM.find_the_topic(config.ACTIVITIES)
             if topic:
-                CHATS[session_id].set_chat_topic(topic)
                 CHATS[session_id].set_chat_state(State.TOPIC)
-
+                CHATS[session_id].set_chat_topic(topic)
                 yield f"data: {topic_question}\n\n"
-                
                 CHATS[session_id].add_assistant_message(topic_question, session_id, config.CHATS_FILE)
                 return
             else:
-                # TODO no more topic
+                fallback_message = "I think I've run out of ideas for now but I'd love to hear from you! Is there anything you'd like to talk about?"
+                CHATS[session_id].set_chat_state(State.CONVERSATION)
+                CHATS[session_id].set_chat_topic('')
+                yield f"data: {fallback_message}\n\n"
+                CHATS[session_id].add_assistant_message(fallback_message, session_id, config.CHATS_FILE)
                 return
-        # else: # TODO
+        else:
+            if not retry:
+                yield from event_stream(session_id, prompt, retry=True)
+            else:
+                fallback_msg = "Sorry, I'm not sure how to respond. Could you please rephrase your message?"
+                yield f"data: {fallback_msg}\n\n"
+                CHATS[session_id].add_assistant_message(fallback_msg, session_id, config.CHATS_FILE)
+            return
 
-    elif CHATS[session_id].get_chat_state() == State.CONVERSATION:          # CONVERSATION
+    # In the case where we are in the middle of a conversation, 
+    # it may happen that the user asks a completely off-topic question, 
+    # so this situation must be handled accordingly.
+    elif CHATS[session_id].get_chat_state() == State.CONVERSATION:
         recent_messages = CHATS[session_id].get_recent_messages()
-
-        
-        evaluation = proactiveLLM.evaluate_general_msg(
-            prompt, 
-            CHATS[session_id].get_chat_topic(),
-            recent_messages,
-            config.MAIN_MODEL
-        )
-
-
+        evaluation = proactiveLLM.evaluate_general_msg(prompt, CHATS[session_id].get_chat_topic(), recent_messages, config.MAIN_MODEL)
 
         if "CONTINUE_TOPIC" in evaluation:
-            CHATS[session_id].set_chat_state(State.CONVERSATION)
             ollama_prompt = conversation_llm(prompt, session_id)
 
             full_response = ''
@@ -359,21 +357,7 @@ def event_stream(session_id, prompt):
                 yield f"data: {chunk}\n\n"
 
             CHATS[session_id].add_assistant_message(full_response, session_id, config.CHATS_FILE)
-        # elif "CHANGE_TOPIC" in evaluation:
-        #     topic, topic_question = proactiveLLM.find_the_topic(ACTIVITIES)
-        #     if topic:
-        #         CHATS[session_id].set_chat_topic(topic)
-        #         CHATS[session_id].set_chat_state(State.TOPIC)
-        #         yield f"data: {topic_question}\n\n"
-        #         return
-        #     else:
-        #         # TODO no more topic
-        #         return
-        # elif "END" in evaluation:
-        #     yield f"data: Goodbye! It was nice chatting with you. Take care!\n\n"
-        #     return
         elif "NEW_QUESTION" in evaluation:
-            CHATS[session_id].set_chat_state(State.CONVERSATION)
             CHATS[session_id].set_chat_topic('')
             ollama_prompt = conversation_llm(prompt, session_id)
 
@@ -383,7 +367,14 @@ def event_stream(session_id, prompt):
                 yield f"data: {chunk}\n\n"
 
             CHATS[session_id].add_assistant_message(full_response, session_id, config.CHATS_FILE)
-        # else: # TODO
+        else:
+            if not retry:
+                yield from event_stream(session_id, prompt, retry=True)
+            else:
+                fallback_msg = "Sorry, I'm not sure how to respond. Could you please rephrase your message?"
+                yield f"data: {fallback_msg}\n\n"
+                CHATS[session_id].add_assistant_message(fallback_msg, session_id, config.CHATS_FILE)
+            return
 
 
 
@@ -391,6 +382,7 @@ def conversation_llm(input, session_id):
 
     prompt = config.INITIAL_PROMPT
 
+    # ----- RAG ------ #
     relevant_chunks = ""
     try:
         relevant_chunks = rag.get_relevant_chunks(prompt)
@@ -401,10 +393,11 @@ def conversation_llm(input, session_id):
                 f"{relevant_chunks}"
             )
 
-        utils.append_log("Successfully retrieved relevant chunks from RAG")
+        utils.append_server_log("Successfully retrieved relevant chunks from RAG")
     except Exception as e:
-        utils.append_log(f"Error retrieving chunks: {e}")
+        utils.append_server_log(f"Error retrieving chunks: {e}")
 
+    # ----- SHORT TERM MEMORY -----#
     recent_messages = CHATS[session_id].get_recent_messages()
 
     if recent_messages:
@@ -413,10 +406,13 @@ def conversation_llm(input, session_id):
             f"{recent_messages}"
         )
 
+    # ----- FINAL PROMPT ------ #
     prompt += (
         f"\nHere is the user's latest message that you need to reply to:\n"
         f"{input}"
     )
+
+    utils.append_conversation_log(f"Final PROMPT:\n{prompt}\n\n")
 
     return prompt
 
@@ -436,3 +432,21 @@ def generate_session_id():
         session_id = str(uuid.uuid4())
     
     return session_id
+
+
+
+
+
+'''# elif "CHANGE_TOPIC" in evaluation:
+        #     topic, topic_question = proactiveLLM.find_the_topic(ACTIVITIES)
+        #     if topic:
+        #         CHATS[session_id].set_chat_topic(topic)
+        #         CHATS[session_id].set_chat_state(State.TOPIC)
+        #         yield f"data: {topic_question}\n\n"
+        #         return
+        #     else:
+        #         # TODO no more topic
+        #         return
+        # elif "END" in evaluation:
+        #     yield f"data: Goodbye! It was nice chatting with you. Take care!\n\n"
+        #     return'''

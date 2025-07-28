@@ -265,3 +265,8 @@ main {
     background-color: rgb(238, 238, 238);
     color: black;
 }
+
+#session-id {
+    margin-top: 5px;
+    font-size: small;
+}

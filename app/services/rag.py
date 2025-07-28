@@ -1,8 +1,8 @@
 import app.services.config as config
+import app.services.utils as utils
 
 from qdrant_client import QdrantClient
 from qdrant_client.models import PointStruct, VectorParams, Distance
-from app.services.utils import append_log
 
 qdrant_client = None
 
@@ -13,9 +13,9 @@ def initialize_db():
     global qdrant_client
     try:
         # Prima, prova ad usare il client in-memory (nessun file di lock)
-        append_log("Attempting to create in-memory Qdrant client...")
+        utils.append_server_log("Attempting to create in-memory Qdrant client...")
         qdrant_client = QdrantClient(":memory:")
-        append_log("Using in-memory Qdrant client")
+        utils.append_server_log("Using in-memory Qdrant client")
 
         # Crea la collezione e riempila
         chunk_list = load_chunks(config.DOCUMENT_PATH)
@@ -33,13 +33,13 @@ def initialize_db():
             for i, (embedding, chunk) in enumerate(zip(embeddings, chunk_list))
         ]
         qdrant_client.upsert(collection_name=config.COLLECTION_NAME, points=points)
-        append_log(f"Successfully populated in-memory Qdrant with {len(points)} chunks")
+        utils.append_server_log(f"Successfully populated in-memory Qdrant with {len(points)} chunks")
     except FileNotFoundError:
-        append_log(f"Error: Document file '{config.DOCUMENT_PATH}' not found.")
+        utils.append_server_log(f"Error: Document file '{config.DOCUMENT_PATH}' not found.")
         qdrant_client = None
     except Exception as e:
-        append_log(f"Failed to initialize Qdrant client in memory: {e}")
-        append_log("Falling back to no RAG mode")
+        utils.append_server_log(f"Failed to initialize Qdrant client in memory: {e}")
+        utils.append_server_log("Falling back to no RAG mode")
         qdrant_client = None
 
 

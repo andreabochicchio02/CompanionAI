@@ -60,6 +60,8 @@ async function createSessionKey() {
         // If the server responded with success, store the session ID
         if (data.success) {
             SESSION_ID = data.message; // 'message' contains the session ID
+            const sessionID_paragraf = document.getElementById('session-id');
+            sessionID_paragraf.textContent = 'Session ID: ' + SESSION_ID;
         } else {
             console.error('Failed to create session:', data.message);
         }
@@ -315,6 +317,8 @@ async function cleanHistory(event) {
         if (chatList) {
             chatList.innerHTML = '';
         }
+
+        await createSessionKey();
 
         cleanChatArea();       // Clear the current chat messages (if defined)
         moveUpTextArea();  // Adjust textarea position after clearing

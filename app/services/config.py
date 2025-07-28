@@ -1,6 +1,9 @@
 from enum import Enum, auto
 from sentence_transformers import SentenceTransformer
 
+SERVER_LOG = "app/services/server_log.txt"
+CONVERSATION_LOG_FOLD = "app/services/conversation_log.txt"
+
 CHATS_FILE = 'app/chats.json'
 
 MAIN_MODEL = "llama3.2:3b"
@@ -18,11 +21,18 @@ MAX_TURNS = 10
 
 # ----- PROACTIVE LLM ----- #
 ACTIVITIES = [
-    "talk about the past", 
-    "talk about what you ate today", 
-    "talk about your children", 
-    "talk about music", 
-    "talk about sports"
+    {"activity": "talk about the past", "selected": False},
+    {"activity": "talk about what you ate today", "selected": False},
+    {"activity": "talk about your children", "selected": False},
+    {"activity": "talk about music", "selected": False},
+    {"activity": "talk about sports", "selected": False}
+]
+
+SUGGEST_TOPIC_SENTENCES = [
+    "Hello! I'm your companion. Would you like to ask me something specific, or would you prefer me to suggest a topic for our conversation?",
+    "Hey there! I'm ready to chat. Do you want to ask something specific, or should I propose some conversation ideas?",
+    "Hello! I'm at your service. Would you prefer to ask me something directly, or would you like me to offer some conversation starters?",
+    "Hey! I'm your companion. Do you want to dive into a specific question, or shall I bring up some ideas to chat about?"
 ]
 
 class State(Enum):
