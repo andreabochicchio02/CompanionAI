@@ -1,5 +1,5 @@
 import app.services.ollama as ollama
-import app.services.utilis as utilis
+import app.services.utils as utils
 
 import random
 
@@ -15,7 +15,7 @@ def evaluate_init_msg(user_input, model):
             )
 
     answer = ollama.query_ollama_no_stream(prompt, model).strip().upper()
-    utilis.append_log(f"User Response: {user_input}. Evaluation: {answer}")
+    utils.append_log(f"User Response: {user_input}. Evaluation: {answer}")
     return answer
 
 
@@ -31,7 +31,7 @@ def evaluate_type_topic(user_input, model):
             )
 
     answer = ollama.query_ollama_no_stream(prompt, model).strip().upper()
-    utilis.append_log(f"User Response: {user_input}. Evaluation: {answer}")
+    utils.append_log(f"User Response: {user_input}. Evaluation: {answer}")
     return answer
 
 
@@ -50,7 +50,7 @@ def evaluate_choose_topic(user_input, topic, model):
             )
 
     answer = ollama.query_ollama_no_stream(prompt, model).strip().upper()
-    utilis.append_log(f"User Response: {user_input}. Evaluation: {answer}")
+    utils.append_log(f"User Response: {user_input}. Evaluation: {answer}")
     return answer
 
 
@@ -59,10 +59,9 @@ def evaluate_general_msg(user_input, topic, short_memory, model):
                 f"Based on the user's message and the context of the ongoing conversation, determine what the user intends to do next.\n"
                 f"Respond only with one of the following options\n"
                 f"CONTINUE_TOPIC — If the user is continuing the current topic, expanding on it, replying to a question, or asking a related follow-up.\n"
-                f"CHANGE_TOPIC — If the user explicitly asks you to suggest a new topic to talk about.\n"
                 f"END — if the user wants to end or close the conversation.\n"
                 f"NEW_QUESTION — if the user asks a new, open-ended question that is unrelated to the current topic.\n"
-                f"Do not include anything else in your reply, only CONTINUE_TOPIC, CHANGE_TOPIC, END or NEW_QUESTION\n"
+                f"Do not include anything else in your reply, only CONTINUE_TOPIC, END or NEW_QUESTION\n"
 
                 f"Current topic: {topic}\n"
 
@@ -72,7 +71,7 @@ def evaluate_general_msg(user_input, topic, short_memory, model):
             )
 
     answer = ollama.query_ollama_no_stream(prompt, model).strip().upper()
-    utilis.append_log(f"User Response: {user_input}. Evaluation: {answer}")
+    utils.append_log(f"User Response: {user_input}. Evaluation: {answer}")
     return answer
 
 

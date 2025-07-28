@@ -22,6 +22,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     const micButton = document.getElementById('mic-button');
     const ttsToggle = document.querySelector('.tts-toggle');
     const newChat = document.getElementById('new-chat');
+    const cleanHistoryBtn = document.getElementById('clear-history-btn');
+
+    cleanHistoryBtn.addEventListener('click', (event) => cleanHistory(event));
 
     // Handle "New Chat" button click
     newChat.addEventListener('click', (event) => createNewChat(event));
@@ -61,7 +64,7 @@ async function uploadHistoryChats() {
         });
 
         if (!response.ok) {
-            throw new Error(`Errore HTTP! Status: ${response.status}`);
+            return;       
         }
 
         const sessionIds = await response.json();  // È un array ora
@@ -341,6 +344,22 @@ async function sendMessageToLLM(text) {
         removeThinkingDots();
         console.error("Fetch failed:", err);
     });
+}
+
+async function cleanHistory(event) {
+    event.preventDefault();
+
+    const res = await fetch('/chatLLM/cleanChats', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+    });
+
+    const chatList = document.getElementById('chat-list');
+    chatList.innerHTML = '';
+
+    clearChat();
+
+    moveUpTextArea();
 }
 
 // Aggiunge un messaggio "sta pensando..." con puntini animati

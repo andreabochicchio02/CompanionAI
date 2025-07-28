@@ -1,7 +1,5 @@
-[2025-07-28 11:19:15]	/chatLLM/start request completed successfully.
-[2025-07-28 11:19:25]	User Response: Hello. Evaluation: INITIAL
-[2025-07-28 11:19:36]	User Response: suggest me a topic. Evaluation: LLM_TOPIC
-[2025-07-28 11:19:48]	User Response: yes. Evaluation: CONTINUE_TOPIC
-[2025-07-28 11:20:27]	Response generated and sent successfully (stream=True)
-[2025-07-28 11:21:25]	User Response: i really like pop music. Evaluation: CONTINUE_TOPIC
-[2025-07-28 11:22:07]	Response generated and sent successfully (stream=True)
+[2025-07-28 13:12:08]	Initializing RAG service...
+[2025-07-28 13:12:08]	Attempting to create in-memory Qdrant client...
+[2025-07-28 13:12:08]	Using in-memory Qdrant client
+[2025-07-28 13:12:09]	Successfully populated in-memory Qdrant with 11 chunks
+[2025-07-28 13:12:09]	RAG service initialized successfully.

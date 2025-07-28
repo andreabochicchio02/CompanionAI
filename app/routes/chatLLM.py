@@ -2,20 +2,16 @@
 import app.services.proactiveLLM as proactiveLLM
 import app.services.ollama as ollama
 from app.services.shortTermMemory import ChatManager
-import app.services.utilis as utilis
+import app.services.utils as utils
 import app.services.rag as rag
 
 # --- Standard library imports ---
 import uuid, json
 from datetime import datetime
 from flask import Blueprint, render_template, request, jsonify, Response
-from sentence_transformers import SentenceTransformer
 from enum import Enum, auto
-from qdrant_client import QdrantClient
-from qdrant_client.models import VectorParams, Distance, PointStruct
 
 CHATS_FILE = 'app/chats.json'
-
 
 bp = Blueprint('chatLLM', __name__)
 
@@ -37,18 +33,6 @@ MAIN_MODEL = "llama3.2:3b"
 SUMMARIZER_MODEL = "gemma3:1b"
 MAX_TURNS = 10
 
-# --- RAG config ---
-EMBEDDING_MODEL = SentenceTransformer("all-MiniLM-L6-v2")
-COLLECTION_NAME = "document_chunks"
-DOCUMENT_PATH = "document.txt"
-TOP_K = 3
-MIN_SCORE = 0.20
-
-# Inizializza Qdrant tramite funzione utility in rag
-#DB_PATH = "qdrant_data"
-EMBEDDING_MODEL_NAME = "all-MiniLM-L6-v2"
-MAX_TOKENS = 500
-
 CHATS = {}
 
 ACTIVITIES = [
@@ -63,43 +47,19 @@ class State(Enum):
     START = auto()
     CHOOSING = auto()
     TOPIC = auto()
-    CONVERSATION = auto()    
+    CONVERSATION = auto()  
 
 
-# --- Qdrant in-memory initialization ---
-# Prova diversi approcci per inizializzare Qdrant
-try:
-    # Prima, prova ad usare il client in-memory (nessun file di lock)
-    
-    print("Attempting to create in-memory Qdrant client...")
-    
-    # Opzione 1: Client in-memory
-    qdrant_client = QdrantClient(":memory:")
-    print("Using in-memory Qdrant client")
-    
-    # Crea la collezione e riempila
-    chunk_list = rag.load_chunks(DOCUMENT_PATH)
-    embeddings = rag.compute_embeddings(EMBEDDING_MODEL, chunk_list)
-    
-    # Inizializza la collezione
-    
-    qdrant_client.recreate_collection(
-        collection_name=COLLECTION_NAME,
-        vectors_config=VectorParams(size=len(embeddings[0]), distance=Distance.COSINE),
-    )
-    
-    # Aggiungi i punti
-    points = [
-        PointStruct(id=i, vector=embedding, payload={"chunk": chunk})
-        for i, (embedding, chunk) in enumerate(zip(embeddings, chunk_list))
-    ]
-    qdrant_client.upsert(collection_name=COLLECTION_NAME, points=points)
-    print(f"Successfully populated in-memory Qdrant with {len(points)} chunks")
-    
-except Exception as e:
-    print(f"Failed to initialize Qdrant client in memory: {e}")
-    print("Falling back to no RAG mode")
-    qdrant_client = None
+
+utils.clear_log_file()
+utils.clear_log_complete_file()
+
+
+# inizializzazione db vettoriale
+# Initialization
+utils.append_log("Initializing RAG service...")
+rag.initialize_db()
+utils.append_log("RAG service initialized successfully.")
 
 
 @bp.route('/chatLLM')
@@ -130,9 +90,7 @@ def start_chat():
     # Commenting it out to allow conversation history to persist during the session.
     # shortTermMemory.clean_history()
 
-    utilis.clear_log_file()
-    utilis.clear_log_complete_file()
-    utilis.append_log("/chatLLM/start request completed successfully.")
+    utils.append_log("/chatLLM/start request completed successfully.")
 
     return jsonify({'session_id': session_id})
 
@@ -162,11 +120,17 @@ def responseLLM():
     
     return Response(event_stream(session_id, prompt), mimetype='text/event-stream')
 
+
 @bp.route('/chatLLM/uploadChats', methods=['POST'])
 def get_chats():
     with open(CHATS_FILE, 'r', encoding='utf-8') as f:
-        data = json.load(f)
+        content = f.read().strip()
 
+    if not content:
+        # Se il file è vuoto, restituisci risposta vuota
+        return jsonify([])
+
+    data = json.loads(content)
     # Crea una lista di tuple (session_id, timestamp)
     sessions_with_timestamps = []
     for session_id, chat in data.items():
@@ -187,6 +151,7 @@ def get_chats():
     sorted_session_ids = [session_id for session_id, _ in sorted_sessions]
 
     return jsonify(sorted_session_ids)
+
 
 @bp.route('/chatLLM/getChat/<session_id>', methods=['POST'])
 def get_single_chat(session_id):
@@ -254,6 +219,7 @@ def event_stream(session_id, prompt):
                 yield f"data: {chunk}\n\n"
 
             CHATS[session_id].add_assistant_message(full_response, session_id, CHATS_FILE)
+            return
         # else: # TODO
 
     elif CHATS[session_id].get_chat_state() == State.TOPIC:             # PROPOSING A TOPIC
@@ -273,12 +239,16 @@ def event_stream(session_id, prompt):
                 yield f"data: {chunk}\n\n"
 
             CHATS[session_id].add_assistant_message(full_response, session_id, CHATS_FILE)
+            return
         elif "CHANGE_TOPIC" in evaluation:
             topic, topic_question = proactiveLLM.find_the_topic(ACTIVITIES)
             if topic:
                 CHATS[session_id].set_chat_topic(topic)
                 CHATS[session_id].set_chat_state(State.TOPIC)
+
                 yield f"data: {topic_question}\n\n"
+                
+                CHATS[session_id].add_assistant_message(topic_question, session_id, CHATS_FILE)
                 return
             else:
                 # TODO no more topic
@@ -288,6 +258,7 @@ def event_stream(session_id, prompt):
     elif CHATS[session_id].get_chat_state() == State.CONVERSATION:          # CONVERSATION
         recent_messages = CHATS[session_id].get_recent_messages()
 
+        
         evaluation = proactiveLLM.evaluate_general_msg(
             prompt, 
             CHATS[session_id].get_chat_topic(),
@@ -307,19 +278,19 @@ def event_stream(session_id, prompt):
                 yield f"data: {chunk}\n\n"
 
             CHATS[session_id].add_assistant_message(full_response, session_id, CHATS_FILE)
-        elif "CHANGE_TOPIC" in evaluation:
-            topic, topic_question = proactiveLLM.find_the_topic(ACTIVITIES)
-            if topic:
-                CHATS[session_id].set_chat_topic(topic)
-                CHATS[session_id].set_chat_state(State.TOPIC)
-                yield f"data: {topic_question}\n\n"
-                return
-            else:
-                # TODO no more topic
-                return
-        elif "END" in evaluation:
-            yield f"data: Goodbye! It was nice chatting with you. Take care!\n\n"
-            return
+        # elif "CHANGE_TOPIC" in evaluation:
+        #     topic, topic_question = proactiveLLM.find_the_topic(ACTIVITIES)
+        #     if topic:
+        #         CHATS[session_id].set_chat_topic(topic)
+        #         CHATS[session_id].set_chat_state(State.TOPIC)
+        #         yield f"data: {topic_question}\n\n"
+        #         return
+        #     else:
+        #         # TODO no more topic
+        #         return
+        # elif "END" in evaluation:
+        #     yield f"data: Goodbye! It was nice chatting with you. Take care!\n\n"
+        #     return
         elif "NEW_QUESTION" in evaluation:
             CHATS[session_id].set_chat_state(State.CONVERSATION)
             CHATS[session_id].set_chat_topic('')
@@ -340,27 +311,26 @@ def conversation_llm(input, session_id):
     prompt = INITIAL_PROMPT
 
     relevant_chunks = ""
-    if qdrant_client:
-        try:
-            relevant_chunks = rag.get_relevant_chunks(qdrant_client, COLLECTION_NAME, EMBEDDING_MODEL, prompt, TOP_K, MIN_SCORE)
+    try:
+        relevant_chunks = rag.get_relevant_chunks(prompt)
 
+        if relevant_chunks:
             prompt += (
                 f"\nThese are some pieces of information you can base your response on, and the information refers to the person you are talking to:\n"
                 f"{relevant_chunks}"
             )
 
-            print("Successfully retrieved relevant chunks from RAG")
-        except Exception as e:
-            print(f"Error retrieving chunks: {e}")
-    else:
-        print("Skipping RAG retrieval - Qdrant client not available")
+        utils.append_log("Successfully retrieved relevant chunks from RAG")
+    except Exception as e:
+        utils.append_log(f"Error retrieving chunks: {e}")
 
     recent_messages = CHATS[session_id].get_recent_messages()
 
-    prompt += (
-        f"\nHere is the conversation so far with the user:\n"
-        f"{recent_messages}"
-    )
+    if recent_messages:
+        prompt += (
+            f"\nHere is the conversation so far with the user:\n"
+            f"{recent_messages}"
+        )
 
     prompt += (
         f"\nHere is the user's latest message that you need to reply to:\n"
@@ -369,116 +339,6 @@ def conversation_llm(input, session_id):
 
     return prompt
 
-
-
-
-
-
-'''
-def event_stream(session_id, prompt):
-    # Inizializza stati della sessione se non presenti
-    if 'topic' not in CHATS[session_id]:
-        CHATS[session_id]['topic'] = None
-    # if 'topic_suggested' not in CHATS[session_id]:
-    #     CHATS[session_id]['topic_suggested'] = False
-
-    # Recupera i messaggi recenti per dare contesto alla valutazione
-
-    # Se c'è un topic attivo, valuta se l'utente vuole continuare, cambiare o chiudere
-    if CHATS[session_id]['topic']:
-        recent_messages = shortTermMemory.get_recent_messages(MAX_TURNS)
-        topic_eval = proactiveLLM.evaluate_topic_continuation(
-            prompt,
-            CHATS[session_id]['topic'],
-            MAIN_MODEL,
-            recent_messages=recent_messages
-        )
-        if topic_eval == "CONTINUE_TOPIC":
-            recent_messages = shortTermMemory.get_recent_messages(MAX_TURNS)
-            # L'utente accetta il topic suggerito, si continua su quello
-            pass  # prosegui con la risposta normale
-        elif topic_eval == "CHANGE_TOPIC":
-            # L'utente vuole cambiare argomento: capiamo se è una domanda diretta o vuole un nuovo suggerimento
-            recent_messages = shortTermMemory.get_recent_messages(MAX_TURNS)
-            change_eval = proactiveLLM.evaluate_user_message(
-                recent_messages,
-                prompt,
-                MAIN_MODEL
-            )
-            if change_eval == "OWN_QUESTION":
-                recent_messages = shortTermMemory.get_recent_messages(MAX_TURNS)
-                # Procedi con la risposta normale (non suggerire un topic, resetta il topic attivo)
-                CHATS[session_id]['topic'] = None
-                # ...continua dopo il blocco if, generando la risposta normale...
-            elif change_eval == "SUGGEST_TOPIC":
-                recent_messages = shortTermMemory.get_recent_messages(MAX_TURNS)
-                activity, topic_question = proactiveLLM.suggest_new_topic(
-                    ACTIVITIES,
-                    MAIN_MODEL,
-                    current_topic=CHATS[session_id]['topic']
-                )
-                if activity:
-                    CHATS[session_id]['topic'] = activity
-                    yield f"data: {topic_question}\n\n"
-                    return
-                else:
-                    CHATS[session_id]['topic'] = None
-                    yield f"data: What would you like to talk about then?\n\n"
-                    return
-        elif topic_eval == "END_CONVERSATION":
-            yield f"data: Goodbye! It was nice chatting with you. Take care!\n\n"
-            return
-    else:
-        # Nessun topic attivo: valuta il messaggio normalmente
-        recent_messages = shortTermMemory.get_recent_messages(MAX_TURNS)
-        evaluation = proactiveLLM.evaluate_user_message(
-            recent_messages,
-            prompt, 
-            MAIN_MODEL
-        )
-
-        if evaluation == "END_CONVERSATION":
-            yield f"data: Goodbye! It was nice chatting with you. Take care!\n\n"
-            return
-        elif evaluation == "SUGGEST_TOPIC":
-            activity, topic_question = proactiveLLM.find_the_topic(ACTIVITIES)
-            if activity:
-                CHATS[session_id]['topic'] = activity
-                yield f"data: {topic_question}\n\n"
-                return
-            else:
-                yield f"data: I'm sorry, I don't have any more topics to suggest. What would you like to talk about?\n\n"
-                return
-
-    # Gestione normale delle risposte con RAG
-    relevant_chunks = ""
-    if qdrant_client:
-        try:
-            relevant_chunks = rag.get_relevant_chunks(qdrant_client, COLLECTION_NAME, EMBEDDING_MODEL, prompt, TOP_K, MIN_SCORE)
-            print("Successfully retrieved relevant chunks from RAG")
-        except Exception as e:
-            print(f"Error retrieving chunks: {e}")
-    else:
-        print("Skipping RAG retrieval - Qdrant client not available")
-
-    # Costruisci il prompt per Ollama
-    recent_messages = shortTermMemory.get_recent_messages(MAX_TURNS)
-    context_prompt = INITIAL_PROMPT
-    if CHATS[session_id]['topic']:
-        context_prompt += f"\n\nCurrent conversation topic: {CHATS[session_id]['topic']}. Keep the conversation relevant to this topic while being natural and engaging."
-    if not recent_messages.strip():
-        ollama_prompt = rag.format_rag_prompt(context_prompt, relevant_chunks, "", prompt)
-    else:
-        ollama_prompt = rag.format_rag_prompt(context_prompt, relevant_chunks, recent_messages, prompt)
-
-    full_response = ''
-    for chunk in ollama.query_ollama_streaming(ollama_prompt, MAIN_MODEL):
-        full_response += chunk
-        yield f"data: {chunk}\n\n"
-
-    CHATS[session_id]['assistantAI'].append(full_response)
-    shortTermMemory.update_history(CHATS[session_id]['user'][-1], full_response, MAX_TURNS, SUMMARIZER_MODEL)
-'''    
 
 @bp.route('/chatLLM/newChat', methods=['POST'])
 def clear_memory():
@@ -489,7 +349,24 @@ def clear_memory():
     while session_id in CHATS:
         session_id = str(uuid.uuid4())
 
+    utils.clear_log_complete_file()
+
     # Initialize session data
     CHATS[session_id] = ChatManager(SUMMARIZER_MODEL, State.START, MAX_TURNS)
     # shortTermMemory.clean_history()
     return jsonify({'session_id': session_id})
+
+
+@bp.route('/chatLLM/cleanChats', methods=['POST'])
+def clean_chats():
+    global CHATS
+    CHATS = {}
+
+    try:
+        # Sovrascrive il file con una lista vuota o dizionario vuoto, a seconda del formato
+        with open(CHATS_FILE, 'w') as f:
+            f.write('')  # oppure '{}' se il file contiene un dizionario
+
+        return jsonify({'message': 'Chats cleaned successfully'}), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
