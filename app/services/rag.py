@@ -1,22 +1,10 @@
+import app.services.config as config
+
 from qdrant_client import QdrantClient
 from qdrant_client.models import PointStruct, VectorParams, Distance
-from sentence_transformers import SentenceTransformer
 from app.services.utils import append_log
 
-# --- RAG config ---
-EMBEDDING_MODEL = SentenceTransformer("all-MiniLM-L6-v2")
-COLLECTION_NAME = "document_chunks"
-DOCUMENT_PATH = "document.txt"
-TOP_K = 3
-MIN_SCORE = 0.1
-
 qdrant_client = None
-
-# Al momento queste variabili non sono usate
-#DB_PATH = "qdrant_data"
-#EMBEDDING_MODEL_NAME = "all-MiniLM-L6-v2"
-#MAX_TOKENS = 500
-
 
 def initialize_db():
     """
@@ -30,12 +18,12 @@ def initialize_db():
         append_log("Using in-memory Qdrant client")
 
         # Crea la collezione e riempila
-        chunk_list = load_chunks(DOCUMENT_PATH)
-        embeddings = compute_embeddings(EMBEDDING_MODEL, chunk_list)
+        chunk_list = load_chunks(config.DOCUMENT_PATH)
+        embeddings = compute_embeddings(config.EMBEDDING_MODEL, chunk_list)
 
         # Inizializza la collezione
         qdrant_client.recreate_collection(
-            collection_name=COLLECTION_NAME,
+            collection_name=config.COLLECTION_NAME,
             vectors_config=VectorParams(size=len(embeddings[0]), distance=Distance.COSINE),
         )
 
@@ -44,10 +32,10 @@ def initialize_db():
             PointStruct(id=i, vector=embedding, payload={"chunk": chunk})
             for i, (embedding, chunk) in enumerate(zip(embeddings, chunk_list))
         ]
-        qdrant_client.upsert(collection_name=COLLECTION_NAME, points=points)
+        qdrant_client.upsert(collection_name=config.COLLECTION_NAME, points=points)
         append_log(f"Successfully populated in-memory Qdrant with {len(points)} chunks")
     except FileNotFoundError:
-        append_log(f"Error: Document file '{DOCUMENT_PATH}' not found.")
+        append_log(f"Error: Document file '{config.DOCUMENT_PATH}' not found.")
         qdrant_client = None
     except Exception as e:
         append_log(f"Failed to initialize Qdrant client in memory: {e}")
@@ -148,9 +136,9 @@ def get_relevant_chunks(query):
     """
     
     print("Sono qui")
-    query_embedding = EMBEDDING_MODEL.encode([query])[0]
+    query_embedding = config.EMBEDDING_MODEL.encode([query])[0]
     
-    selected_chunks, selected_scores = search_chunks(qdrant_client, COLLECTION_NAME, query_embedding, TOP_K, MIN_SCORE)
+    selected_chunks, selected_scores = search_chunks(qdrant_client, config.COLLECTION_NAME, query_embedding, config.TOP_K, config.MIN_SCORE)
 
     # Migliorato il prompt del RAG per estrarre meglio le informazioni
     if not selected_chunks:

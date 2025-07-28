@@ -30,9 +30,9 @@ body {
 }
 
 .app-icon {
-    width: 32px;
-    height: 32px;
-    margin-right: 8px;
+    width: 40px;
+    height: 40px;
+    margin-right: 20px;
 }
 
 .app-name {
@@ -47,7 +47,7 @@ body {
     padding: 10px;
     border-radius: 6px;
     cursor: pointer;
-    margin-top: 40px;
+    margin-top: 30px;
     margin-bottom: 30px;
     font-size: large;
 }
@@ -58,6 +58,8 @@ body {
 
 #chat-history-title {
     font-size: medium;
+    border-top: 1px solid #ccc;
+    padding-top: 10px;
 }
 
 .chat-list {
@@ -235,7 +237,9 @@ main {
 .messages {
     display: none;
     flex-direction: column;
-    width: 70%;
+    width: 100%;
+    margin-top: 10px;
+    padding: 0 15%;
     margin-bottom: 1rem;
     overflow-y: auto;
     transition: height 0.7s ease;
@@ -250,13 +254,13 @@ main {
     font-size: 0.95rem;
 }
 
-.message.sent {
+.message.user {
     align-self: flex-end;
     background-color: #36679B;
     color: white;
 }
 
-.message.received {
+.message.assistantAI {
     align-self: flex-start;
     background-color: rgb(238, 238, 238);
     color: black;

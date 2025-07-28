@@ -1,5 +1,7 @@
-[2025-07-28 13:12:08]	Initializing RAG service...
-[2025-07-28 13:12:08]	Attempting to create in-memory Qdrant client...
-[2025-07-28 13:12:08]	Using in-memory Qdrant client
-[2025-07-28 13:12:09]	Successfully populated in-memory Qdrant with 11 chunks
-[2025-07-28 13:12:09]	RAG service initialized successfully.
+[2025-07-28 17:33:02]	/chatLLM/start request completed successfully.
+[2025-07-28 17:33:14]	User Response: hello. Evaluation: INITIAL
+[2025-07-28 17:33:17]	/chatLLM/start request completed successfully.
+[2025-07-28 17:33:23]	User Response: Hello. Evaluation: INITIAL
+[2025-07-28 17:33:25]	/chatLLM/start request completed successfully.
+[2025-07-28 17:33:31]	User Response: hello. Evaluation: INITIAL
+[2025-07-28 17:33:48]	User Response: suggest me a topic. Evaluation: LLM_TOPIC

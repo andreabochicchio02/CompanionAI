@@ -1,110 +1,217 @@
-let SESSION_KEY = 0
-let N_MESSAGES = 0
-let ENABLE_TTS = false;
+import { observer, addThinkingDots, removeThinkingDots } from './thinking-dots.js';
 
-// Create a MutationObserver to watch for DOM changes
-const observer = new MutationObserver((mutations) => {
-    mutations.forEach((mutation) => {
-        // Loop through all nodes that were removed from the DOM
-        mutation.removedNodes.forEach((node) => {
-            // If the removed node is the 'thinking-dots' element and has an active interval
-            if (node.id === 'thinking-dots' && node._dotsInterval) {
-                // Stop the dot animation interval when the element is removed
-                clearInterval(node._dotsInterval);
-            }
-        });
-    });
-}); 
+let SESSION_ID = 0
+let TEXTAREACENTERED = true;
+let ENABLE_TTS = false;
 
 document.addEventListener('DOMContentLoaded', async () => {
     const textArea = document.getElementById('textarea');
     const sendButton = document.getElementById('send-button');
     const micButton = document.getElementById('mic-button');
-    const ttsToggle = document.querySelector('.tts-toggle');
+    const ttsToggle = document.getElementById('tts-toggle');
     const newChat = document.getElementById('new-chat');
     const cleanHistoryBtn = document.getElementById('clear-history-btn');
 
-    cleanHistoryBtn.addEventListener('click', (event) => cleanHistory(event));
-
-    // Handle "New Chat" button click
-    newChat.addEventListener('click', (event) => createNewChat(event));
-
-    // Automatically resize the message input box as the user types
     textArea.addEventListener('input', () => textAreaResize());
 
-    // Handle message sending based on which button was clicked
     sendButton.addEventListener('click', (event) => handleClickSendButton(event));
     micButton.addEventListener('click', (event) => handleClickMic(event));
 
-    // Send message on Enter key, insert line break on Shift+Enter
+    ttsToggle.addEventListener('change', (event) => {ENABLE_TTS = event.target.checked;});
+    
+    newChat.addEventListener('click', (event) => createNewChat(event));
+
+    cleanHistoryBtn.addEventListener('click', (event) => cleanHistory(event));
+
     textArea.addEventListener('keydown', (event) => {
         if (event.key === 'Enter' && !event.shiftKey) {
             handleClickSendButton(event);
         }
     });
 
-    // Handle the toggle to enable or disable TTS (Text-to-Speech)
-    ttsToggle.addEventListener('change', (event) => {ENABLE_TTS = event.target.checked;});
-
-    // Get the session key and automatically start the chat
-    SESSION_KEY = await createSessionKey();
+    await createSessionKey();
+    
+    await uploadHistoryChats();
 
     // Start observing message container for changes (e.g. to stop animation)
     observer.observe(document.getElementById('messages'), { childList: true });
-
-    await uploadHistoryChats();
 });
 
+
+/**
+ * Sends a POST request to the backend to start a new chat session.
+ * If successful, assigns the session ID to the global variable SESSION_ID.
+ * Logs an error message to the console if the request fails or the server returns an error.
+ */
+async function createSessionKey() {
+    try {
+        const response = await fetch('/chatLLM/newSessionID', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' }
+        });
+
+        if (!response.ok) {
+            console.error('Failed to fetch chat sessions, status:', response.status);
+            return;
+        }
+
+        const data = await response.json();
+
+        // If the server responded with success, store the session ID
+        if (data.success) {
+            SESSION_ID = data.message; // 'message' contains the session ID
+        } else {
+            console.error('Failed to create session:', data.message);
+        }
+
+    } catch (error) {
+        // Handle fetch or parsing errors
+        console.error('Error creating session:', error);
+    }
+}
+
+/**
+ * Sends a user message to the backend LLM service and handles the streamed response.
+ * It disables input buttons, displays the user's message, shows a "thinking" indicator,
+ * then listens for server-sent events to progressively display the assistant's response.
+ * Enables buttons and optionally triggers TTS when the response ends or errors.
+ * @param {string} text - The user input message to send.
+ */
+async function sendMessageToLLM(text) {
+    if (TEXTAREACENTERED) {
+        moveDownTextArea();
+        createChatButton(SESSION_ID, new Date().toLocaleString(), true);
+    }
+
+    // Disable input buttons while waiting for the response
+    disableSendButtons();
+
+    // Display the user's message immediately
+    addMessage(text, 'user');
+
+    // Clear the input textarea
+    document.getElementById('textarea').value = '';
+
+    // Show thinking dots animation
+    addThinkingDots();
+
+    try {
+        // Send the user prompt to the backend API
+        const response = await fetch('/chatLLM/sendPrompt', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                prompt: text,
+                sessionId: SESSION_ID
+            })
+        });
+
+        if (!response.ok) {
+            console.error('Failed to fetch chat sessions, status:', response.status);
+            return;
+        }
+
+        const result = await response.json();
+
+        // If the backend reports failure, log error and stop
+        if (!result.success) {
+            console.error('Prompt submission failed:', result.message);
+            removeThinkingDots();
+            return;
+        }
+
+        // Start receiving streamed assistant response via EventSource
+        const evtSource = new EventSource('/chatLLM/responseLLM?session_id=' + encodeURIComponent(SESSION_ID));
+
+        let first_token = true;
+
+        // Handle each chunk of streamed data from the server
+        evtSource.onmessage = (e) => {
+            if (!e.data) return;  // Ignore empty messages
+
+            if (first_token) {
+                removeThinkingDots();
+                addMessage(e.data, 'assistantAI');  // Show the first token as a new message
+                first_token = false;
+            } else {
+                // Append subsequent tokens to the last message element
+                const lastMessage = document.getElementById('messages').lastElementChild;
+                if (lastMessage) {
+                    lastMessage.textContent += e.data;
+                }
+            }
+        };
+
+        // Handle errors or stream closure
+        evtSource.onerror = (e) => {
+            removeThinkingDots();
+            if (ENABLE_TTS) {
+                const last = document.getElementById('messages').lastElementChild;
+                if (last) textToSpeech(last.textContent);
+            }
+            activateSendButtons();
+            evtSource.close();
+        };
+
+    } catch (error) {
+        // Remove thinking indicator and log fetch error
+        removeThinkingDots();
+        console.error("Prompt request failed:", error);
+    }
+}
+
+/**
+ * Fetches the list of chat sessions from the backend,
+ * then populates the #chat-list container with buttons labeled by their timestamp.
+ * Clicking a button loads the corresponding chat session.
+ */
 async function uploadHistoryChats() {
     try {
-        // Richiesta al backend per ottenere la lista dei session ID
+        // Request the list of session IDs and timestamps from the backend
         const response = await fetch('/chatLLM/uploadChats', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' }
         });
 
         if (!response.ok) {
-            return;       
-        }
-
-        const sessionIds = await response.json();  // È un array ora
-
-        const container = document.getElementById('chat-list');
-        if (!container) {
-            console.error("Contenitore #chat-list non trovato nel DOM");
+            console.error('Failed to fetch chat sessions, status:', response.status);
             return;
         }
 
-        // Pulisce il contenitore prima di aggiungere nuovi bottoni (opzionale)
-        container.innerHTML = '';
+        const data = await response.json();
 
-        // Crea un bottone per ogni session ID
-        sessionIds.forEach(sessionId => {
-            const button = document.createElement('button');
-            button.id = sessionId;
-            button.textContent = sessionId;
-            button.className = 'chat-item';
-            button.addEventListener('click', () => {
-                loadChat(sessionId);  // Funzione che carica i dettagli della chat
-            });
-            container.appendChild(button);
+        if (!data.success) {
+            return;
+        }
+
+        // data.message is an array of [sessionId, timestamp] tuples
+        const sessions = data.message;
+
+        const container = document.getElementById('chat-list');
+        container.innerHTML = '';   // Clear previous buttons if any
+
+        // Create a button for each session, labeled by formatted timestamp
+        sessions.forEach(([sessionId, timestamp]) => {
+            createChatButton(sessionId, formatDate(timestamp), false);
         });
+
     } catch (error) {
-        console.error('Errore nel recupero o parsing dei session ID:', error);
+        console.error('Error fetching or parsing session IDs:', error);
     }
 }
 
+
+/**
+ * Loads the chat history for the given session ID,
+ * highlights the corresponding chat button,
+ * and displays the chat messages in the UI.
+ * @param {string} sessionId - The ID of the chat session to load.
+ */
 async function loadChat(sessionId) {
-    // Rimuovi evidenziazioni e abilita tutti i bottoni
-    const container = document.getElementById('chat-list');
-    const children = container.children;  // HTMLCollection di tutti i figli
+    // Reset all chat list buttons to default state
+    resetChatListButtons();
 
-    for (const child of children) {
-        child.style.backgroundColor = '';  // rimuovi sfondo
-        child.disabled = false;             // abilita se è un elemento disabilitabile (es. button)
-    }
-
-    // Evidenzia e disabilita il bottone cliccato
+    // Highlight and disable the active chat button
     const activeButton = document.getElementById(sessionId);
     if (activeButton) {
         activeButton.style.backgroundColor = 'lightgrey';
@@ -112,132 +219,190 @@ async function loadChat(sessionId) {
     }
 
     try {
-        const response = await fetch(`/chatLLM/getChat/${sessionId}`, {
+        // Send a POST request to fetch the chat data for the given session ID
+        const response = await fetch('/chatLLM/getChat', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ 
+                session_id: sessionId 
+            })
+        });
+
+        if (!response.ok) {
+            console.error('Failed to fetch chat session, status:', response.status);
+            return;
+        }
+
+        const data = await response.json();
+
+        // Check if the backend returned a success status
+        if (!data.success) {
+            console.error('Failed to load chat:', data.message);
+            return;
+        }
+
+        cleanChatArea();
+        if(TEXTAREACENTERED){
+            moveDownTextArea();
+        }
+
+        // Extract user and assistant messages from the response
+        const userMessages = data.message.user;
+        const assistantMessages = data.message.assistantAI;
+
+        // Determine the number of messages to display based on the longer array
+        const maxLength = Math.max(userMessages.length, assistantMessages.length);
+
+        // Loop through and add each message to the chat UI in the correct order
+        for (let i = 0; i < maxLength; i++) {
+            if (userMessages[i]) {
+                addMessage(userMessages[i], 'user');       // Add user message
+            }
+            if (assistantMessages[i]) {
+                addMessage(assistantMessages[i], 'assistantAI');  // Add assistant response
+            }
+        }
+    } catch (error) {
+        console.error('Error loading chat session:', error);
+    }
+}
+
+/**
+ * Handles the creation of a new chat session.
+ * Prevents the default form/button behavior,
+ * clears the current chat area,
+ * adjusts the textarea position,
+ * resets the chat list buttons,
+ * and creates a new session key asynchronously.
+ * @param {Event} event - The event triggered by user interaction.
+ */
+async function createNewChat(event) {
+    event.preventDefault();
+
+    cleanChatArea();       // Clear chat messages and UI elements
+
+    moveUpTextArea();      // Adjust textarea position (e.g., move it up)
+
+    resetChatListButtons(); // Reset styles and states of chat session buttons
+
+    await createSessionKey(); // Generate and set a new session ID asynchronously
+}
+
+
+/**
+ * Sends a POST request to clean all stored chat sessions,
+ * then clears the chat list UI and resets the chat input area.
+ * @param {Event} event - The event triggered by user interaction.
+ */
+async function cleanHistory(event) {
+    event.preventDefault();
+
+    try {
+        const res = await fetch('/chatLLM/cleanChats', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' }
         });
 
-        if (!response.ok) {
-            throw new Error(`Errore HTTP! Status: ${response.status}`);
-        }
+        const data = await res.json();
 
-        const chat = await response.json();
-
-        if (!chat || !chat.user || !chat.assistantAI) {
-            console.warn('Chat non valida o incompleta:', chat);
+        if (!data.success) {
+            console.error('Failed to clean chats:', data.message);
             return;
         }
 
-        // Pulisci l'interfaccia chat (se vuoi)
-        clearChat(); // questa è opzionale, solo se esiste
-        moveDownTextArea();
-
-        const userMessages = chat.user;
-        const assistantMessages = chat.assistantAI;
-
-        const maxLength = Math.max(userMessages.length, assistantMessages.length);
-
-        N_MESSAGES = maxLength;
-
-        for (let i = 0; i < maxLength; i++) {
-            if (userMessages[i]) {
-                addMessage(userMessages[i], 'sent');      // messaggio utente
-            }
-            if (assistantMessages[i]) {
-                addMessage(assistantMessages[i], 'received');  // risposta AI
-            }
+        // Clear the chat list container in the UI
+        const chatList = document.getElementById('chat-list');
+        if (chatList) {
+            chatList.innerHTML = '';
         }
+
+        cleanChatArea();       // Clear the current chat messages (if defined)
+        moveUpTextArea();  // Adjust textarea position after clearing
     } catch (error) {
-        console.error('Errore nel caricamento della chat:', error);
+        console.error('Error cleaning chat history:', error);
     }
 }
 
-function clearChat(){
+
+/**
+ * Clears all chat messages from the chat area in the UI.
+ */
+function cleanChatArea() {
     const messagesDiv = document.getElementById('messages');
     messagesDiv.innerHTML = '';
 }
 
-async function createNewChat(event){
-    event.preventDefault();
 
-    N_MESSAGES = 0;
-
-    clearChat();
-
-    moveUpTextArea();
-
-    const container = document.getElementById('chat-list');
-    const children = container.children;  // HTMLCollection di tutti i figli
-
-    for (const child of children) {
-        child.style.backgroundColor = '';  // rimuovi sfondo
-        child.disabled = false;             // abilita se è un elemento disabilitabile (es. button)
-    }
-
-    const res = await fetch('/chatLLM/newChat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' }
-    });
-    const data = await res.json();
-
-    SESSION_KEY = data.session_id;
-}
-
-async function createSessionKey() {
-    const res = await fetch('/chatLLM/start', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' }
-    });
-    const data = await res.json();
-    return data.session_id;
-}
-
-function handleClickSendButton(event){
+/**
+ * Handles the send button click event.
+ * Prevents the default form submission behavior,
+ * retrieves and trims the input text,
+ * and sends the message if the input is not empty.
+ * 
+ * @param {Event} event - The click event object.
+ */
+function handleClickSendButton(event) {
     event.preventDefault();
 
     const textArea = document.getElementById('textarea');
-    const text = textArea.value.trim(); // trim() -> remove whitespace from the beginning and end of the input text.
+    const text = textArea.value.trim(); // Remove whitespace from both ends of the input text
 
-    if(text == ""){
-        return;
+    if (text === "") {
+        return; // Do nothing if input is empty
     }
 
     sendMessageToLLM(text);    
 }
 
+
+/**
+ * Handles the microphone button click event to start speech recognition.
+ * Uses the Web Speech API to capture spoken words and sends the transcript as a message.
+ * 
+ * @param {Event} event - The click event object.
+ */
 function handleClickMic(event) {
     event.preventDefault();
 
+    // Get the SpeechRecognition interface depending on the browser
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 
+    // Alert user if speech recognition is not supported
     if (!SpeechRecognition) {
         alert("Sorry, your browser does not support speech recognition.");
         return;
     }
 
+    // Create a new SpeechRecognition instance
     const recognition = new SpeechRecognition();
-    recognition.lang = 'en-US';
-    recognition.interimResults = false;
-    recognition.maxAlternatives = 1;
+    recognition.lang = 'en-US';          // Set recognition language
+    recognition.interimResults = false;  // Only return final results
+    recognition.maxAlternatives = 1;     // Return only the top result
 
-    recognition.start();
+    recognition.start(); // Start listening for speech input
 
+    // When speech is recognized, extract transcript and send as message
     recognition.addEventListener('result', (event) => {
         const transcript = event.results[0][0].transcript;
-        console.log("You said:", transcript);
         sendMessageToLLM(transcript);
     });
 
+    // Stop recognition when speech input ends
     recognition.addEventListener('speechend', () => {
         recognition.stop();
     });
 
+    // Handle recognition errors
     recognition.addEventListener('error', (event) => {
-        alert("Voice recognition error!")
+        alert("Voice recognition error!");
         console.error("Recognition error:", event.error);
     });
 }
 
+
+/**
+ * Moves and styles the text area and related elements to a centered, compact layout.
+ */
 function moveUpTextArea() {
     const textArea = document.getElementById('textarea');
     const subTile = document.getElementById('subTitle');
@@ -252,9 +417,14 @@ function moveUpTextArea() {
     chatArea.style.justifyContent = 'center'
     textArea.value = '';
 
+    TEXTAREACENTERED = true;
+
     textAreaResize();
 }
 
+/**
+ * Resets the text area and related elements to their default layout and styles, expanding the message area.
+ */
 function moveDownTextArea() {
     const textArea = document.getElementById('textarea');
     const subTile = document.getElementById('subTitle');
@@ -271,126 +441,14 @@ function moveDownTextArea() {
     chatArea.style.justifyContent = 'normal';
     textArea.value = '';
 
+    TEXTAREACENTERED = false;
+
     textAreaResize();
 }
 
-async function sendMessageToLLM(text) {
-    if(N_MESSAGES == 0){
-        moveDownTextArea();
-        N_MESSAGES++;
-
-        const container = document.getElementById('chat-list');
-        
-        const button = document.createElement('button');
-        button.id = SESSION_KEY;
-        button.textContent = SESSION_KEY;
-        button.className = 'chat-item';
-        button.style.backgroundColor = 'lightgrey';
-        button.style.disabled = true;
-        button.addEventListener('click', () => {
-            loadChat(SESSION_KEY);  // Funzione che carica i dettagli della chat
-        });
-        container.insertBefore(button, container.firstChild);
-    }
-
-    disableSendButtons();
-
-    addMessage(text, 'sent');
-
-    // Pulisce la text area dopo l'invio del messaggio
-    const textArea = document.getElementById('textarea');
-    textArea.value = '';
-
-    // Aggiungi puntini di ragionamento
-    addThinkingDots();
-
-    fetch('/chatLLM/sendPrompt', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ prompt: text, sessionId: SESSION_KEY })
-    })
-    .then(() => {
-        // EventSource ESTABLISHES A PERMANENT ONE-WAY CONNECTION (SERVER - CLIENT) WHERE THE SERVER CAN SEND EVENTS AS THEY BECOME AVAILABLE.
-        // PERFECT FOR CHAT WITH PROGRESSIVE RESPONSE, DATA STREAMING
-        const evtSource = new EventSource('/chatLLM/responseLLM?session_id=' + encodeURIComponent(SESSION_KEY));
-
-        let first_token = true;
-
-        evtSource.onmessage = (e) => {
-            if (!e.data) return;  // salta se non arriva nulla
-            if (first_token) {
-                removeThinkingDots();
-                addMessage(e.data, 'received');
-                first_token = false;
-            } else {
-                const lastMessage = document.getElementById('messages').lastElementChild;
-                if (lastMessage) {
-                    lastMessage.textContent += e.data;
-                }
-            }
-        };
-
-        evtSource.onerror = (e) => {
-            removeThinkingDots();
-            if(ENABLE_TTS){
-                textToSpeech(document.getElementById('messages').lastElementChild.textContent);
-            }
-            activateSendButtons();
-            console.error("EventSource failed:", e);
-            evtSource.close();
-        };
-    })
-    .catch(err => {
-        removeThinkingDots();
-        console.error("Fetch failed:", err);
-    });
-}
-
-async function cleanHistory(event) {
-    event.preventDefault();
-
-    const res = await fetch('/chatLLM/cleanChats', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' }
-    });
-
-    const chatList = document.getElementById('chat-list');
-    chatList.innerHTML = '';
-
-    clearChat();
-
-    moveUpTextArea();
-}
-
-// Aggiunge un messaggio "sta pensando..." con puntini animati
-function addThinkingDots() {
-    const messages = document.getElementById('messages');
-    const thinking = document.createElement('div');
-    thinking.classList.add('message', 'thinking', 'received'); // aggiunta classe received
-    thinking.id = 'thinking-dots';
-    thinking.textContent = 'I am thinking';
-    messages.append(thinking);
-    animateDots(thinking);
-}
-
-// Rimuove il messaggio "sta pensando..."
-function removeThinkingDots() {
-    const thinking = document.getElementById('thinking-dots');
-    if (thinking) thinking.remove();
-}
-
-// Anima i puntini dopo "sta pensando"
-function animateDots(element) {
-    let dots = 0;
-    element._dotsInterval = setInterval(() => {
-        dots = (dots + 1) % 4;
-        element.textContent = 'I am thinking' + '.'.repeat(dots);
-    }, 500);
-    element._dotsCount = dots;
-}
-
-
-
+/**
+ * Disables both the send button and the microphone button to prevent user input.
+ */
 function disableSendButtons(){
     const sendButton = document.getElementById('send-button');
     const micButton = document.getElementById('mic-button');
@@ -399,6 +457,9 @@ function disableSendButtons(){
     micButton.disabled = true;
 }
 
+/**
+ * Enables both the send button and the microphone button to allow user input.
+ */
 function activateSendButtons(){
     const sendButton = document.getElementById('send-button');
     const micButton = document.getElementById('mic-button');
@@ -407,31 +468,108 @@ function activateSendButtons(){
     micButton.disabled = false;
 }
 
+/**
+ * Automatically adjusts the height of the textarea to fit its content,
+ * preventing scrollbars and improving user experience while typing.
+ */
 function textAreaResize(){
     const textArea = document.getElementById('textarea');
     textArea.style.height = 'auto';
     textArea.style.height = (textArea.scrollHeight) + 'px';
 }
 
-function resetTextAreaPosition() {
-    const container = document.querySelector('.container');
-    container.style.transform = 'translateY(0)';
-}
-
+/**
+ * Adds a chat message to the messages container.
+ * The message is styled with a class based on the sender type:
+ * 'user' for messages sent by the user,
+ * 'assistantAI' for messages sent by the AI assistant.
+ * @param {string} text - The message text to display.
+ * @param {string} type - The sender type ('user' or 'assistantAI').
+ */
 function addMessage(text, type) {
     const messages = document.getElementById('messages');
     const message = document.createElement('div');
-    message.classList.add('message', type);
+    message.classList.add('message', type);  // Apply class based on sender type
     message.textContent = text;
     messages.append(message);
 }
 
+/**
+ * Converts the given text to speech using the Web Speech API.
+ * Configures language, speed, pitch, and volume before speaking.
+ * @param {string} text - The text to be spoken aloud.
+ */
 function textToSpeech(text) {
     const utterance = new SpeechSynthesisUtterance(text);
     utterance.lang = 'en-US';
-    utterance.rate = 1;       // speed (1 = normal)
-    utterance.pitch = 1;      // pitch (1 = normal)
-    utterance.volume = 1;     // volume (0 to 1)
+    utterance.rate = 1;       // Normal speaking speed
+    utterance.pitch = 1;      // Normal pitch
+    utterance.volume = 1;     // Maximum volume
 
     speechSynthesis.speak(utterance);
+}
+
+/**
+ * Creates and inserts a chat session button into the chat list.
+ * The button is labeled with the current SESSION_ID and triggers loading of the chat when clicked.
+ */
+function createChatButton(session_id, date, activate) {
+    const container = document.getElementById('chat-list');
+
+    const button = document.createElement('button');
+    button.id = session_id;
+    button.textContent = date;
+    button.className = 'chat-item';
+
+    if(activate){
+        button.style.backgroundColor = 'lightgrey';
+        button.disabled = true;
+    }
+    else{
+        button.style.backgroundColor = '';
+        button.disabled = false;
+    }
+
+    // Set up the click event to load the chat
+    button.addEventListener('click', () => {
+        loadChat(session_id);  // Function that loads the chat content
+    });
+
+    // Insert the new button at the top of the chat list
+    container.insertBefore(button, container.firstChild);
+}
+
+/**
+ * Formats an ISO datetime string into a human-readable short date and time.
+ * Returns 'Unknown Date' if the input is falsy or a default empty date string.
+ * 
+ * @param {string} date - The ISO datetime string to format.
+ * @returns {string} - Formatted date and time string or 'Unknown Date' if invalid.
+ */
+function formatDate(date) {
+    if (!date || date === '0001-01-01T00:00:00') return 'Unknown Date';
+    const d = new Date(date);
+    return d.toLocaleString(undefined, {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit'
+    });
+}
+
+
+/**
+ * Clears all highlights and enables all buttons within the chat list container.
+ * It resets the background color and enables any disabled buttons.
+ */
+function resetChatListButtons() {
+    const container = document.getElementById('chat-list');
+    const children = container.children;  // HTMLCollection of all child elements
+
+    for (const child of children) {
+        child.style.backgroundColor = '';  // Remove background highlight
+        child.disabled = false;             // Enable the button if it is disableable (e.g., <button>)
+    }
 }

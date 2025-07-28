@@ -10,15 +10,15 @@
     <link href="https://fonts.googleapis.com/css2?family=Cal+Sans&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
-    <link rel="icon" href="{{ url_for('static', filename='img/chip.png') }}">
+    <link rel="icon" href="{{ url_for('static', filename='img/img.png') }}">
     <link rel="stylesheet" href="../static/css/chatLLM.css">
-    <script src="../static/js/chatLLM.js"></script>
+    <script type="module" src="../static/js/chatLLM.js"></script>
 </head>
 <body>
     <main>
         <div id="sideBar">
             <div class="app-header">
-                <img src="{{ url_for('static', filename='img/chip.png') }}" alt="App Icon" class="app-icon" />
+                <img src="{{ url_for('static', filename='img/img.png') }}" alt="App Icon" class="app-icon" />
                 <h1 class="app-name">AssistantAI</h1>
             </div>
 
@@ -30,7 +30,7 @@
                 <h3 class="settings-title">Settings</h3>
                 <label class="toggle-container">
                     <span>Read answers (TTS)</span>
-                    <input type="checkbox" class="tts-toggle">
+                    <input type="checkbox" class="tts-toggle" id="tts-toggle">
                     <span class="slider"></span>
                 </label>
             </div>
