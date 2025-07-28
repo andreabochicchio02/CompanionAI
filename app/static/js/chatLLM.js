@@ -176,7 +176,8 @@ async function createNewChat(event){
         headers: { 'Content-Type': 'application/json' }
     });
     const data = await res.json();
-    return data.session_id;
+
+    SESSION_KEY = data.session_id;
 }
 
 async function createSessionKey() {

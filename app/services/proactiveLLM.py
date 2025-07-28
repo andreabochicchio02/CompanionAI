@@ -62,7 +62,7 @@ def evaluate_general_msg(user_input, topic, short_memory, model):
                 f"CHANGE_TOPIC — If the user explicitly asks you to suggest a new topic to talk about.\n"
                 f"END — if the user wants to end or close the conversation.\n"
                 f"NEW_QUESTION — if the user asks a new, open-ended question that is unrelated to the current topic.\n"
-                f"Do not include anything else in your reply, only CONTINUE_TOPIC, END or NEW_QUESTION\n"
+                f"Do not include anything else in your reply, only CONTINUE_TOPIC, CHANGE_TOPIC, END or NEW_QUESTION\n"
 
                 f"Current topic: {topic}\n"
 

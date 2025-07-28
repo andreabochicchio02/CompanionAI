@@ -277,7 +277,7 @@ def event_stream(session_id, prompt):
             topic, topic_question = proactiveLLM.find_the_topic(ACTIVITIES)
             if topic:
                 CHATS[session_id].set_chat_topic(topic)
-                CHATS[session_id].get_chat_state(State.TOPIC)
+                CHATS[session_id].set_chat_state(State.TOPIC)
                 yield f"data: {topic_question}\n\n"
                 return
             else:
@@ -482,5 +482,14 @@ def event_stream(session_id, prompt):
 
 @bp.route('/chatLLM/newChat', methods=['POST'])
 def clear_memory():
+    # Generate a truly unique session ID (not already in CHATS)
+    session_id = str(uuid.uuid4())
+
+    # Extremely unlikely, but this ensures we avoid accidental ID collision
+    while session_id in CHATS:
+        session_id = str(uuid.uuid4())
+
+    # Initialize session data
+    CHATS[session_id] = ChatManager(SUMMARIZER_MODEL, State.START, MAX_TURNS)
     # shortTermMemory.clean_history()
-    return jsonify({'status': 'success', 'message': 'Memory cleared'})
+    return jsonify({'session_id': session_id})
