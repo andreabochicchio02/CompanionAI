@@ -14,6 +14,7 @@ from flask import Blueprint, render_template, request, jsonify, Response
 
 bp = Blueprint('chatLLM', __name__)
 
+utils.clear_server_log()
 # Initialize vector database for RAG service
 utils.append_server_log("Initializing RAG service...")
 rag.initialize_db()
@@ -37,7 +38,6 @@ def chatLLM():
     # ollama.preload_model(SUMMARIZER_MODEL)
 
     # Clear previous log files to start fresh for the new session
-    utils.clear_server_log()
     utils.clear_conversation_log()
 
     # Render the chat interface template
@@ -385,7 +385,7 @@ def conversation_llm(input, session_id):
     # ----- RAG ------ #
     relevant_chunks = ""
     try:
-        relevant_chunks = rag.get_relevant_chunks(prompt)
+        relevant_chunks = rag.get_relevant_chunks(input)
 
         if relevant_chunks:
             prompt += (

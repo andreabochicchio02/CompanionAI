@@ -10,11 +10,14 @@ MAIN_MODEL = "llama3.2:3b"
 SUMMARIZER_MODEL = "gemma3:1b"
 
 # ----- RAG ----- #
-EMBEDDING_MODEL = SentenceTransformer("all-MiniLM-L6-v2")
+EMBEDDING_MODEL = SentenceTransformer("all-MiniLM-L12-v2")
+#EMBEDDING_MODEL = SentenceTransformer("BAAI/bge-m3")
 COLLECTION_NAME = "document_chunks"
-DOCUMENT_PATH = "document.txt"
+DOCUMENT_PATHS = ["document.txt"] #* aggiungi nuovi file rag qua
 TOP_K = 3
-MIN_SCORE = 0.1
+MIN_SCORE = 0.2
+
+QDRANT_DB_PATH = "qdrant_storage"
 
 # ----- SHORT TERM MEMORY ----- #
 MAX_TURNS = 10

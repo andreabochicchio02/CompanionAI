@@ -6,7 +6,7 @@ env_llm
 
 # data structure index
 faiss_index
-qdrant_data
-qdrant_data_web
+qdrant_storage
+file_hashes.json
 
 .vscode/
