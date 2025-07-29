@@ -1,3 +1,0 @@
-[2025-07-11 22:53:39]	CIAO
-[2025-07-11 22:53:43]	Error: Cannot connect to Ollama. Is it running?
-[2025-07-11 22:53:43]	Response generated and sent successfully (stream=True)

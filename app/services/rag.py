@@ -241,7 +241,7 @@ def save_file_hash(file_paths, hash_store_path="file_hashes.json"):
     except Exception as e:
         print(f"Error saving file hashes: {e}")
 
-#! al momento non usato perchè thread disattivato, vedi app.py
+# !!! al momento non usato perchè thread disattivato, vedi app.py  !!!
 def monitor_file_changes(interval=60):
     """Monitora periodicamente i file per rilevare modifiche."""
     while True:

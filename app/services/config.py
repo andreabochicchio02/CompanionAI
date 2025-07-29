@@ -13,7 +13,7 @@ SUMMARIZER_MODEL = "gemma3:1b"
 EMBEDDING_MODEL = SentenceTransformer("all-MiniLM-L12-v2")
 #EMBEDDING_MODEL = SentenceTransformer("BAAI/bge-m3")
 COLLECTION_NAME = "document_chunks"
-DOCUMENT_PATHS = ["document.txt"] #* aggiungi nuovi file rag qua
+DOCUMENT_PATHS = ["document.txt"] #* elenco dei file
 TOP_K = 3
 MIN_SCORE = 0.2
 

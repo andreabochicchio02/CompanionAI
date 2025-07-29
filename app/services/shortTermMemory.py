@@ -136,18 +136,18 @@ class ChatManager:
         """
         prompt = ""
 
-        if self.chat['user']:
+        if self.chat['assistantAI'] or self.summary:
             prompt += (
                 "Note: You have access to a summarized context of the conversation as well as the last "
                 f"{self.max_turns} exchanges between the user and assistant. "
-                "Use this information to answer only if necessary.\n\n"
+                "Use this information to answer only if necessary.\n"
             )
 
         if self.summary:
             prompt += f"{self.summary}\n\n"
 
         for user, assistant in zip(self.chat['user'][-self.max_turns:], self.chat['assistantAI'][-self.max_turns:]):
-            prompt += f"User: {user}\nAssistant: {assistant}\n"
+            prompt += f"User: {user}\nAssistant: {assistant}\n\n"
 
         return prompt
 

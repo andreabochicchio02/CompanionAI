@@ -15,6 +15,7 @@ from flask import Blueprint, render_template, request, jsonify, Response
 bp = Blueprint('chatLLM', __name__)
 
 utils.clear_server_log()
+
 # Initialize vector database for RAG service
 utils.append_server_log("Initializing RAG service...")
 rag.initialize_db()
@@ -432,21 +433,3 @@ def generate_session_id():
         session_id = str(uuid.uuid4())
     
     return session_id
-
-
-
-
-
-'''# elif "CHANGE_TOPIC" in evaluation:
-        #     topic, topic_question = proactiveLLM.find_the_topic(ACTIVITIES)
-        #     if topic:
-        #         CHATS[session_id].set_chat_topic(topic)
-        #         CHATS[session_id].set_chat_state(State.TOPIC)
-        #         yield f"data: {topic_question}\n\n"
-        #         return
-        #     else:
-        #         # TODO no more topic
-        #         return
-        # elif "END" in evaluation:
-        #     yield f"data: Goodbye! It was nice chatting with you. Take care!\n\n"
-        #     return'''
