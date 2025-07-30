@@ -1,6 +1,8 @@
 from enum import Enum, auto
 from sentence_transformers import SentenceTransformer
 
+EVENTS_PATH = "events.json"
+
 SERVER_LOG = "app/services/server_log.txt"
 CONVERSATION_LOG_FOLD = "app/services/conversation_log.txt"
 

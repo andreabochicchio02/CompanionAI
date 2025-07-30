@@ -18,7 +18,9 @@
     <main>
         <div id="sideBar">
             <div class="app-header">
-                <img src="{{ url_for('static', filename='img/img.png') }}" alt="App Icon" class="app-icon" />
+                <a href="{{ url_for('index.index') }}">
+                    <img src="{{ url_for('static', filename='img/img.png') }}" alt="App Icon" class="app-icon" />
+                </a>
                 <h1 class="app-name">AssistantAI</h1>
             </div>
 

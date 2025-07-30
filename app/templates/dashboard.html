@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AssistantAI</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cal+Sans&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+    <link rel="icon" href="{{ url_for('static', filename='img/img.png') }}">
+    <link rel="stylesheet" href="../static/css/dashboard.css">
+    <script type="module" src="../static/js/dashboard.js"></script>
+</head>
+<body>
+    <div class="app-header">
+        <a href="{{ url_for('index.index') }}">
+            <img src="{{ url_for('static', filename='img/img.png') }}" alt="App Icon" class="app-icon" />
+        </a>
+        <h1 class="app-name">DASHBOARD</h1>
+    </div>
+
+    <div id="all-content">
+        <div id="up-content">
+            <div id="event-list">
+                <div id="header-event-list">
+                    <h3 class="sub-title">EVENTS LIST</h3>
+                    <button id="show-event-popup-btn">Add New Event</button>
+                </div>
+                <div id="events-output"></div>
+            </div>
+            <div id="right-content">
+                <h3 class="sub-title">CHAT HISTORY</h3>
+                <div class="chat-list" id="chat-list"></div>
+            </div>
+        </div>
+        <div id="personal-info-container">
+            <button id="personal-info-btn">CLICK HERE TO ENTER OR UPLOAD <strong>PERSONAL INFORMATION</strong></button>
+        </div>
+    </div>
+
+    <div id="overlay" class="overlay hidden"></div>
+
+    <div id="chat-popup" class="chat-popup hidden">
+        <div class="popup-content">
+            <span class="close-btn" id="close-btn">&times;</span>
+            <div class="messages" id="messages"></div>
+        </div>
+    </div>
+
+    <div id="personal-info-popup" class="chat-popup hidden">
+        <div class="popup-content">
+            <span class="close-btn" id="close-personal-info-btn">&times;</span>
+
+            <form id="bio-form">
+                <h3>Biography Information</h3>
+
+                <label for="full-name">Full Name</label>
+                <textarea id="full-name" class="personal-info-label" placeholder="Enter your full name" required></textarea>
+
+                <label for="birth-details">Date and Place of Birth</label>
+                <textarea id="birth-details" class="personal-info-label" placeholder="e.g., January 1, 1990, London, UK"></textarea>
+
+                <label for="family-info">Family Details</label>
+                <textarea id="family-info" class="personal-info-label" placeholder="Describe your family members, relationships, children, etc."></textarea>
+
+                <label for="education">Education Background</label>
+                <textarea id="education" class="personal-info-label" placeholder="Schools, degrees, special achievements in academics"></textarea>
+
+                <label for="career">Career and Work Experience</label>
+                <textarea id="career" class="personal-info-label" placeholder="Jobs, roles, companies, responsibilities, achievements"></textarea>
+
+                <label for="interests">Hobbies and Personal Interests</label>
+                <textarea id="interests" class="personal-info-label" placeholder="What do you enjoy doing in your free time?"></textarea>
+
+                <label for="life-events">Significant Life Events</label>
+                <textarea id="life-events" class="personal-info-label" placeholder="Major life milestones, challenges, or memorable moments"></textarea>
+
+                <label for="personality">Personality Traits and Values</label>
+                <textarea id="personality" class="personal-info-label" placeholder="Describe your character, values, or how others see you"></textarea>
+
+                <label for="goals">Aspirations and Future Goals</label>
+                <textarea id="goals" class="personal-info-label" placeholder="What are your personal or professional goals?"></textarea>
+
+                <button type="submit" id="submit-personal-info-btn">Submit Biography Info</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="add-event-popup" class="chat-popup hidden">
+        <div class="popup-content">
+            <span class="close-btn" id="close-event-popup-btn">&times;</span>
+            <div id="add-event">
+                <h3 class="sub-title">ADD NEW EVENT</h3>
+                <form id="event-form">
+                    <div class="form-row">
+                        <div class="div-coloumn">
+                            <label for="title">Event Title</label>
+                            <input type="text" id="title" placeholder="e.g., Doctor Visit" required>
+                        </div>
+                        <div class="div-coloumn">
+                            <label for="date">Start Date & Time</label>
+                            <input type="datetime-local" id="date" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="div-coloumn">
+                            <label for="recurrence">Recurrence</label>
+                            <select id="recurrence">
+                                <option value="">No recurrence</option>
+                                <option value="daily">Daily</option>
+                                <option value="weekly">Weekly</option>
+                                <option value="monthly">Monthly</option>
+                                <option value="annual">Annual</option>
+                            </select>
+                        </div>
+                        <div class="div-coloumn">
+                            <label for="recurrence-end">Recurrence End (optional)</label>
+                            <input type="date" id="recurrence-end">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="div-coloumn">
+                            <label for="note">Notes</label>
+                            <textarea id="note" placeholder="Additional information (e.g., location, reminder...)"></textarea>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <button type="submit" id="new-event-btn">Add Event</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

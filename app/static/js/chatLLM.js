@@ -163,47 +163,6 @@ async function sendMessageToLLM(text) {
 }
 
 /**
- * Fetches the list of chat sessions from the backend,
- * then populates the #chat-list container with buttons labeled by their timestamp.
- * Clicking a button loads the corresponding chat session.
- */
-async function uploadHistoryChats() {
-    try {
-        // Request the list of session IDs and timestamps from the backend
-        const response = await fetch('/chatLLM/uploadChats', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' }
-        });
-
-        if (!response.ok) {
-            console.error('Failed to fetch chat sessions, status:', response.status);
-            return;
-        }
-
-        const data = await response.json();
-
-        if (!data.success) {
-            return;
-        }
-
-        // data.message is an array of [sessionId, timestamp] tuples
-        const sessions = data.message;
-
-        const container = document.getElementById('chat-list');
-        container.innerHTML = '';   // Clear previous buttons if any
-
-        // Create a button for each session, labeled by formatted timestamp
-        sessions.forEach(([sessionId, timestamp]) => {
-            createChatButton(sessionId, formatDate(timestamp), false);
-        });
-
-    } catch (error) {
-        console.error('Error fetching or parsing session IDs:', error);
-    }
-}
-
-
-/**
  * Loads the chat history for the given session ID,
  * highlights the corresponding chat button,
  * and displays the chat messages in the UI.
@@ -495,6 +454,7 @@ function addMessage(text, type) {
     const message = document.createElement('div');
     message.classList.add('message', type);  // Apply class based on sender type
     message.textContent = text;
+    message.style.whiteSpace = "pre-line";
     messages.append(message);
 }
 
@@ -511,6 +471,46 @@ function textToSpeech(text) {
     utterance.volume = 1;     // Maximum volume
 
     speechSynthesis.speak(utterance);
+}
+
+/**
+ * Fetches the list of chat sessions from the backend,
+ * then populates the #chat-list container with buttons labeled by their timestamp.
+ * Clicking a button loads the corresponding chat session.
+ */
+async function uploadHistoryChats() {
+    try {
+        // Request the list of session IDs and timestamps from the backend
+        const response = await fetch('/chatLLM/uploadChats', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' }
+        });
+
+        if (!response.ok) {
+            console.error('Failed to fetch chat sessions, status:', response.status);
+            return;
+        }
+
+        const data = await response.json();
+
+        if (!data.success) {
+            return;
+        }
+
+        // data.message is an array of [sessionId, timestamp] tuples
+        const sessions = data.message;
+
+        const container = document.getElementById('chat-list');
+        container.innerHTML = '';   // Clear previous buttons if any
+
+        // Create a button for each session, labeled by formatted timestamp
+        sessions.forEach(([sessionId, timestamp]) => {
+            createChatButton(sessionId, formatDate(timestamp), false);
+        });
+
+    } catch (error) {
+        console.error('Error fetching or parsing session IDs:', error);
+    }
 }
 
 /**
@@ -544,6 +544,20 @@ function createChatButton(session_id, date, activate) {
 }
 
 /**
+ * Clears all highlights and enables all buttons within the chat list container.
+ * It resets the background color and enables any disabled buttons.
+ */
+function resetChatListButtons() {
+    const container = document.getElementById('chat-list');
+    const children = container.children;  // HTMLCollection of all child elements
+
+    for (const child of children) {
+        child.style.backgroundColor = '';  // Remove background highlight
+        child.disabled = false;             // Enable the button if it is disableable (e.g., <button>)
+    }
+}
+
+/**
  * Formats an ISO datetime string into a human-readable short date and time.
  * Returns 'Unknown Date' if the input is falsy or a default empty date string.
  * 
@@ -561,19 +575,4 @@ function formatDate(date) {
         minute: '2-digit',
         second: '2-digit'
     });
-}
-
-
-/**
- * Clears all highlights and enables all buttons within the chat list container.
- * It resets the background color and enables any disabled buttons.
- */
-function resetChatListButtons() {
-    const container = document.getElementById('chat-list');
-    const children = container.children;  // HTMLCollection of all child elements
-
-    for (const child of children) {
-        child.style.backgroundColor = '';  // Remove background highlight
-        child.disabled = false;             // Enable the button if it is disableable (e.g., <button>)
-    }
 }

@@ -20,7 +20,8 @@
       <h1>CompanionAI</h1>
       <p>Your personal assistant, always by your side.</p>
       <div class="buttons">
-        <a href="{{ url_for('chatLLM.chatLLM') }}" class="btn btn-primary">Go to Service</a>
+        <a href="{{ url_for('chatLLM.chatLLM') }}" class="btn btn-primary">Go to CHAT</a>
+        <a href="{{ url_for('dashboard.dashboard') }}" class="btn btn-primary" onclick="return checkPIN()">Go to DASHBOARD</a>
       </div>
     </header>
 
@@ -46,5 +47,18 @@
       <p>&copy; 2025 CompanionAI. All rights reserved.</p>
     </footer>
   </div>
+  <script>
+    function checkPIN() {
+      const correctPIN = "1234";
+      const userPIN = prompt("Enter the PIN to access the dashboard:");
+
+      if (userPIN === correctPIN) {
+          return true;
+      } else {
+          alert("Incorrect PIN. Access denied.");
+          return false;
+      }
+    }
+  </script>
 </body>
 </html>
