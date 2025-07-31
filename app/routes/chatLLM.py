@@ -9,7 +9,8 @@ from app.services.config import State as State
 
 # --- Standard library imports ---
 import uuid, json, random
-from datetime import datetime
+from datetime import datetime, date
+import json
 from flask import Blueprint, render_template, request, jsonify, Response
 
 bp = Blueprint('chatLLM', __name__)
@@ -236,10 +237,27 @@ def event_stream(session_id, prompt, retry=False):
         evaluation = proactiveLLM.evaluate_init_msg(prompt, config.MAIN_MODEL)
 
         if "INITIAL" in evaluation:
-            suggest_topic_sentence = random.choice(config.SUGGEST_TOPIC_SENTENCES)
-            yield f"data: {suggest_topic_sentence}\n\n"
+            # Load scheduled events from file
+            with open(config.EVENTS_PATH, "r") as f:
+                events = json.load(f)
+
+            # Filter and get today's events
+            today_events = get_events_today(events)
+
+            response = ''
+            if today_events:
+                response += "EVENTS:\n" + "\n".join(today_events) + "\n\n"
+
+            # Add a random suggested topic sentence
+            response += random.choice(config.SUGGEST_TOPIC_SENTENCES)
+
+            # Format each line
+            sse_payload = ''.join(f"data: {line}\n" for line in response.strip().split('\n'))
+            sse_payload += "\n"
+
+            yield sse_payload
             CHATS[session_id].set_chat_state(State.CHOOSING)
-            CHATS[session_id].add_assistant_message(suggest_topic_sentence, session_id, config.CHATS_FILE)
+            CHATS[session_id].add_assistant_message(response, session_id, config.CHATS_FILE)
             return
         elif "QUESTION" in evaluation:
             CHATS[session_id].set_chat_state(State.CONVERSATION)
@@ -252,6 +270,7 @@ def event_stream(session_id, prompt, retry=False):
                 yield f"data: {chunk}\n\n"
 
             CHATS[session_id].add_assistant_message(full_response, session_id, config.CHATS_FILE)
+            return
         else:
             if not retry:
                 yield from event_stream(session_id, prompt, retry=True)
@@ -358,6 +377,7 @@ def event_stream(session_id, prompt, retry=False):
                 yield f"data: {chunk}\n\n"
 
             CHATS[session_id].add_assistant_message(full_response, session_id, config.CHATS_FILE)
+            return
         elif "NEW_QUESTION" in evaluation:
             CHATS[session_id].set_chat_topic('')
             ollama_prompt = conversation_llm(prompt, session_id)
@@ -368,6 +388,29 @@ def event_stream(session_id, prompt, retry=False):
                 yield f"data: {chunk}\n\n"
 
             CHATS[session_id].add_assistant_message(full_response, session_id, config.CHATS_FILE)
+            return
+        elif "EVENTS" in evaluation:
+            CHATS[session_id].set_chat_topic('')
+
+            # Load scheduled events from file
+            with open(config.EVENTS_PATH, "r") as f:
+                events = json.load(f)
+
+            # Filter and get today's events
+            today_events = get_events_today(events)
+
+            response = ''
+            if today_events:
+                response += "EVENTS:\n" + "\n".join(today_events) + "\n\n"
+
+            # Format each line
+            sse_payload = ''.join(f"data: {line}\n" for line in response.strip().split('\n'))
+            sse_payload += "\n"
+
+            yield sse_payload
+
+            CHATS[session_id].add_assistant_message(sse_payload, session_id, config.CHATS_FILE)
+            return
         else:
             if not retry:
                 yield from event_stream(session_id, prompt, retry=True)
@@ -433,3 +476,77 @@ def generate_session_id():
         session_id = str(uuid.uuid4())
     
     return session_id
+
+
+def get_events_today(events):
+    """
+    Returns today's events as formatted strings.
+
+    Handles one-time and recurring events (daily, weekly, monthly, annual), 
+    skips past events for today, and sorts by time if available.
+    """
+    
+    now = datetime.now()
+    today = now.date()
+    weekday_name = today.strftime("%A")
+    event_list = []
+
+    for event in events:
+        event_date_str = event["date"]
+        recurrence = event.get("recurrence")
+
+        try:
+            event_datetime = datetime.fromisoformat(event_date_str)
+        except ValueError:
+            continue
+
+        event_date = event_datetime.date()
+        event_time = event_datetime.time()
+        time_str = event_time.strftime('%H:%M:') if "T" in event_date_str else ""
+
+        if time_str and event_time < now.time():
+            continue
+
+        if not recurrence:
+            if event_date == today:
+                event_list.append((event_time, f"- {time_str} {event['title']}, Note: {event['note']}"))
+            continue
+
+        end_date_str = recurrence.get("end")
+        if end_date_str:
+            try:
+                end_date = datetime.fromisoformat(end_date_str).date()
+                if today > end_date:
+                    continue
+            except ValueError:
+                continue
+
+        frequency = recurrence.get("frequency")
+
+        if frequency == "daily":
+            days = recurrence.get("days_of_week")
+            if days:
+                if weekday_name in days:
+                    event_list.append((event_time, f"- {time_str} {event['title']}, Note: {event['note']}"))
+            else:
+                event_list.append((event_time, f"- {time_str} {event['title']}, Note: {event['note']}"))
+
+        elif frequency == "weekly":
+            if today >= event_date and today.weekday() == event_date.weekday():
+                event_list.append((event_time, f"- {time_str} {event['title']}, Note: {event['note']}"))
+
+
+        elif frequency == "monthly":
+            if today.day == event_date.day and today >= event_date:
+                event_list.append((event_time, f"- {time_str} {event['title']}, Note: {event['note']}"))
+
+
+        elif frequency == "annual":
+            if (today.month, today.day) == (event_date.month, event_date.day):
+                event_list.append((event_time, f"- {time_str} {event['title']}, Note: {event['note']}"))
+
+
+    event_list.sort(key=lambda x: x[0] or datetime.min.time())
+
+    results = [entry[1] for entry in event_list]
+    return results

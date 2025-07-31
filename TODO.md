@@ -32,6 +32,8 @@
 1. La frase: "Hello! I'm your companion. Would you like to ask me something specific, or would you prefer me to suggest a topic for our conversation?" Invece di averla fissa possiamo cheidere al LLM di riformularla ogni volta per rendere la cosa meno hardcodata
 2. Fare in modo che activity siano infinite, che non si ripetano e che le possa prendere anche dalla RAG
 3. Alcune volte propone due volte di seguito lo stesso topic, togliere random e modificare in modo che non escano sempre le stesse
+4. Secondo me già dopo 5 messaggi si deve fare la sintesi della chat
+5. Secondo me possiamo anche evitare di mettere gli eventi all'inizio. Si può fare anche che li chiede quando li chiede l'utente
 
 **NOTE DANIEL**
 - [ ] Spesso quando fai una domanda aperta all'inizio la vede come "INITIAL" in maniera errata

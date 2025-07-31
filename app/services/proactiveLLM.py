@@ -59,9 +59,9 @@ def evaluate_general_msg(user_input, topic, short_memory, model):
         "Based on the user's message and the context of the ongoing conversation, determine what the user intends to do next.\n"
         "Respond only with one of the following options\n"
         "CONTINUE_TOPIC — If the user is continuing the current topic, expanding on it, replying to a question, or asking a related follow-up.\n"
-        # "END — if the user wants to end or close the conversation.\n"
         "NEW_QUESTION — if the user asks a new, open-ended question that is unrelated to the current topic.\n"
-        "Do not include anything else in your reply, only CONTINUE_TOPIC or NEW_QUESTION\n\n"
+        "EVENTS — If the user explicitly asks what events, appointments, or plans they have scheduled for today,\n"
+        "Do not include anything else in your reply, only CONTINUE_TOPIC, EVENTS, or NEW_QUESTION\n\n"
     )
 
     if short_memory:
