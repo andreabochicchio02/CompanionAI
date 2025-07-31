@@ -88,9 +88,15 @@ function addEventToList(event, index) {
     const div = document.createElement('div');
     div.className = 'event-item';
 
+    const dateObj = new Date(event.date);
+    const hasTime = event.date.includes('T');
+    const formattedDate = hasTime ? 
+            dateObj.toLocaleString()        // show date and time
+            : dateObj.toLocaleDateString(); // show only date
+
     const content = document.createElement('div');
     content.className = 'event-content';
-    content.innerHTML = '<strong>' + event.title + '</strong><br>' + new Date(event.date).toLocaleString() + '<br>' + '<em>' + event.note + '</em>';
+    content.innerHTML = '<strong>' + event.title + '</strong><br>' + formattedDate + '<br>' + '<em>' + event.note + '</em>';
 
     if (event.recurrence) {
         const freq = event.recurrence.frequency;
