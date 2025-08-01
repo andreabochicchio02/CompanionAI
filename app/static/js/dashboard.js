@@ -179,7 +179,7 @@ async function addNewEvent(event) {
         return;
     }
 
-    const inputValue = dateInput.value;
+    const inputValue = date.value;
     const selectedDate = new Date(inputValue);
     const now = new Date();
     if (selectedDate < now) {
@@ -211,6 +211,7 @@ async function addNewEvent(event) {
         }
 
         renderEvents();
+        closeEventPopup(event);
 
     } catch (error) {
         console.error('Fetch error:', error);

@@ -2,6 +2,7 @@ from flask import Blueprint, render_template, jsonify, request
 import os, json
 import app.services.config as config
 from datetime import datetime, time
+import uuid
 
 bp = Blueprint('dashboard', __name__)
 
@@ -32,6 +33,7 @@ def get_events():
 def add_new_event():
     try:
         new_event = request.get_json()
+        new_event['id'] = str(uuid.uuid4())
 
         if not new_event:
             return jsonify({"success": False, "message": "No data received"})
