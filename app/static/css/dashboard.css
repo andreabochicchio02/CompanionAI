@@ -19,16 +19,16 @@ body {
     justify-content: center;
     align-items: center;
     height: 10%;
-    padding: 10px 0 0 0;
+    padding: 10px 0;
 }
 
 .app-icon {
-    height: 60px;
+    height: 50px;
     margin-right: 30px;
 }
 
 .app-name {
-    font-size: 2.5rem;
+    font-size: 2rem;
     height: auto;
     vertical-align: middle;
 }
@@ -183,7 +183,7 @@ body {
 }
 
 .sub-title {
-    font-size: 2rem;
+    font-size: 1.5rem;
     text-align: center;
 }
 
@@ -221,7 +221,7 @@ body {
     z-index: 9999;
     width: 70%;
     height: 90%;
-    padding: 10px 20px;
+    padding: 10px 20px 50px 20px;
 }
 
 .chat-popup.hidden {
@@ -234,6 +234,8 @@ body {
     display: flex;
     justify-content: center;
     flex-direction: column;
+    overflow-y: auto;
+    flex: 1 1 auto;
 }
 
 .close-btn {
@@ -278,14 +280,13 @@ body {
     overflow-y: auto;
 }
 
-#bio-form h3{
-    text-align: center;
-    margin-bottom: 30px;
-}
-
 .personal-info-label {
     margin-top: 10px;
     margin-bottom: 30px;
+}
+
+#bio-form textarea {
+    height: 100px;
 }
 
 #submit-personal-info-btn {
@@ -306,8 +307,10 @@ body {
     border: none;
     border-radius: 10px;
     color: white;
-    font-size: medium;
+    font-size: small;
     width: auto;
+    height: auto;
+    margin-right: 20px;
 }
 
 #show-event-popup-btn:hover {
@@ -333,7 +336,28 @@ body {
 #header-event-list {
     display: flex;
     flex-direction: row;
-    justify-content: space-around;
+    justify-content: flex-end;
     align-items: center;
     width: 100%;
+}
+
+#header-event-list .sub-title {
+    margin-right: 160px;
+}
+
+#add-paragraph-btn {
+    background-color: lightgray;
+    border: 1px solid lightgray;
+    border-radius: 10px;
+    color: black;
+    font-size: x-small;
+    width: auto;
+    height: auto;
+    margin-bottom: 20px;
+}
+
+#add-paragraph-btn:hover {
+    background-color: white;
+    border: 1px solid lightgray;
+    cursor: pointer;
 }

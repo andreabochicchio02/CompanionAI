@@ -1,7 +1,5 @@
-[2025-07-30 13:42:04]	Initializing RAG service...
-[2025-07-30 13:42:04]	Attempting to create Qdrant client at path: qdrant_storage
-[2025-07-30 13:42:04]	Using Qdrant client at path: qdrant_storage
-[2025-07-30 13:42:05]	No changes detected in documents. Skipping update.
-[2025-07-30 13:42:05]	RAG service initialized successfully.
-[2025-07-30 14:28:58]	/chatLLM/start request completed successfully.
-[2025-07-30 14:47:51]	/chatLLM/start request completed successfully.
+[2025-08-01 13:00:04]	Initializing RAG service...
+[2025-08-01 13:00:04]	Attempting to create Qdrant client at path: qdrant_storage
+[2025-08-01 13:00:04]	Using Qdrant client at path: qdrant_storage
+[2025-08-01 13:00:04]	No changes detected in documents. Skipping update.
+[2025-08-01 13:00:04]	RAG service initialized successfully.

@@ -1,11 +1,13 @@
 [
   {
+    "id": "a1c97f77-2a9e-4b9e-a2e4-b49e6d13d960",
     "title": "Dentist Appointment",
     "date": "2025-08-01T15:30:00",
     "note": "Dr. Smith's clinic. Bring previous X-rays.",
     "recurrence": null
   },
   {
+    "id": "ba431a2c-1099-4e25-9c11-9ef1053034b5",
     "title": "Marta's Birthday",
     "date": "2025-09-12",
     "note": "Buy a gift before September 10th.",
@@ -15,24 +17,7 @@
     }
   },
   {
-    "title": "Weekly House Cleaning",
-    "date": "2025-07-30",
-    "note": "Clean the house every week.",
-    "recurrence": {
-      "frequency": "weekly",
-      "end": "2025-12-31"
-    }
-  },
-  {
-    "title": "Take Morning Medication",
-    "date": "2025-07-29T08:00:00",
-    "note": "Blood pressure pill.",
-    "recurrence": {
-      "frequency": "daily",
-      "end": "2025-12-31"
-    }
-  },
-  {
+    "id": "d7477f79-ec9a-493e-bb8a-259927198270",
     "title": "Take Evening Medication",
     "date": "2025-07-29T20:00:00",
     "note": "Vitamin D supplement.",
@@ -42,29 +27,7 @@
     }
   },
   {
-    "title": "Monthly Team Meeting",
-    "date": "2025-07-31T10:00:00",
-    "note": "Online via Zoom. Prepare project updates.",
-    "recurrence": {
-      "frequency": "monthly",
-      "end": "2026-07-31"
-    }
-  },
-  {
-    "title": "Take Allergy Tablet",
-    "date": "2025-07-29T07:00:00",
-    "note": "Before breakfast, on Monday, Wednesday, Friday.",
-    "recurrence": {
-      "frequency": "daily",
-      "days_of_week": [
-        "Monday",
-        "Wednesday",
-        "Friday"
-      ],
-      "end": "2025-09-30"
-    }
-  },
-  {
+    "id": "54dfaf72-8938-4e06-bfd8-d9c6c2940fa4",
     "title": "Therapy Session",
     "date": "2025-08-05T18:00:00",
     "note": "Weekly session with Dr. Harris.",
@@ -74,6 +37,7 @@
     }
   },
   {
+    "id": "40388f0d-bf93-4d65-9d1f-6432acaf89d7",
     "title": "Jogging with Alex",
     "date": "2025-07-30T06:30:00",
     "note": "Jog every Monday, Wednesday, and Friday.",
@@ -85,15 +49,6 @@
         "Friday"
       ],
       "end": null
-    }
-  },
-  {
-    "title": "Take Antibiotics",
-    "date": "2025-08-01T07:00:00",
-    "note": "Amoxicillin, 3 times a day. This is the morning dose.",
-    "recurrence": {
-      "frequency": "daily",
-      "end": "2025-08-07"
     }
   }
 ]

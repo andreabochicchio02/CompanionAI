@@ -12,7 +12,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     newEventBtn.addEventListener('click', (event) => {addNewEvent(event);});
 
-    personalInfoBtn.addEventListener('click', showPersonalInfoPopUp);
+    personalInfoBtn.addEventListener('click', (event) => {showPersonalInfoPopUp(event);});
     showEventPopupBtn.addEventListener('click', showEventPopup);
 
     await renderEvents();
@@ -37,9 +37,127 @@ function closePersonalInfoPopup(event){
     document.getElementById('personal-info-popup').classList.add('hidden');
 }
 
-function showPersonalInfoPopUp(){
+async function showPersonalInfoPopUp(event){
+    event.preventDefault();
+
     document.getElementById('overlay').classList.remove('hidden');
     document.getElementById('personal-info-popup').classList.remove('hidden');
+
+    try {
+        const response = await fetch('/dashboard/getParagraphs', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+
+        const data = await response.json();
+
+        if(!data.success){
+            console.error('Errore nella risposta:', data.message);
+            return;
+        }
+
+        const form = document.getElementById('bio-form');
+        form.innerHTML = '';
+
+        data.message.forEach(paragraph => {
+            const title = paragraph.title;
+            const content = paragraph.content;
+
+            const id = title.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9\-]/g, '');
+
+            const label = document.createElement('label');
+            label.setAttribute('for', id);
+            label.textContent = title;
+
+            const textarea = document.createElement('textarea');
+            textarea.id = id;
+            textarea.className = 'personal-info-label';
+            textarea.value = content;
+
+            form.appendChild(label);
+            form.appendChild(textarea);
+        });
+
+        const addButton = document.createElement('button');
+        addButton.type = 'button';
+        addButton.id = 'add-paragraph-btn';
+        addButton.textContent = '➕ Add Paragraph';
+
+        addButton.addEventListener('click', () => {
+            const newTitle = prompt('Enter the title of the new paragraph:');
+            if (newTitle && newTitle.trim() !== '') {
+                const title = newTitle;
+
+                const id = title.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9\-]/g, '');
+
+                const label = document.createElement('label');
+                label.setAttribute('for', id);
+                label.textContent = title;
+
+                const textarea = document.createElement('textarea');
+                textarea.id = id;
+                textarea.className = 'personal-info-label';
+
+                form.insertBefore(label, addButton);
+                form.insertBefore(textarea, addButton);
+            }
+        });
+
+        form.append(addButton);
+
+        const button = document.createElement('button');
+        button.type = 'click';
+        button.id = 'submit-personal-info-btn';
+        button.textContent = 'Submit Biography Info';
+        button.addEventListener('click', (event) => {sendNewBio(event);})
+        form.appendChild(button);
+
+    } catch (error) {
+        console.error('Errore durante la fetch:', error);
+    }
+}
+
+async function sendNewBio(event) {
+    event.preventDefault();
+
+    const form = document.getElementById('bio-form');
+    
+    const labels = form.querySelectorAll('label[for]');
+    const paragraphs = [];
+
+    labels.forEach(label => {
+        const textarea = form.querySelector('#' + label.getAttribute('for'));
+        if (textarea) {
+            paragraphs.push({
+            title: label.textContent.trim(),
+            content: textarea.value.trim()
+            });
+        }
+    });
+
+    try {
+        const response = await fetch('/dashboard/saveParagraphs', {
+            method: 'POST',
+            headers: {
+            'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ paragraphs })
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+            alert('Biography saved successfully!');
+        } else {
+            alert('Error saving biography: ' + data.message);
+        }
+
+    } catch (error) {
+        console.error('Submission error:', error);
+        alert('An error occurred during submission.');
+    }
 }
 
 async function addNewEvent(event) {
@@ -50,6 +168,24 @@ async function addNewEvent(event) {
     const note = document.getElementById('note').value;
     const frequency = document.getElementById('recurrence').value;
     const recurrenceEnd = document.getElementById('recurrence-end').value;
+
+    if (!title) {
+        alert("To add a new event, you must enter the event title!");
+        return;
+    }
+
+    if (!date) {
+        alert("To add a new event, you must enter the date and time!");
+        return;
+    }
+
+    const inputValue = dateInput.value;
+    const selectedDate = new Date(inputValue);
+    const now = new Date();
+    if (selectedDate < now) {
+        alert('The selected date and time must be in the future.');
+        return;
+    }
 
     const newEvent = {
         title,
@@ -74,7 +210,6 @@ async function addNewEvent(event) {
             return;
         }
 
-        console.log('Event added successfully:', data.message);
         renderEvents();
 
     } catch (error) {
@@ -110,10 +245,11 @@ function addEventToList(event, index) {
 
     const deleteBtn = document.createElement('button');
     deleteBtn.className = 'delete-btn';
+    deleteBtn.id = event.id;
     deleteBtn.textContent = '🗑️';
     deleteBtn.title = 'Delete event';
-    deleteBtn.addEventListener('click', () => {
-        deleteEvent(index);
+    deleteBtn.addEventListener('click', (event) => {
+        deleteEvent(event.target);
     });
 
     div.appendChild(content);
@@ -152,12 +288,28 @@ async function renderEvents() {
     }
 }
 
+async function deleteEvent(button) {
+    const eventId = button.id;
 
-function deleteEvent(index) {
-  if (confirm('Are you sure you want to delete this event?')) {
-    rawEvents.splice(index, 1);
-    renderEvents();
-  }
+    if (confirm('Are you sure you want to delete this event?')) {
+        try {
+            const response = await fetch('/dashboard/deleteEvent', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ id: eventId })
+            });
+
+            if (response.ok) {
+                renderEvents();
+            } else {
+                console.error('Failed to delete event. Status:', response.status);
+            }
+        } catch (error) {
+            console.error('Network or server error:', error);
+        }
+    }
 }
 
 /**
@@ -303,8 +455,6 @@ async function loadChat(sessionId) {
             console.error('Failed to load chat:', data.message);
             return;
         }
-
-        console.log(data);
 
         const userMessages = data.message.user;
         const assistantMessages = data.message.assistantAI;

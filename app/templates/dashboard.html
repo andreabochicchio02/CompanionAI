@@ -26,13 +26,13 @@
         <div id="up-content">
             <div id="event-list">
                 <div id="header-event-list">
-                    <h3 class="sub-title">EVENTS LIST</h3>
+                    <h3 class="sub-title"><em>EVENTS LIST</em></h3>
                     <button id="show-event-popup-btn">Add New Event</button>
                 </div>
                 <div id="events-output"></div>
             </div>
             <div id="right-content">
-                <h3 class="sub-title">CHAT HISTORY</h3>
+                <h3 class="sub-title"><em>CHAT HISTORY</em></h3>
                 <div class="chat-list" id="chat-list"></div>
             </div>
         </div>
@@ -54,38 +54,8 @@
         <div class="popup-content">
             <span class="close-btn" id="close-personal-info-btn">&times;</span>
 
-            <form id="bio-form">
-                <h3>Biography Information</h3>
-
-                <label for="full-name">Full Name</label>
-                <textarea id="full-name" class="personal-info-label" placeholder="Enter your full name" required></textarea>
-
-                <label for="birth-details">Date and Place of Birth</label>
-                <textarea id="birth-details" class="personal-info-label" placeholder="e.g., January 1, 1990, London, UK"></textarea>
-
-                <label for="family-info">Family Details</label>
-                <textarea id="family-info" class="personal-info-label" placeholder="Describe your family members, relationships, children, etc."></textarea>
-
-                <label for="education">Education Background</label>
-                <textarea id="education" class="personal-info-label" placeholder="Schools, degrees, special achievements in academics"></textarea>
-
-                <label for="career">Career and Work Experience</label>
-                <textarea id="career" class="personal-info-label" placeholder="Jobs, roles, companies, responsibilities, achievements"></textarea>
-
-                <label for="interests">Hobbies and Personal Interests</label>
-                <textarea id="interests" class="personal-info-label" placeholder="What do you enjoy doing in your free time?"></textarea>
-
-                <label for="life-events">Significant Life Events</label>
-                <textarea id="life-events" class="personal-info-label" placeholder="Major life milestones, challenges, or memorable moments"></textarea>
-
-                <label for="personality">Personality Traits and Values</label>
-                <textarea id="personality" class="personal-info-label" placeholder="Describe your character, values, or how others see you"></textarea>
-
-                <label for="goals">Aspirations and Future Goals</label>
-                <textarea id="goals" class="personal-info-label" placeholder="What are your personal or professional goals?"></textarea>
-
-                <button type="submit" id="submit-personal-info-btn">Submit Biography Info</button>
-            </form>
+            <h3>Biography Information</h3>
+            <form id="bio-form"></form>
         </div>
     </div>
 
@@ -101,7 +71,7 @@
                             <input type="text" id="title" placeholder="e.g., Doctor Visit" required>
                         </div>
                         <div class="div-coloumn">
-                            <label for="date">Start Date & Time</label>
+                            <label for="date">Date & Time</label>
                             <input type="datetime-local" id="date" required>
                         </div>
                     </div>
