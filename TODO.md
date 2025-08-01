@@ -36,4 +36,8 @@
 5. Secondo me possiamo anche evitare di mettere gli eventi all'inizio. Si può fare anche che li chiede quando li chiede l'utente
 
 **NOTE DANIEL**
-- [ ] Spesso quando fai una domanda aperta all'inizio la vede come "INITIAL" in maniera errata
+- [x] Spesso quando fai una domanda aperta all'inizio la vede come "INITIAL" in maniera errata
+- Se chiede dipendenze mancanti, scarica modello di spacy con `python -m spacy download en_core_web_sm`
+- [x] Alcune volte salva in memoria anche cose inutili
+- [x] l'informazione del messaggio corrente, non deve esere usato come context della risposta subito dopo altrimenti dice "come ti avevo gia detto" o cose simili
+- [ ] Sembra che la collezione "memory" non venga sempre ricreata all'inizio..

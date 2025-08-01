@@ -1,7 +1,7 @@
 from app import create_app
 import threading
 
-from app.services.rag import monitor_file_changes
+#from app.services.rag import monitor_file_changes
 
 app = create_app()
 

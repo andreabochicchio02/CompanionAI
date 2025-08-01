@@ -7,7 +7,7 @@ def evaluate_init_msg(user_input, model):
     prompt = (  
                 f"Determine whether the user's message is just a greeting to start a conversation or a question that requires a response. \n"
                 f"Respond only with:\n"
-                f"INITIAL — if it is a simple greeting or conversation starter.\n"
+                f"INITIAL — if it is a simple greeting\n"
                 f"QUESTION — if it is a question or a message introducing a topic the user wants to discuss.\n"
                 f"Do not include anything else in your reply, only INITIAL or QUESTION.\n"
 

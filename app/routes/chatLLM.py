@@ -6,6 +6,7 @@ import app.services.utils as utils
 import app.services.rag as rag
 import app.services.config as config
 from app.services.config import State as State
+from app.services.info_extractor import process_and_store_message
 
 # --- Standard library imports ---
 import uuid, json, random
@@ -111,6 +112,12 @@ def responseLLM():
 
     # Retrieve the last message sent by the user in this session
     prompt = CHATS[session_id].get_last_user_message()
+
+    # Process and store the message(if rilevant) in the RAG system
+    process_and_store_message(
+        text=prompt,
+        qdrant_client=rag.qdrant_client,
+    )
     
     # Return a streaming response with mimetype for Server-Sent Events (SSE)
     return Response(event_stream(session_id, prompt), mimetype='text/event-stream')
@@ -430,11 +437,18 @@ def conversation_llm(input, session_id):
     relevant_chunks = ""
     try:
         relevant_chunks = rag.get_relevant_chunks(input)
+        relevant_memory = rag.get_relevant_memory(input)
 
         if relevant_chunks:
             prompt += (
                 f"\nThese are some pieces of information you can base your response on, and the information refers to the person you are talking to:\n"
                 f"{relevant_chunks}"
+            )
+
+        if relevant_memory:
+            prompt += (
+                f"\nHere is some relevant information about the user that you can use to personalize your response:\n"
+                f"{relevant_memory}"
             )
 
         utils.append_server_log("Successfully retrieved relevant chunks from RAG")
