@@ -22,7 +22,7 @@ MIN_SCORE = 0.2
 QDRANT_DB_PATH = "qdrant_storage"
 
 # ----- SHORT TERM MEMORY ----- #
-MAX_TURNS = 10
+MAX_TURNS = 5
 
 # ----- PROACTIVE LLM ----- #
 ACTIVITIES = [

@@ -40,6 +40,14 @@ def chatLLM():
     # ollama.preload_model(MAIN_MODEL)
     # ollama.preload_model(SUMMARIZER_MODEL)
 
+    with open(config.EVENTS_PATH, 'r', encoding='utf-8') as f:
+            events = json.load(f)
+
+    filtered_events = [event for event in events if utils.keep_event(event)]
+
+    with open(config.EVENTS_PATH, 'w', encoding='utf-8') as f:
+        json.dump(filtered_events, f, indent=2)
+
     # Clear previous log files to start fresh for the new session
     utils.clear_conversation_log()
 
@@ -61,6 +69,9 @@ def new_session_id():
     # Initialize a new ChatManager instance for the session
     # This manages the conversation history and short-term memory
     CHATS[session_id] = ChatManager(config.SUMMARIZER_MODEL, State.START, config.MAX_TURNS)
+
+    for activity in config.ACTIVITIES:
+        activity["selected"] = False
 
     # Log that the start request has been successfully processed
     utils.append_server_log("/chatLLM/start request completed successfully.")

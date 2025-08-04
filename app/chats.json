@@ -30,5 +30,41 @@
         "state": "CHOOSING",
         "summary": "",
         "timestamp": "2025-07-30T14:29:24.348200+02:00"
+    },
+    "eb042dea-6b62-4167-9806-a2c2f09ba091": {
+        "user": [
+            "Hello"
+        ],
+        "assistantAI": [
+            "EVENTS:\n- 20:00: Take Evening Medication, Note: Vitamin D supplement.\n\nHello! I'm at your service. Would you prefer to ask me something directly, or would you like me to offer some conversation starters?"
+        ],
+        "topic": "",
+        "state": "CHOOSING",
+        "summary": "",
+        "timestamp": "2025-08-04T18:18:13.139346+02:00"
+    },
+    "c1e8341e-7f23-4fbb-b3eb-68b506fa79c7": {
+        "user": [
+            "hello"
+        ],
+        "assistantAI": [
+            "EVENTS:\n- 20:00: Take Evening Medication, Note: Vitamin D supplement.\n\nHello! I'm at your service. Would you prefer to ask me something directly, or would you like me to offer some conversation starters?"
+        ],
+        "topic": "",
+        "state": "CHOOSING",
+        "summary": "",
+        "timestamp": "2025-08-04T18:33:23.178072+02:00"
+    },
+    "64bc4a26-460f-4a60-a64e-9f02e44a6b07": {
+        "user": [
+            "capital of rome"
+        ],
+        "assistantAI": [
+            "The capital of Rome is Rome itself! Isn't that lovely? You know, I was just thinking about our conversation earlier today... but don't worry if your mind gets a bit fuzzy sometimes. It can be helpful to write things down or use reminders to help us remember. Would you like me to look up any fun facts about Rome for you?"
+        ],
+        "topic": "",
+        "state": "CONVERSATION",
+        "summary": "",
+        "timestamp": "2025-08-04T18:34:48.788136+02:00"
     }
 }

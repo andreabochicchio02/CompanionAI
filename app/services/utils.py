@@ -1,6 +1,5 @@
 import app.services.config as config
-from datetime import datetime
-import os
+from datetime import datetime, time
 
 def append_server_log(message):
     """
@@ -35,3 +34,38 @@ def clear_conversation_log():
     # Opening the file in write mode truncates its contents
     with open(config.CONVERSATION_LOG_FOLD, "w", encoding="utf-8") as file:
         pass
+
+
+
+def keep_event(event):
+    now = datetime.now()
+    date_str = event.get("date")
+    recurrence = event.get("recurrence")
+
+    if 'T' in date_str:
+        event_date = datetime.fromisoformat(date_str)
+    else:
+        event_date = datetime.fromisoformat(date_str)
+        event_date = datetime.combine(event_date.date(), time(23, 59, 59))
+
+    event_date = datetime.fromisoformat(date_str)
+
+    if event_date >= now:
+        return True
+
+    if not recurrence:
+        return False
+
+    end_str = recurrence.get("end")
+    if end_str:
+        if 'T' in date_str:
+            end_date = datetime.fromisoformat(date_str)
+        else:
+            end_date = datetime.fromisoformat(date_str)
+            end_date = datetime.combine(end_date.date(), time(23, 59, 59))
+        if end_date < now:
+            return False
+        else:
+            return True
+    else:
+        return True

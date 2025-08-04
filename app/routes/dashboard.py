@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, jsonify, request
 import os, json
 import app.services.config as config
-from datetime import datetime, time
+import app.services.utils as utils
 import uuid
 
 bp = Blueprint('dashboard', __name__)
@@ -19,7 +19,7 @@ def get_events():
         with open(config.EVENTS_PATH, 'r', encoding='utf-8') as f:
             events = json.load(f)
 
-        filtered_events = [event for event in events if keep_event(event)]
+        filtered_events = [event for event in events if utils.keep_event(event)]
 
         with open(config.EVENTS_PATH, 'w', encoding='utf-8') as f:
             json.dump(filtered_events, f, indent=2)
@@ -128,37 +128,3 @@ def delete_event():
         json.dump(updated_events, f, indent=2)
 
     return jsonify({'success': True}), 200
-
-
-def keep_event(event):
-    now = datetime.now()
-    date_str = event.get("date")
-    recurrence = event.get("recurrence")
-
-    if 'T' in date_str:
-        event_date = datetime.fromisoformat(date_str)
-    else:
-        event_date = datetime.fromisoformat(date_str)
-        event_date = datetime.combine(event_date.date(), time(23, 59, 59))
-
-    event_date = datetime.fromisoformat(date_str)
-
-    if event_date >= now:
-        return True
-
-    if not recurrence:
-        return False
-
-    end_str = recurrence.get("end")
-    if end_str:
-        if 'T' in date_str:
-            end_date = datetime.fromisoformat(date_str)
-        else:
-            end_date = datetime.fromisoformat(date_str)
-            end_date = datetime.combine(end_date.date(), time(23, 59, 59))
-        if end_date < now:
-            return False
-        else:
-            return True
-    else:
-        return True
