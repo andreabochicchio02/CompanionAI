@@ -60,8 +60,6 @@ async function createSessionKey() {
         // If the server responded with success, store the session ID
         if (data.success) {
             SESSION_ID = data.message; // 'message' contains the session ID
-            const sessionID_paragraf = document.getElementById('session-id');
-            sessionID_paragraf.textContent = 'Session ID: ' + SESSION_ID;
         } else {
             console.error('Failed to create session:', data.message);
         }
@@ -142,6 +140,9 @@ async function sendMessageToLLM(text) {
                     lastMessage.textContent += e.data;
                 }
             }
+
+            const messages = document.getElementById('messages');
+            messages.scrollTop = messages.scrollHeight;
         };
 
         // Handle errors or stream closure
@@ -162,6 +163,20 @@ async function sendMessageToLLM(text) {
     }
 }
 
+function hideTextArea() {
+    const container = document.getElementById('container');
+    container.style.filter = "blur(0.5px)";
+    container.style.pointerEvents = "none";
+    container.style.opacity = "0.5";
+}
+
+function showTextArea() {
+    const container = document.getElementById('container');
+    container.style.filter = "none";
+    container.style.pointerEvents = "auto";
+    container.style.opacity = "1";
+}
+
 /**
  * Loads the chat history for the given session ID,
  * highlights the corresponding chat button,
@@ -171,6 +186,8 @@ async function sendMessageToLLM(text) {
 async function loadChat(sessionId) {
     // Reset all chat list buttons to default state
     resetChatListButtons();
+
+    hideTextArea();
 
     // Highlight and disable the active chat button
     const activeButton = document.getElementById(sessionId);
@@ -239,6 +256,8 @@ async function loadChat(sessionId) {
  */
 async function createNewChat(event) {
     event.preventDefault();
+
+    showTextArea();
 
     cleanChatArea();       // Clear chat messages and UI elements
 
@@ -456,6 +475,7 @@ function addMessage(text, type) {
     message.textContent = text;
     message.style.whiteSpace = "pre-line";
     messages.append(message);
+    messages.scrollTop = messages.scrollHeight;
 }
 
 /**

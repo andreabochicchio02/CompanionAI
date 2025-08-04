@@ -93,3 +93,15 @@ footer {
     font-size: 0.9rem;
     color: #666;
 }
+
+.app-icon {
+    height: 90px;
+    margin-right: 20px;
+}
+
+#img-title {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+}

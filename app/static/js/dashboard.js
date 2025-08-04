@@ -131,8 +131,8 @@ async function sendNewBio(event) {
         const textarea = form.querySelector('#' + label.getAttribute('for'));
         if (textarea) {
             paragraphs.push({
-            title: label.textContent.trim(),
-            content: textarea.value.trim()
+                title: label.textContent.trim(),
+                content: textarea.value.trim().replace(/(\r?\n){2,}/g, '\n')
             });
         }
     });

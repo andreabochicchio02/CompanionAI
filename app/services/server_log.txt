@@ -1,34 +1,11 @@
-[2025-08-04 18:12:36]	Initializing RAG service...
-[2025-08-04 18:12:36]	Attempting to create Qdrant client at path: qdrant_storage
-[2025-08-04 18:12:36]	Using Qdrant client at path: qdrant_storage
-[2025-08-04 18:12:36]	Collection 'memory' already exists. Deleting it for testing...
-[2025-08-04 18:12:37]	Collection 'memory' deleted successfully.
-[2025-08-04 18:12:37]	Collection 'memory' recreated successfully.
-[2025-08-04 18:12:37]	No changes detected in documents. Skipping update.
-[2025-08-04 18:12:37]	RAG service initialized successfully.
-[2025-08-04 18:17:39]	/chatLLM/start request completed successfully.
-[2025-08-04 18:17:53]	/chatLLM/start request completed successfully.
-[2025-08-04 18:17:58]	process_and_store_message chiamata con: Hello
-[2025-08-04 18:17:58]	Checking if message is useful: Hello
-[2025-08-04 18:17:58]	Extracting entities from text: Hello
-[2025-08-04 18:17:59]	Message is not useful: no entities, preferences, relations or events found.
-[2025-08-04 18:33:03]	/chatLLM/start request completed successfully.
-[2025-08-04 18:33:10]	process_and_store_message chiamata con: hello
-[2025-08-04 18:33:10]	Checking if message is useful: hello
-[2025-08-04 18:33:10]	Extracting entities from text: hello
-[2025-08-04 18:33:10]	Message is not useful: no entities, preferences, relations or events found.
-[2025-08-04 18:33:45]	/chatLLM/start request completed successfully.
-[2025-08-04 18:34:02]	process_and_store_message chiamata con: capital of rome
-[2025-08-04 18:34:02]	Checking if message is useful: capital of rome
-[2025-08-04 18:34:02]	Extracting entities from text: capital of rome
-[2025-08-04 18:34:02]	Message is useful with entities: [('rome', 'GPE')], preferences: ['capital rome', 'rome'], relations: []
-[2025-08-04 18:34:03]	Rewriting extracted info for text: capital of rome
-[2025-08-04 18:34:15]	Message processed and stored: The user's extracted information is:
-
-- The city of Rome is a Geopolitical Entity (GPE).
-- No specific preferences are mentioned.
-- No relationships are specified.
-
-
-[2025-08-04 18:34:22]	Successfully retrieved relevant chunks from RAG
-[2025-08-04 18:34:48]	Response generated and sent successfully (stream=True)
+[2025-08-04 22:48:38]	Initializing RAG service...
+[2025-08-04 22:48:38]	Attempting to create Qdrant client at path: app/qdrant_storage
+[2025-08-04 22:48:38]	Using Qdrant client at path: app/qdrant_storage
+[2025-08-04 22:48:38]	Failed to initialize Qdrant client: module 'app.services.config' has no attribute 'COLLECTION_NAME'
+[2025-08-04 22:48:38]	RAG service initialized successfully.
+[2025-08-04 22:48:45]	/chatLLM/start request completed successfully.
+[2025-08-04 22:48:49]	process_and_store_message chiamata con: Hello
+[2025-08-04 22:48:49]	Checking if message is useful: Hello
+[2025-08-04 22:48:49]	Extracting entities from text: Hello
+[2025-08-04 22:48:49]	Message is not useful: no entities, preferences, relations or events found.
+[2025-08-04 22:51:39]	/chatLLM/start request completed successfully.

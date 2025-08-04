@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AssistantAI</title>
+    <title>CompanionAI</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -21,7 +21,7 @@
                 <a href="{{ url_for('index.index') }}">
                     <img src="{{ url_for('static', filename='img/img.png') }}" alt="App Icon" class="app-icon" />
                 </a>
-                <h1 class="app-name">AssistantAI</h1>
+                <h1 class="app-name">CompanionAI</h1>
             </div>
 
             <button id="new-chat" class="new-chat-btn">New chat</button>
@@ -42,7 +42,7 @@
         </div>
         
         <div id="chatArea">
-            <div id="subTitle">Chat with your personal AI assistant!</div>
+            <div id="subTitle">Chat with your personal AI companion!</div>
             <div class="messages" id="messages"></div>
             <div class="container" id="container">
                 <form class="form" id="form">
@@ -51,7 +51,6 @@
                     <button type="submit" class="submit-button" id="send-button">➤</button>
                 </form>
             </div> 
-            <p id="session-id"></p>
         </div>  
     </main>
 </body>

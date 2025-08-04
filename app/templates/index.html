@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AssistantAI</title>
+  <title>CompanionAI</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -17,8 +17,13 @@
 <body>
   <div class="container">
     <header>
-      <h1>CompanionAI</h1>
-      <p>Your personal assistant, always by your side.</p>
+      <div id="img-title">
+        <a href="{{ url_for('index.index') }}">
+            <img src="{{ url_for('static', filename='img/img.png') }}" alt="App Icon" class="app-icon" />
+        </a>
+        <h1>CompanionAI</h1>
+      </div>
+      <p>Your personal companion, always by your side.</p>
       <div class="buttons">
         <a href="{{ url_for('chatLLM.chatLLM') }}" class="btn btn-primary">Go to CHAT</a>
         <a href="{{ url_for('dashboard.dashboard') }}" class="btn btn-primary" onclick="return checkPIN()">Go to DASHBOARD</a>
@@ -33,12 +38,24 @@
           <p>Warm, reassuring conversations to make you feel less alone.</p>
         </div>
         <div class="feature-box">
-          <h3>Works Offline</h3>
-          <p>Everything runs locally: no data leaves your device.</p>
+          <h3>Smart Adaptation</h3>
+          <p>CompanionAI continuously learns and adjusts to your habits, preferences, and emotional needs automatically and effortlessly.</p>
+        </div>
+        <div class="feature-box">
+          <h3>Event & Reminder Tracking</h3>
+          <p>Never miss an appointment again. CompanionAI can remember and remind you of events, medications, and daily tasks.</p>
+        </div>
+        <div class="feature-box">
+          <h3>Family Access Dashboard</h3>
+          <p>A dedicated dashboard allows family members to securely add events, input helpful information, and review chat history for peace of mind and better care.</p>
+        </div>
+        <div class="feature-box">
+          <h3>Works Completely Offline</h3>
+          <p>All functionalities are local your data never leaves your device. No internet, no cloud, no tracking.</p>
         </div>
         <div class="feature-box">
           <h3>Guaranteed Privacy</h3>
-          <p>Your data is safe and never sent over the internet.</p>
+          <p>Privacy is at the core. No information is transmitted or shared your personal moments stay with you and your device alone.</p>
         </div>
       </div>
     </section>
@@ -47,6 +64,7 @@
       <p>&copy; 2025 CompanionAI. All rights reserved.</p>
     </footer>
   </div>
+
   <script>
     function checkPIN() {
       const correctPIN = "1234";

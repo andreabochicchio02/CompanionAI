@@ -1,7 +1,7 @@
 from enum import Enum, auto
 from sentence_transformers import SentenceTransformer
 
-EVENTS_PATH = "events.json"
+EVENTS_PATH = "app/events.json"
 
 SERVER_LOG = "app/services/server_log.txt"
 CONVERSATION_LOG_FOLD = "app/services/conversation_log.txt"
@@ -14,12 +14,11 @@ SUMMARIZER_MODEL = "gemma3:1b"
 # ----- RAG ----- #
 EMBEDDING_MODEL = SentenceTransformer("all-MiniLM-L12-v2")
 #EMBEDDING_MODEL = SentenceTransformer("BAAI/bge-m3")
-COLLECTION_NAME = "document_chunks"
-DOCUMENT_PATHS = ["document.txt"] #* elenco dei file
+DOCUMENT_PATHS = ["app/document.txt"] #* elenco dei file
 TOP_K = 3
 MIN_SCORE = 0.2
 
-QDRANT_DB_PATH = "qdrant_storage"
+QDRANT_DB_PATH = "app/qdrant_storage"
 
 # ----- SHORT TERM MEMORY ----- #
 MAX_TURNS = 5

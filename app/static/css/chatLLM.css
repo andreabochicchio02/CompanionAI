@@ -192,6 +192,10 @@ main {
     transition: bottom 0.7s ease;
 }
 
+.container.hidden {
+    display: none;
+}
+
 .form {
     display: flex;
     justify-content: space-between;
@@ -238,7 +242,6 @@ main {
     display: none;
     flex-direction: column;
     width: 100%;
-    margin-top: 10px;
     padding: 0 15%;
     margin-bottom: 1rem;
     overflow-y: auto;
@@ -248,7 +251,7 @@ main {
 .message {
     padding: 0.5rem 1rem;
     border-radius: 15px;
-    margin: 0.3rem 0;
+    margin: 0.5rem 0;
     max-width: 80%;
     word-wrap: break-word;
     font-size: 0.95rem;
@@ -264,9 +267,4 @@ main {
     align-self: flex-start;
     background-color: rgb(238, 238, 238);
     color: black;
-}
-
-#session-id {
-    margin-top: 5px;
-    font-size: small;
 }
