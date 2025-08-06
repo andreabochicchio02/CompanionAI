@@ -15,6 +15,15 @@ def append_server_log(message):
     with open(config.SERVER_LOG, "a", encoding="utf-8") as file:
         file.write(f"[{timestamp}]\t{message}\n")
 
+def append_memory_log(message):
+
+    # Get current date and time as a formatted string
+    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    
+    # Open the file in append mode and write the timestamp and message
+    with open(config.MEMORY_LOG, "a", encoding="utf-8") as file:
+        file.write(f"[{timestamp}]\t{message}\n")
+
 def clear_server_log():
     """
     Clears all contents of the log file by opening it in write mode.
@@ -23,6 +32,9 @@ def clear_server_log():
     with open(config.SERVER_LOG, "w", encoding="utf-8") as file:
         pass  # Opening in write mode with no content truncates the file
 
+def clear_memory_log():
+    with open(config.MEMORY_LOG, "w", encoding="utf-8") as file:
+        pass  # Opening in write mode with no content truncates the file
 
 def append_conversation_log(message):
     # Append the message to the single log file

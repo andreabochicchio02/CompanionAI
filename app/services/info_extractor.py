@@ -9,16 +9,16 @@ import json
 
 
 kw_model = KeyBERT()
-nlp = spacy.load("en_core_web_sm") # se serve scarica il modello con `python -m spacy download en_core_web_sm`
+nlp = spacy.load("en_core_web_sm")
 
 def extract_preferences(text):
-    # Estrai solo keyword/frasi rappresentative con KeyBERT (top 2, puoi regolare)
+    # extract only representative keywords/phrases with KeyBERT (top 2, can be adjusted)
     keywords = [k[0] for k in kw_model.extract_keywords(text, keyphrase_ngram_range=(1,2), stop_words='english', top_n=2)]
-    # Filtro keyword banali
+    # Filter banal keywords
     stop_keywords = {"hi", "hello", "ok", "thanks", "thank you", "please"}
     return [kw for kw in keywords if kw and kw.lower() not in stop_keywords]
 
-# Relation Extraction: soggetto-verbo-oggetto
+# Relation Extraction: subject-verb-object triples
 def extract_relations(text):
     doc = nlp(text)
     relations = []
@@ -40,25 +40,44 @@ def extract_entities(text):
     doc = nlp(text)
     return [(ent.text, ent.label_) for ent in doc.ents]
 
-def rewrite_extracted_info(entities, preferences, relations, text, model, utils_module=utils):
+def rewrite_extracted_info(entities, preferences, relations, text, model):
     """
     Pass extracted entities, preferences, and relations to an LLM to rewrite them in a more structured and meaningful format.
     """
-    utils_module.append_server_log(f"Rewriting extracted info for text: {text}")
+    utils.append_server_log(f"Rewriting extracted info for text: {text}")
 
     prompt = f"""
-    Extract and rewrite only the useful personal information from the following user message. 
-    Ignore the question format and focus on facts, preferences, relationships, etc.
-    Examples:
-    - "Do you know I like chocolate?" → "The user likes chocolate."  
-    - "Did you know my favorite color is blue?" → "The user's favorite color is blue."
-    - "What is my favorite food?" → [don't save anything, it's just a question]
+    Extract and rewrite personal information from the user's message. Focus on what the user reveals about themselves.
 
-    Original message: "{text}"
-    Extracted entities: {entities}
-    Extracted preferences: {preferences}
-    Extracted relations: {relations}
-    """
+    ALWAYS SAVE these types of information:
+    - Likes/dislikes: "I love X", "I hate Y", "I prefer Z"
+    - Personal facts: age, location, family, work, health conditions
+    - Future plans: "I want to travel to X", "I will visit Y"
+    - Personal experiences: "I have been to X", "I tried Y"
+    - Characteristics: personality traits, habits, allergies
+
+    NEVER SAVE these:
+    - Pure questions: "What is my favorite food?" (no new info revealed)
+    - Commands: "Tell me about X", "Show me Y" 
+    - Greetings: "Hello", "Thanks", "Goodbye"
+
+    Format: Always start with "The user..." when saving information.
+    If no personal information is revealed, respond exactly: "No personal information found"
+
+    Examples:
+    - "I love chocolate" → "The user loves chocolate"
+    - "I want to travel to Japan" → "The user wants to travel to Japan"
+    - "I love Japan" → "The user loves Japan"
+    - "I love dogs" → "The user loves dogs"
+    - "What is my favorite color?" → "No personal information found"
+    - "Tell me a joke" → "No personal information found"
+
+    User message: "{text}"
+    Detected entities: {entities}
+    Keywords: {preferences}
+    Relations: {relations}
+
+    Response:"""
 
     result = subprocess.run(
         ["ollama", "run", model],
@@ -66,9 +85,13 @@ def rewrite_extracted_info(entities, preferences, relations, text, model, utils_
         capture_output=True
     )
     try:
-        return json.loads(result.stdout.decode())
-    except Exception:
-        return result.stdout.decode()
+        response = result.stdout.decode().strip()
+        if response.startswith("Response:"):
+            response = response[9:].strip()
+        return response
+    except Exception as e:
+        utils.append_server_log(f"Error in LLM processing: {e}")
+        return "No personal information found"
     
 def is_useful_message(text):
     """ Check if the message contains useful information by extracting entities, preferences, and relations.
@@ -78,10 +101,10 @@ def is_useful_message(text):
     entities = extract_entities(text)
     preferences = extract_preferences(text)
     relations = extract_relations(text)
-    # Se troviamo almeno una tra entità, preferenze, relazioni, eventi
+    # if we find at least one among entities, preferences, relations
     if entities or preferences or relations:
         utils.append_server_log(
-            f"Message is useful with entities: {entities}, preferences: {preferences}, relations: {relations}"
+            f"Message is possibly useful with entities: {entities}, preferences: {preferences}, relations: {relations}"
         )
         return True, entities, preferences, relations
     else:
@@ -89,12 +112,11 @@ def is_useful_message(text):
         return False, [], [], []
 
 def process_and_store_message(text, qdrant_client,embedding_model=config.EMBEDDING_MODEL, llm_model=config.MAIN_MODEL):
-    utils.append_server_log(f"process_and_store_message chiamata con: {text}")
     is_useful, entities, preferences, relations = is_useful_message(text)
     if is_useful:
-        # Controlla se esistono già le stesse preferenze, entità o relazioni in memoria
+        # Check if similar message already exists in Qdrant (similarity > 0.9)
         existing = qdrant_client.search(
-            collection_name="memory",
+            collection_name=config.MEMORY_COLLECTION_NAME,
             query_vector=compute_embeddings(embedding_model, [text])[0],
             limit=20,
             with_payload=True,
@@ -104,18 +126,30 @@ def process_and_store_message(text, qdrant_client,embedding_model=config.EMBEDDI
             utils.append_server_log(f"Similar message already in memory, skipping: {text}")
             return
         
-        # Riscrivi le informazioni estratte usando l'LLM
         rewrited_info = rewrite_extracted_info(
-            entities, preferences, relations, text, llm_model, utils_module=utils
+            entities, preferences, relations, text, llm_model
         )
+        #! testing
+        utils.append_server_log(f"Rewritten info: {rewrited_info}")
         # Filter: save only if the rewritten info contains relevant information (not generic questions)
         if not rewrited_info:
             utils.append_server_log(f"Rewritten info is empty, skipping insert: {text}")
             return
-        #TODO: If the rewritten info is a question or too generic, do not save (possibili miglioramenti?)
+        # if the message is generic (the user asks something) skip it
         info_str = str(rewrited_info).lower()
-        if info_str.startswith("the user asks") or "asks" in info_str:
-            utils.append_server_log(f"Rewritten info is a question, skipping insert: {text}")
+
+        # Blocca risposte che indicano nessuna informazione utile
+        no_info_indicators = [
+            "no extracted information",
+            "no useful information", 
+            "no relevant information",
+            "no personal information",
+            "the user asks",
+            "asks"
+        ]
+
+        if any(indicator in info_str for indicator in no_info_indicators):
+            utils.append_server_log(f"Rewritten info indicates no useful information, skipping insert: {text}")
             return
         
         # Prepare the payload
@@ -123,11 +157,9 @@ def process_and_store_message(text, qdrant_client,embedding_model=config.EMBEDDI
             "rewrited_info": rewrited_info,
             "text": text
         }
-        # Calcola embedding
         embedding = compute_embeddings(embedding_model, [text])[0]
-        # Salva in Qdrant
         qdrant_client.upsert(
-            collection_name="memory",
+            collection_name=config.MEMORY_COLLECTION_NAME,
             points=[
                 PointStruct(
                     id=hash(f"{hash(text)}") % (2**31),
@@ -137,3 +169,4 @@ def process_and_store_message(text, qdrant_client,embedding_model=config.EMBEDDI
             ]
         )
         utils.append_server_log(f"Message processed and stored: {rewrited_info}")
+        utils.append_memory_log(rewrited_info)

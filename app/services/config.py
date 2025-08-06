@@ -4,6 +4,7 @@ from sentence_transformers import SentenceTransformer
 EVENTS_PATH = "app/events.json"
 
 SERVER_LOG = "app/services/server_log.txt"
+MEMORY_LOG = "app/services/memory_log.txt"
 CONVERSATION_LOG_FOLD = "app/services/conversation_log.txt"
 
 CHATS_FILE = 'app/chats.json'
@@ -13,12 +14,13 @@ SUMMARIZER_MODEL = "gemma3:1b"
 
 # ----- RAG ----- #
 EMBEDDING_MODEL = SentenceTransformer("all-MiniLM-L12-v2")
-#EMBEDDING_MODEL = SentenceTransformer("BAAI/bge-m3")
 DOCUMENT_PATHS = ["app/document.txt"] #* elenco dei file
 TOP_K = 3
 MIN_SCORE = 0.2
 
 QDRANT_DB_PATH = "app/qdrant_storage"
+DOCUMENTS_COLLECTION_NAME = "documents"
+MEMORY_COLLECTION_NAME = "memory"
 
 # ----- SHORT TERM MEMORY ----- #
 MAX_TURNS = 5
