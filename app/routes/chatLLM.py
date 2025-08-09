@@ -10,7 +10,7 @@ from app.services.info_extractor import process_and_store_message
 
 # --- Standard library imports ---
 import uuid, json, random
-from datetime import datetime, date
+from datetime import datetime, date, timedelta
 import json
 from flask import Blueprint, render_template, request, jsonify, Response
 
@@ -384,7 +384,7 @@ def event_stream(session_id, prompt, retry=False):
     # so this situation must be handled accordingly.
     elif CHATS[session_id].get_chat_state() == State.CONVERSATION:
         recent_messages = CHATS[session_id].get_recent_messages()
-        evaluation = proactiveLLM.evaluate_general_msg(prompt, CHATS[session_id].get_chat_topic(), recent_messages, config.MAIN_MODEL)
+        evaluation = proactiveLLM.evaluate_general_msg(prompt, recent_messages, config.MAIN_MODEL)
 
         if "CONTINUE_TOPIC" in evaluation:
             ollama_prompt = conversation_llm(prompt, session_id)
@@ -410,24 +410,29 @@ def event_stream(session_id, prompt, retry=False):
         elif "EVENTS" in evaluation:
             CHATS[session_id].set_chat_topic('')
 
-            # Load scheduled events from file
+            # Extract time-related parameters from the user request
+            time_params = extract_time_parameters(prompt)
+            
             with open(config.EVENTS_PATH, "r") as f:
                 events = json.load(f)
-
-            # Filter and get today's events
-            today_events = get_events_today(events)
-
+            
+            # Get events for the requested period
+            future_events = get_events_for_period(events, time_params)
+            
             response = ''
-            if today_events:
-                response += "EVENTS:\n" + "\n".join(today_events) + "\n\n"
-
-            # Format each line
+            if future_events:
+                response += "EVENTS:\n" + "\n".join(future_events) + "\n\n"
+            else:
+                response += "There are no events for the requested period.\n\n"
+            
+            # Format each line for SSE (Server-Sent Events) streaming
             sse_payload = ''.join(f"data: {line}\n" for line in response.strip().split('\n'))
             sse_payload += "\n"
-
+            
+            # Send the SSE payload to the client
             yield sse_payload
 
-            CHATS[session_id].add_assistant_message(sse_payload, session_id, config.CHATS_FILE)
+            CHATS[session_id].add_assistant_message(response, session_id, config.CHATS_FILE)
             return
         else:
             if not retry:
@@ -575,3 +580,169 @@ def get_events_today(events):
 
     results = [entry[1] for entry in event_list]
     return results
+
+
+def get_events_for_period(events, time_params):
+    """
+    Returns events for a given time period.
+    Handles both single and recurring events for the requested period.
+    """
+    if time_params["type"] == "none":
+        return []
+    
+    now = datetime.now()
+    event_list = []
+
+    # Determine the period of interest
+    if time_params["type"] == "today":
+        start_date = end_date = now.date()
+    elif time_params["type"] == "tomorrow":
+        start_date = end_date = now.date() + timedelta(days=1)
+    elif time_params["type"] == "specific_date":
+        start_date = end_date = datetime.fromisoformat(time_params["date"]).date()
+    elif time_params["type"] == "month":
+        year = time_params.get("year", now.year)
+        month = time_params["month"]
+        start_date = date(year, month, 1)
+        if month == 12:
+            end_date = date(year + 1, 1, 1) - timedelta(days=1)
+        else:
+            end_date = date(year, month + 1, 1) - timedelta(days=1)
+    elif time_params["type"] == "next_week":
+        # Calculate the start of next week (Monday)
+        days_until_monday = (7 - now.weekday()) % 7
+        if days_until_monday == 0:
+            days_until_monday = 7
+        start_date = now.date() + timedelta(days=days_until_monday)
+        end_date = start_date + timedelta(days=6)
+    else:
+        return []
+
+    for event in events:
+        event_date_str = event["date"]
+        recurrence = event.get("recurrence")
+        
+        try:
+            event_datetime = datetime.fromisoformat(event_date_str)
+        except ValueError:
+            continue
+
+        event_date = event_datetime.date()
+        event_time = event_datetime.time()
+        time_str = event_time.strftime('%H:%M') if event_time != datetime.min.time() else ""
+
+        # Handle single events
+        if not recurrence:
+            if start_date <= event_date <= end_date:
+                event_list.append((event_date, event_time, f"- {time_str} {event['title']}, Note: {event['note']}"))
+            continue
+
+        # Handle recurring events
+        recurrence_start_str = recurrence.get("start", event_date_str)
+        recurrence_end_str = recurrence.get("end")
+        
+        try:
+            recurrence_start_date = datetime.fromisoformat(recurrence_start_str).date()
+            if recurrence_start_date > end_date:
+                continue
+        except ValueError:
+            continue
+
+        if recurrence_end_str:
+            try:
+                recurrence_end_date = datetime.fromisoformat(recurrence_end_str).date()
+                if start_date > recurrence_end_date:
+                    continue
+            except ValueError:
+                continue
+
+        frequency = recurrence.get("frequency")
+
+        if frequency == "daily":
+            days = recurrence.get("days_of_week")
+            current_date = start_date
+            while current_date <= end_date:
+                if days:
+                    weekday_name = current_date.strftime("%A")
+                    if weekday_name in days:
+                        event_list.append((current_date, event_time, f"- {time_str} {event['title']}, Note: {event['note']}"))
+                else:
+                    event_list.append((current_date, event_time, f"- {time_str} {event['title']}, Note: {event['note']}"))
+                current_date += timedelta(days=1)
+
+        elif frequency == "weekly":
+            days = recurrence.get("days_of_week")
+            current_date = start_date
+            while current_date <= end_date:
+                if days:
+                    weekday_name = current_date.strftime("%A")
+                    if weekday_name in days:
+                        event_list.append((current_date, event_time, f"- {time_str} {event['title']}, Note: {event['note']}"))
+                elif current_date.weekday() == event_date.weekday():
+                    event_list.append((current_date, event_time, f"- {time_str} {event['title']}, Note: {event['note']}"))
+                current_date += timedelta(days=1)
+
+        elif frequency == "monthly":
+            current_date = start_date
+            while current_date <= end_date:
+                if current_date.day == event_date.day:
+                    event_list.append((current_date, event_time, f"- {time_str} {event['title']}, Note: {event['note']}"))
+                current_date += timedelta(days=1)
+
+        elif frequency == "annual":
+            current_date = start_date
+            while current_date <= end_date:
+                if (current_date.month, current_date.day) == (event_date.month, event_date.day):
+                    event_list.append((current_date, event_time, f"- {time_str} {event['title']}, Note: {event['note']}"))
+                current_date += timedelta(days=1)
+
+    # Sort by date and time
+    event_list.sort(key=lambda x: (x[0], x[1] or datetime.min.time()))
+
+    # Group by date
+    grouped_events = {}
+    for event_date, event_time, event_str in event_list:
+        date_str = event_date.strftime('%d/%m/%Y')
+        grouped_events.setdefault(date_str, []).append(event_str)
+
+    # Format results
+    results = []
+    for date_str, events in grouped_events.items():
+        results.append(f"\n{date_str}:")
+        results.extend(events)
+
+    return results
+
+
+def extract_time_parameters(user_input):
+    """
+    Extracts temporal parameters from the user's request.
+    Returns a dictionary with the extracted parameters.
+    """
+    prompt = f"""
+    Analyze the user's request and extract temporal information.
+    Respond only with a JSON in the following format:
+    {{
+        "type": "date|month|today|tomorrow|next_week|specific_date|none",
+        "date": "YYYY-MM-DD",
+        "month": MM (1-12),
+        "year": YYYY
+    }}
+
+    Examples:
+    - "events in August" → {{"type": "month", "month": 8, "year": 2025}}
+    - "events on August 15" → {{"type": "specific_date", "date": "2025-08-15"}}
+    - "events today" → {{"type": "today"}}
+    - "events tomorrow" → {{"type": "tomorrow"}}
+    - "events next week" → {{"type": "next_week"}}
+
+    If there are no temporal references, respond with {{"type": "none"}}.
+
+    User request: {user_input}
+    """
+
+    try:
+        response = ollama.query_ollama_no_stream(prompt, config.MAIN_MODEL)
+        return json.loads(response)
+    except:
+        return {"type": "none"}

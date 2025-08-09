@@ -2,7 +2,7 @@
   {
     "id": "ba431a2c-1099-4e25-9c11-9ef1053034b5",
     "title": "Marta's Birthday",
-    "date": "2025-09-12",
+    "date": "2025-08-12",
     "note": "Buy a gift before September 10th.",
     "recurrence": {
       "frequency": "annual",
@@ -20,16 +20,6 @@
     }
   },
   {
-    "id": "54dfaf72-8938-4e06-bfd8-d9c6c2940fa4",
-    "title": "Therapy Session",
-    "date": "2025-08-05T18:00:00",
-    "note": "Weekly session with Dr. Harris.",
-    "recurrence": {
-      "frequency": "weekly",
-      "end": "2025-12-31"
-    }
-  },
-  {
     "id": "40388f0d-bf93-4d65-9d1f-6432acaf89d7",
     "title": "Jogging with Alex",
     "date": "2025-07-30T06:30:00",
@@ -39,7 +29,8 @@
       "days_of_week": [
         "Monday",
         "Wednesday",
-        "Friday"
+        "Friday",
+        "Sunday"
       ],
       "end": null
     }

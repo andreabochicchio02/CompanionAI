@@ -54,13 +54,13 @@ def evaluate_choose_topic(user_input, topic, model):
     return answer
 
 
-def evaluate_general_msg(user_input, topic, short_memory, model):
+def evaluate_general_msg(user_input, short_memory, model):
     prompt = (
         "Based on the user's message and the context of the ongoing conversation, determine what the user intends to do next.\n"
         "Respond only with one of the following options\n"
         "CONTINUE_TOPIC — If the user is continuing the current topic, expanding on it, replying to a question, or asking a related follow-up.\n"
         "NEW_QUESTION — if the user asks a new, open-ended question that is unrelated to the current topic.\n"
-        "EVENTS — If the user explicitly asks what events, appointments, or plans they have scheduled for today,\n"
+        "EVENTS — If the user explicitly asks about their events or appointments for a specific period (e.g., events in August, events next week, events on August 15)\n"
         "Do not include anything else in your reply, only CONTINUE_TOPIC, EVENTS, or NEW_QUESTION\n\n"
     )
 
@@ -70,7 +70,7 @@ def evaluate_general_msg(user_input, topic, short_memory, model):
     prompt += f"User message: {user_input}"
 
     answer = ollama.query_ollama_no_stream(prompt, model).strip().upper()
-    utils.append_conversation_log(f"We have to check if: CONTINUE_TOPIC or NEW_QUESTION.\n\nPrompt:\n{prompt.strip()}.\n\nEvaluation:\n{answer.strip()}\n\n")
+    utils.append_conversation_log(f"We have to check if: CONTINUE_TOPIC, EVENTS, or NEW_QUESTION.\n\nPrompt:\n{prompt.strip()}.\n\nEvaluation:\n{answer.strip()}\n\n")
     return answer
 
 
