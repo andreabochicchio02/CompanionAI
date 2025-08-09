@@ -17,7 +17,7 @@ export const observer = new MutationObserver((mutations) => {
 export function addThinkingDots() {
     const messages = document.getElementById('messages');
     const thinking = document.createElement('div');
-    thinking.classList.add('message', 'thinking');
+    thinking.classList.add('thinking');
     thinking.id = 'thinking-dots';
     thinking.textContent = 'I am thinking';
     messages.append(thinking);

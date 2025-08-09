@@ -37,22 +37,28 @@ body {
 .app-name {
     margin: 0;
     font-size: x-large;
+    color: #36679B;
+    font-weight: 700;
 }
 
 .new-chat-btn {
-    background-color: #36679B;
+    background: linear-gradient(135deg, #36679B 0%, #4b7bb5 100%);
     color: white;
     border: none;
-    padding: 10px;
-    border-radius: 6px;
+    padding: 0.75rem 1.5rem;
+    border-radius: 10px;
     cursor: pointer;
     margin-top: 30px;
     margin-bottom: 30px;
-    font-size: large;
+    font-size: 0.95rem;
+    font-weight: 600;
+    box-shadow: 0 4px 12px rgba(54, 103, 155, 0.3);
+    transition: all 0.3s ease;
 }
 
 .new-chat-btn:hover {
-    background-color: #4b7bb5;
+    background: linear-gradient(135deg, #4b7bb5 0%, #5a8bc7 100%);
+    box-shadow: 0 6px 20px rgba(54, 103, 155, 0.4);
 }
 
 #chat-history-title {
@@ -66,33 +72,42 @@ body {
     overflow-y: auto;
     display: flex;
     flex-direction: column;
+    scrollbar-gutter: stable;
 }
 
 .chat-item {
     margin-top: 10px;
-    padding: 8px;
-    border-radius: 10px;
-    border: 1px solid lightgray;
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    border: 1px solid #ddd;
     cursor: pointer;
-    font-size: small;
+    font-size: 0.9rem;
+    background: white;
+    transition: all 0.3s ease;
 }
 
 .chat-item:hover {
-    background-color: lightgray;
+    background-color: #f5f5f5;
+    border-color: #36679B;
 }
 
 .clear-history-btn {
-    background-color: #e74c3c;
+    background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
     color: white;
     border: none;
-    padding: 8px;
-    border-radius: 6px;
+    padding: 0.6rem 1rem;
+    border-radius: 10px;
     cursor: pointer;
     margin-top: 16px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    box-shadow: 0 4px 12px rgba(231, 76, 60, 0.3);
+    transition: all 0.3s ease;
 }
 
 .clear-history-btn:hover {
-    background-color: #c0392b;
+    background: linear-gradient(135deg, #ee5a4c 0%, #d64a3c 100%);
+    box-shadow: 0 6px 20px rgba(231, 76, 60, 0.4);
 }
 
 .settings-section {
@@ -169,7 +184,8 @@ main {
 }
 
 #subTitle {
-    color: black;
+    color: #36679B;
+    font-weight: 700;
     font-size: x-large;
     width: 100%;
     text-align: center;
@@ -230,11 +246,13 @@ main {
     font-size: 1.2rem;
     border-radius: 50%;
     cursor: pointer;
-    transition: background-color 0.3s;
+    box-shadow: 0 4px 12px rgba(54, 103, 155, 0.25);
+    transition: all 0.3s ease;
 }
 
 .submit-button:hover {
     background-color: #4b7bb5;
+    box-shadow: 0 6px 20px rgba(54, 103, 155, 0.35);
 }
 
 .messages {
@@ -244,26 +262,161 @@ main {
     padding: 0 15%;
     margin-bottom: 1rem;
     overflow-y: auto;
+    overflow-x: hidden;
+    scroll-behavior: smooth;
     transition: height 0.7s ease;
+    scrollbar-width: thin;
+    scrollbar-color: #36679B transparent;
 }
 
 .message {
-    padding: 0.5rem 1rem;
-    border-radius: 15px;
+    padding: 0.75rem 1rem;
+    border-radius: 18px;
     margin: 0.5rem 0;
-    max-width: 80%;
+    max-width: 85%;
     word-wrap: break-word;
-    font-size: 0.95rem;
+    font-size: 0.9rem;
+    line-height: 1.4;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .message.user {
     align-self: flex-end;
     background-color: #36679B;
     color: white;
+    margin-left: 15%;
 }
 
 .message.assistantAI {
     align-self: flex-start;
-    background-color: rgb(238, 238, 238);
-    color: black;
+    background-color: #f8f9fa;
+    color: #333;
+    border: 1px solid #e9ecef;
+    margin-right: 15%;
+}
+
+.messages::-webkit-scrollbar {
+    width: 8px;
+}
+
+.messages::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.messages::-webkit-scrollbar-thumb {
+    background-color: #36679B;
+    border-radius: 10px;
+    border: 2px solid transparent;
+}
+
+.messages::-webkit-scrollbar-thumb:hover {
+    background-color: #4b7bb5;
+}
+
+.chat-list::-webkit-scrollbar {
+    width: 8px;
+}
+
+.chat-list::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.05);
+    border-radius: 12px;
+    margin: 2px;
+}
+
+.chat-list::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, rgba(54, 103, 155, 0.4) 0%, rgba(54, 103, 155, 0.6) 100%);
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    transition: all 0.3s ease;
+    min-height: 40px;
+}
+
+.chat-list::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(180deg, rgba(54, 103, 155, 0.6) 0%, rgba(54, 103, 155, 0.8) 100%);
+    transform: scaleX(1.1);
+    box-shadow: 0 2px 8px rgba(54, 103, 155, 0.3);
+}
+
+.chat-list::-webkit-scrollbar-thumb:active {
+    background: linear-gradient(180deg, rgba(54, 103, 155, 0.7) 0%, rgba(54, 103, 155, 0.9) 100%);
+    transform: scaleX(1.05);
+}
+
+.chat-list::-webkit-scrollbar-corner {
+    background: transparent;
+}
+
+.chat-list {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(54, 103, 155, 0.5) rgba(0, 0, 0, 0.05);
+}
+
+@media (max-width: 1200px) {
+    #sideBar { width: 24%; }
+    .container { width: min(70%, 800px); }
+    .messages { padding: 0 10%; }
+}
+
+@media (max-width: 992px) {
+    #sideBar { width: 28%; }
+    .app-name { font-size: large; }
+    .messages { padding: 0 8%; }
+}
+
+@media (max-width: 768px) {
+    html, body, main { width: 100%; }
+    main { 
+        flex-direction: column; 
+        align-items: stretch; 
+        justify-content: flex-start; 
+    }
+
+    #sideBar {
+        width: 100%;
+        height: auto;
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+    }
+
+    .app-header { 
+        justify-content: flex-start; 
+        gap: 10px; 
+    }
+
+    .new-chat-btn { width: 100%; }
+
+    .chat-list { 
+        max-height: 30vh; 
+        overflow-y: auto; 
+    }
+
+    #chatArea { 
+        width: 100%; 
+        height: auto; 
+        padding: 0 12px; 
+    }
+
+    .container { 
+        width: 100%; 
+        margin-top: 10px; 
+        margin-bottom: 10px; 
+        border-radius: 14px; 
+    }
+
+    .messages { 
+        padding-left: 4%; 
+        padding-right: 4%; 
+    }
+
+    .message { max-width: 100%; }
+
+    .input-text { width: 100%; }
+
+    .submit-button { 
+        width: 2.5em; 
+        height: 2.5em; 
+        font-size: 1rem; 
+    }
 }

@@ -111,7 +111,6 @@ body {
 
 #show-event-popup-btn:hover {
     background: linear-gradient(135deg, #4b7bb5 0%, #5a8bc7 100%);
-    transform: translateY(-2px);
     box-shadow: 0 6px 20px rgba(54, 103, 155, 0.4);
 }
 
@@ -204,7 +203,6 @@ body {
 .chat-item:hover {
     background-color: #f5f5f5;
     border-color: #36679B;
-    transform: translateY(-1px);
 }
 
 /* Personal info section */
@@ -234,7 +232,6 @@ body {
 
 #personal-info-container #personal-info-btn:hover {
     background: linear-gradient(135deg, #4b7bb5 0%, #5a8bc7 100%);
-    transform: translateY(-2px);
     box-shadow: 0 6px 24px rgba(54, 103, 155, 0.4);
 }
 
@@ -393,7 +390,6 @@ body {
 
 #add-event #event-form #new-event-btn:hover {
     background: linear-gradient(135deg, #4b7bb5 0%, #5a8bc7 100%);
-    transform: translateY(-2px);
     box-shadow: 0 6px 20px rgba(54, 103, 155, 0.4);
 }
 
@@ -504,7 +500,6 @@ body {
 
 #submit-personal-info-btn:hover {
     background: linear-gradient(135deg, #4b7bb5 0%, #5a8bc7 100%);
-    transform: translateY(-2px);
     box-shadow: 0 6px 20px rgba(54, 103, 155, 0.4);
 }
 
