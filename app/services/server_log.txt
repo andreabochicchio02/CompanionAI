@@ -1,11 +1,6 @@
-[2025-08-04 22:48:38]	Initializing RAG service...
-[2025-08-04 22:48:38]	Attempting to create Qdrant client at path: app/qdrant_storage
-[2025-08-04 22:48:38]	Using Qdrant client at path: app/qdrant_storage
-[2025-08-04 22:48:38]	Failed to initialize Qdrant client: module 'app.services.config' has no attribute 'COLLECTION_NAME'
-[2025-08-04 22:48:38]	RAG service initialized successfully.
-[2025-08-04 22:48:45]	/chatLLM/start request completed successfully.
-[2025-08-04 22:48:49]	process_and_store_message chiamata con: Hello
-[2025-08-04 22:48:49]	Checking if message is useful: Hello
-[2025-08-04 22:48:49]	Extracting entities from text: Hello
-[2025-08-04 22:48:49]	Message is not useful: no entities, preferences, relations or events found.
-[2025-08-04 22:51:39]	/chatLLM/start request completed successfully.
+[2025-08-13 18:59:53]	Initializing RAG service...
+[2025-08-13 18:59:53]	Attempting to create Qdrant client at path: app/qdrant_storage
+[2025-08-13 18:59:53]	Using Qdrant client at path: app/qdrant_storage
+[2025-08-13 18:59:53]	No changes detected in documents. Skipping update.
+[2025-08-13 18:59:53]	RAG service initialized successfully.
+[2025-08-13 19:00:48]	/chatLLM/start request completed successfully.

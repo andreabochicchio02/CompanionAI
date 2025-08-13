@@ -1,11 +1,6 @@
 __pycache__/
 
-# python virtual environment
-env_llm
-.venv
-
 # data structure index
-faiss_index
 qdrant_storage
 file_hashes.json
 

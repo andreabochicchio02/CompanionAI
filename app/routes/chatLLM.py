@@ -124,11 +124,12 @@ def responseLLM():
     # Retrieve the last message sent by the user in this session
     prompt = CHATS[session_id].get_last_user_message()
 
-    # Process and store the message(if rilevant) in the RAG system
-    process_and_store_message(
-        text=prompt,
-        qdrant_client=rag.qdrant_client,
-    )
+    if config.USER_RELIABLE:
+        # Process and store the message(if rilevant) in the RAG system
+        process_and_store_message(
+            text=prompt,
+            qdrant_client=rag.qdrant_client,
+        )
     
     # Return a streaming response with mimetype for Server-Sent Events (SSE)
     return Response(event_stream(session_id, prompt), mimetype='text/event-stream')
@@ -277,6 +278,33 @@ def event_stream(session_id, prompt, retry=False):
             CHATS[session_id].set_chat_state(State.CHOOSING)
             CHATS[session_id].add_assistant_message(response, session_id, config.CHATS_FILE)
             return
+        elif "EVENTS" in evaluation:
+            CHATS[session_id].set_chat_topic('')
+
+            # Extract time-related parameters from the user request
+            time_params = extract_time_parameters(prompt)
+            
+            with open(config.EVENTS_PATH, "r") as f:
+                events = json.load(f)
+            
+            # Get events for the requested period
+            future_events = get_events_for_period(events, time_params)
+            
+            response = ''
+            if future_events:
+                response += "EVENTS:\n" + "\n".join(future_events) + "\n\n"
+            else:
+                response += "There are no events for the requested period.\n\n"
+            
+            # Format each line for SSE (Server-Sent Events) streaming
+            sse_payload = ''.join(f"data: {line}\n" for line in response.strip().split('\n'))
+            sse_payload += "\n"
+            
+            # Send the SSE payload to the client
+            yield sse_payload
+
+            CHATS[session_id].add_assistant_message(response, session_id, config.CHATS_FILE)
+            return
         elif "QUESTION" in evaluation:
             CHATS[session_id].set_chat_state(State.CONVERSATION)
             CHATS[session_id].set_chat_topic('')
@@ -304,10 +332,15 @@ def event_stream(session_id, prompt, retry=False):
         evaluation = proactiveLLM.evaluate_type_topic(prompt, config.MAIN_MODEL)
 
         if "LLM_TOPIC" in evaluation:
-            topic, topic_question = proactiveLLM.find_the_topic(config.ACTIVITIES)
-            if topic:
+            # Build session topics pool once, then reuse
+            topics_pool = CHATS[session_id].get_topics_pool()
+            if not topics_pool:
+                topics_pool = proactiveLLM.build_topics_pool(config.ACTIVITIES)
+                CHATS[session_id].set_topics_pool(topics_pool)
+            topic_question = proactiveLLM.choose_topic_from_pool(CHATS[session_id].get_topics_pool())
+            if topic_question:
                 CHATS[session_id].set_chat_state(State.TOPIC)
-                CHATS[session_id].set_chat_topic(topic)
+                CHATS[session_id].set_chat_topic(topic_question)
                 yield f"data: {topic_question}\n\n"
                 CHATS[session_id].add_assistant_message(topic_question, session_id, config.CHATS_FILE)
                 return
@@ -356,10 +389,11 @@ def event_stream(session_id, prompt, retry=False):
             CHATS[session_id].add_assistant_message(full_response, session_id, config.CHATS_FILE)
             return
         elif "CHANGE_TOPIC" in evaluation:
-            topic, topic_question = proactiveLLM.find_the_topic(config.ACTIVITIES)
-            if topic:
+            topics_pool = CHATS[session_id].get_topics_pool()
+            topic_question = proactiveLLM.choose_topic_from_pool(topics_pool)
+            if topic_question:
                 CHATS[session_id].set_chat_state(State.TOPIC)
-                CHATS[session_id].set_chat_topic(topic)
+                CHATS[session_id].set_chat_topic(topic_question)
                 yield f"data: {topic_question}\n\n"
                 CHATS[session_id].add_assistant_message(topic_question, session_id, config.CHATS_FILE)
                 return

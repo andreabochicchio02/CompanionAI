@@ -75,7 +75,7 @@ def get_paragraphs():
                 "content": body
             })
 
-        return jsonify({"success": True, "message": paragraphs})
+        return jsonify({"success": True, "message": paragraphs, "userReliable": config.USER_RELIABLE})
 
     except Exception as e:
         return jsonify({"success": False, "message": f"Errore durante la lettura del file: {str(e)}"}), 500
@@ -86,6 +86,8 @@ def save_paragraphs():
     try:
         data = request.get_json()
         paragraphs = data.get('paragraphs', [])
+        reliable = bool(data.get('reliable', False))
+        config.set_user_reliable(reliable)
 
         if not paragraphs:
             return jsonify({"success": False, "message": "No paragraphs provided."}), 400

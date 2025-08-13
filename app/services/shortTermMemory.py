@@ -1,12 +1,13 @@
 import app.services.utils as utils
 import app.services.ollama as ollama
 import threading
-import os, json
+import os
+import json
 import datetime
 from zoneinfo import ZoneInfo
 
 class ChatManager:
-    def __init__(self, summarizer_model, state, max_turns=6, user_history=None, assistant_history=None, topic=''):
+    def __init__(self, summarizer_model, state, max_turns=6, user_history=None, assistant_history=None, topic='', topics_pool=None):
         """
         Initializes the ChatManager.
 
@@ -25,7 +26,8 @@ class ChatManager:
             'user': user_history if user_history is not None else [],
             'assistantAI': assistant_history if assistant_history is not None else [],
             'topic': topic,
-            'state': state
+            'state': state,
+            'topics_pool': topics_pool if topics_pool is not None else []
         }
 
         self.summary = ""
@@ -74,6 +76,14 @@ class ChatManager:
     def get_chat_topic(self):
         """Returns the current conversation topic."""
         return self.chat['topic']
+
+    def get_topics_pool(self):
+        """Returns the session-scoped topics pool (list of dicts)."""
+        return self.chat.get('topics_pool', [])
+
+    def set_topics_pool(self, topics_pool):
+        """Sets the session-scoped topics pool."""
+        self.chat['topics_pool'] = topics_pool or []
 
     def summarize_history_async(self, history_snapshot, current_summary):
         """
@@ -192,6 +202,7 @@ class ChatManager:
             'topic': self.chat['topic'],
             'state': self.chat['state'].name if hasattr(self.chat['state'], 'name') else str(self.chat['state']),
             'summary': self.summary,
+            'topics_pool': self.chat.get('topics_pool', []),
             'timestamp': datetime.datetime.now(ZoneInfo("Europe/Rome")).isoformat()
         }
 

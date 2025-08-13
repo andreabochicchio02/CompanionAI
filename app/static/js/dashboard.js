@@ -61,6 +61,26 @@ async function showPersonalInfoPopUp(event){
         const form = document.getElementById('bio-form');
         form.innerHTML = '';
 
+        const label = document.createElement("label");
+        label.className = "toggle-container";
+
+        const mainText = document.createElement("span");
+        mainText.textContent = "User is reliable?";
+
+        const input = document.createElement("input");
+        input.type = "checkbox";
+        input.className = "reliable-toggle";
+        input.id = "reliable-toggle";
+        input.checked = data.userReliable;
+
+        const spanSlider = document.createElement("span");
+        spanSlider.className = "slider";
+
+        label.appendChild(mainText);
+        label.appendChild(input);
+        label.appendChild(spanSlider);
+        form.appendChild(label);
+        
         data.message.forEach(paragraph => {
             const title = paragraph.title;
             const content = paragraph.content;
@@ -137,13 +157,19 @@ async function sendNewBio(event) {
         }
     });
 
+    const reliableToggle = document.getElementById('reliable-toggle');
+    const isReliable = reliableToggle ? reliableToggle.checked : false;
+
     try {
         const response = await fetch('/dashboard/saveParagraphs', {
             method: 'POST',
             headers: {
             'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ paragraphs })
+            body: JSON.stringify({ 
+                "paragraphs": paragraphs,
+                "reliable": isReliable
+            })
         });
 
         const data = await response.json();
@@ -247,7 +273,7 @@ function addEventToList(event, index) {
     const deleteBtn = document.createElement('button');
     deleteBtn.className = 'delete-btn';
     deleteBtn.id = event.id;
-    deleteBtn.textContent = '🗑️';
+    deleteBtn.textContent = '🗑';
     deleteBtn.title = 'Delete event';
     deleteBtn.addEventListener('click', (event) => {
         deleteEvent(event.target);

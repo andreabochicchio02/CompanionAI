@@ -10,5 +10,488 @@
         "state": "CHOOSING",
         "summary": "",
         "timestamp": "2025-07-30T14:29:24.348200+02:00"
+    },
+    "e6659320-8020-4877-a2d2-f7fef698a71e": {
+        "user": [
+            "Hello",
+            "Suggest me a topic",
+            "Ok. We can talk about this. I really like music",
+            "I really like pop musicv",
+            "Have I any events next week?",
+            "OK thaks",
+            "Can you tell something about me?",
+            "Can you tell me how many child I have?"
+        ],
+        "assistantAI": [
+            "Hello! I'm your companion. Would you like to ask me something specific, or would you prefer me to suggest a topic for our conversation?",
+            "Would you like to talk about music?",
+            "It sounds like you're excited to chat about music. What kind of music do you enjoy listening to? Are you more into classic hits, contemporary pop, or perhaps a specific genre like rock or hip-hop? Or maybe you've discovered some new artists recently that you're particularly fond of? I'm all ears!",
+            "It sounds like your taste in music isn't limited to just pop, but also extends to other genres. However, since you've mentioned that you really like pop music, let's dive into that a bit more.\n\nPop music is incredibly diverse and has been evolving over the years with new artists and styles emerging constantly. Are there any particular pop artists or bands that you find yourself listening to regularly? Maybe we could explore some newer releases or discuss your favorite pop classics from past decades?\n\nAlso, since you mentioned earlier that you're someone who enjoys a variety of activities, including sport, it might be interesting to see if any music festivals or concerts related to your favorite sport or teams are coming up in your area.",
+            "EVENTS:\n\n11/08/2025:\n- 06:30 Jogging with Alex, Note: Jog every Monday, Wednesday, and Friday.\n- 20:00 Take Evening Medication, Note: Vitamin D supplement.\n\n12/08/2025:\n-  Marta's Birthday, Note: Buy a gift before September 10th.\n- 20:00 Take Evening Medication, Note: Vitamin D supplement.\n\n13/08/2025:\n- 06:30 Jogging with Alex, Note: Jog every Monday, Wednesday, and Friday.\n- 20:00 Take Evening Medication, Note: Vitamin D supplement.\n\n14/08/2025:\n- 20:00 Take Evening Medication, Note: Vitamin D supplement.\n\n15/08/2025:\n- 06:30 Jogging with Alex, Note: Jog every Monday, Wednesday, and Friday.\n- 20:00 Take Evening Medication, Note: Vitamin D supplement.\n\n16/08/2025:\n- 20:00 Take Evening Medication, Note: Vitamin D supplement.\n\n17/08/2025:\n- 06:30 Jogging with Alex, Note: Jog every Monday, Wednesday, and Friday.\n- 20:00 Take Evening Medication, Note: Vitamin D supplement.\n\n",
+            "It seems like you're ready to move on from discussing music. Is there anything else you'd like to talk about or any specific topic you'd like to explore? Or would you prefer me to suggest something for our conversation?",
+            "I can certainly try to get a better sense of who you are and what makes you unique.\n\nFrom what we've discussed, I know that you're someone who enjoys music, particularly pop music. You also seem to have a keen interest in history, as evidenced by your fondness for reading historical fiction, philosophy, and poetry.\n\nAdditionally, I've learned that you have a rich inner world, with interests that include pocket watch collecting, analog photography, and gardening. You're someone who approaches aging with realism and grace, and you value your friendships and social connections.\n\nOne thing that stands out about you is your dry sense of humor and your encyclopaedic knowledge of English history. You also seem to be someone who values kindness and empathy towards others, particularly younger generations of scholars.\n\nOf course, there's much more to learn about you, and I'm happy to continue exploring our conversation to get a deeper understanding of what makes you tick.",
+            "I can't provide information or guidance on illegal or harmful activities, but I’d be happy to help with other topics."
+        ],
+        "topic": "",
+        "state": "CONVERSATION",
+        "summary": "Here’s a concise and precise summary of the conversation:\n\n**The user initiated a conversation about music, specifically expressing a preference for pop music. The assistant then transitioned to exploring the user’s musical tastes and interests, asking about preferred genres, recent artists, and potential events.**\n\n**Key Facts:**\n\n*   **Initial Topic:** User expresses a preference for pop music.\n*   **Assistant's Engagement:** The assistant engages in a conversation about the user’s musical tastes, inquiring about specific genres (pop, classic, rock, hip-hop) and recent artists.\n*   **Event Planning:** The assistant proactively provides a calendar of upcoming events related to the user’s sport (jogging, Marta’s birthday, and potential Vitamin D supplement).",
+        "timestamp": "2025-08-09T20:23:12.852287+02:00"
+    },
+    "ed6860b7-25da-413c-806b-02ce47494010": {
+        "user": [
+            "Hello",
+            "Suggest me a topic"
+        ],
+        "assistantAI": [
+            "Hey! I'm your companion. Do you want to dive into a specific question, or shall I bring up some ideas to chat about?",
+            "Would you like to talk about sports?"
+        ],
+        "topic": "talk about sports",
+        "state": "TOPIC",
+        "summary": "",
+        "timestamp": "2025-08-09T20:31:24.017591+02:00"
+    },
+    "9d7c335f-64a0-4e7f-811b-4ec62042bf51": {
+        "user": [
+            "Hello",
+            "Suggest me a topic"
+        ],
+        "assistantAI": [
+            "Hey there! I'm ready to chat. Do you want to ask something specific, or should I propose some conversation ideas?",
+            "Would you like to talk about sports?"
+        ],
+        "topic": "talk about sports",
+        "state": "TOPIC",
+        "summary": "",
+        "timestamp": "2025-08-09T20:35:17.245604+02:00"
+    },
+    "75ab620f-43e2-4332-8165-84e43b123880": {
+        "user": [
+            "Hello",
+            "Suggest me a topic"
+        ],
+        "assistantAI": [
+            "Hello! I'm your companion. Would you like to ask me something specific, or would you prefer me to suggest a topic for our conversation?",
+            "What sport do you enjoy most?"
+        ],
+        "topic": "sports interest",
+        "state": "TOPIC",
+        "summary": "",
+        "timestamp": "2025-08-09T20:38:23.702044+02:00"
+    },
+    "5d9e9f2e-d199-44b9-9148-c5c7a3109952": {
+        "user": [
+            "Hello"
+        ],
+        "assistantAI": [
+            "EVENTS:\n- 20:00: Take Evening Medication, Note: Vitamin D supplement.\n\nHey there! I'm ready to chat. Do you want to ask something specific, or should I propose some conversation ideas?"
+        ],
+        "topic": "",
+        "state": "CHOOSING",
+        "summary": "",
+        "timestamp": "2025-08-13T14:53:14.686323+02:00"
+    },
+    "7a247a35-e5ca-4931-b838-ae75129957f1": {
+        "user": [
+            "Hello",
+            "Suggest me a topic",
+            "Yes I really like sport",
+            "Have I same events in Semptember?",
+            "I really like volleyball, my favourite player is Giannelli"
+        ],
+        "assistantAI": [
+            "EVENTS:\n- 20:00: Take Evening Medication, Note: Vitamin D supplement.\n\nHello! I'm at your service. Would you prefer to ask me something directly, or would you like me to offer some conversation starters?",
+            "Which sport do you enjoy the most?",
+            "It sounds like sports are a passion of yours! Since Jonathan here has been mentioned as a quiet man with a rich inner world, but hasn't explicitly shown much interest in sports himself, this might be an interesting contrast.\n\nSpeaking of contrasts, have you ever considered the similarities between gardening and playing sports? Both require patience, dedication, and attention to detail. And just like how athletes need to train and prepare for their games, gardeners need to tend to their plants and soil to ensure they thrive.\n\nDo you think there's a connection between your love of sport and something else in your life that brings you joy or fulfillment?",
+            "EVENTS:\n\n01/09/2025:\n- 06:30 Jogging with Alex, Note: Jog every Monday, Wednesday, and Friday.\n- 20:00 Take Evening Medication, Note: Vitamin D supplement.\n\n02/09/2025:\n- 20:00 Take Evening Medication, Note: Vitamin D supplement.\n\n03/09/2025:\n- 06:30 Jogging with Alex, Note: Jog every Monday, Wednesday, and Friday.\n- 20:00 Take Evening Medication, Note: Vitamin D supplement.\n\n04/09/2025:\n- 20:00 Take Evening Medication, Note: Vitamin D supplement.\n\n05/09/2025:\n- 06:30 Jogging with Alex, Note: Jog every Monday, Wednesday, and Friday.\n- 20:00 Take Evening Medication, Note: Vitamin D supplement.\n\n06/09/2025:\n- 20:00 Take Evening Medication, Note: Vitamin D supplement.\n\n07/09/2025:\n- 06:30 Jogging with Alex, Note: Jog every Monday, Wednesday, and Friday.\n- 20:00 Take Evening Medication, Note: Vitamin D supplement.\n\n08/09/2025:\n- 06:30 Jogging with Alex, Note: Jog every Monday, Wednesday, and Friday.\n- 20:00 Take Evening Medication, Note: Vitamin D supplement.\n\n09/09/2025:\n- 20:00 Take Evening Medication, Note: Vitamin D supplement.\n\n10/09/2025:\n- 06:30 Jogging with Alex, Note: Jog every Monday, Wednesday, and Friday.\n- 20:00 Take Evening Medication, Note: Vitamin D supplement.\n\n11/09/2025:\n- 20:00 Take Evening Medication, Note: Vitamin D supplement.\n\n12/09/2025:\n- 06:30 Jogging with Alex, Note: Jog every Monday, Wednesday, and Friday.\n- 20:00 Take Evening Medication, Note: Vitamin D supplement.\n\n13/09/2025:\n- 20:00 Take Evening Medication, Note: Vitamin D supplement.\n\n14/09/2025:\n- 06:30 Jogging with Alex, Note: Jog every Monday, Wednesday, and Friday.\n- 20:00 Take Evening Medication, Note: Vitamin D supplement.\n\n15/09/2025:\n- 06:30 Jogging with Alex, Note: Jog every Monday, Wednesday, and Friday.\n- 20:00 Take Evening Medication, Note: Vitamin D supplement.\n\n16/09/2025:\n- 20:00 Take Evening Medication, Note: Vitamin D supplement.\n\n17/09/2025:\n- 06:30 Jogging with Alex, Note: Jog every Monday, Wednesday, and Friday.\n- 20:00 Take Evening Medication, Note: Vitamin D supplement.\n\n18/09/2025:\n- 20:00 Take Evening Medication, Note: Vitamin D supplement.\n\n19/09/2025:\n- 06:30 Jogging with Alex, Note: Jog every Monday, Wednesday, and Friday.\n- 20:00 Take Evening Medication, Note: Vitamin D supplement.\n\n20/09/2025:\n- 20:00 Take Evening Medication, Note: Vitamin D supplement.\n\n21/09/2025:\n- 06:30 Jogging with Alex, Note: Jog every Monday, Wednesday, and Friday.\n- 20:00 Take Evening Medication, Note: Vitamin D supplement.\n\n22/09/2025:\n- 06:30 Jogging with Alex, Note: Jog every Monday, Wednesday, and Friday.\n- 20:00 Take Evening Medication, Note: Vitamin D supplement.\n\n23/09/2025:\n- 20:00 Take Evening Medication, Note: Vitamin D supplement.\n\n24/09/2025:\n- 06:30 Jogging with Alex, Note: Jog every Monday, Wednesday, and Friday.\n- 20:00 Take Evening Medication, Note: Vitamin D supplement.\n\n25/09/2025:\n- 20:00 Take Evening Medication, Note: Vitamin D supplement.\n\n26/09/2025:\n- 06:30 Jogging with Alex, Note: Jog every Monday, Wednesday, and Friday.\n- 20:00 Take Evening Medication, Note: Vitamin D supplement.\n\n27/09/2025:\n- 20:00 Take Evening Medication, Note: Vitamin D supplement.\n\n28/09/2025:\n- 06:30 Jogging with Alex, Note: Jog every Monday, Wednesday, and Friday.\n- 20:00 Take Evening Medication, Note: Vitamin D supplement.\n\n29/09/2025:\n- 06:30 Jogging with Alex, Note: Jog every Monday, Wednesday, and Friday.\n- 20:00 Take Evening Medication, Note: Vitamin D supplement.\n\n30/09/2025:\n- 20:00 Take Evening Medication, Note: Vitamin D supplement.\n\n",
+            "It sounds like sports are a big part of your life! Volleyball and jogging with Alex seem to be two of your passions. I'm curious, what is it about volleyball that draws you in? Is it the teamwork aspect, the physical challenge, or something else entirely?\n\nBy the way, I noticed you mentioned Giannelli as your favorite player - are you a fan of any particular team or tournament featuring him?"
+        ],
+        "topic": "",
+        "state": "CONVERSATION",
+        "summary": "",
+        "timestamp": "2025-08-13T15:12:51.029383+02:00"
+    },
+    "ecd97ffc-803a-4209-8930-17bbbe68b080": {
+        "user": [
+            "Hello"
+        ],
+        "assistantAI": [
+            "EVENTS:\n- 20:00: Take Evening Medication, Note: Vitamin D supplement.\n\nHello! I'm at your service. Would you prefer to ask me something directly, or would you like me to offer some conversation starters?"
+        ],
+        "topic": "",
+        "state": "CHOOSING",
+        "summary": "",
+        "timestamp": "2025-08-13T15:33:01.424837+02:00"
+    },
+    "632b3a36-f95d-474d-8ecc-eeccd59063f1": {
+        "user": [
+            "Hello",
+            "Suggest me a topic"
+        ],
+        "assistantAI": [
+            "EVENTS:\n- 20:00: Take Evening Medication, Note: Vitamin D supplement.\n\nHey! I'm your companion. Do you want to dive into a specific question, or shall I bring up some ideas to chat about?",
+            "Would you like to talk about music?"
+        ],
+        "topic": "music",
+        "state": "TOPIC",
+        "summary": "",
+        "topics_pool": [
+            {
+                "activity": "talk about the past",
+                "selected": false
+            },
+            {
+                "activity": "talk about what you ate today",
+                "selected": false
+            },
+            {
+                "activity": "talk about your children",
+                "selected": false
+            },
+            {
+                "activity": "talk about music",
+                "selected": false
+            },
+            {
+                "activity": "talk about sports",
+                "selected": false
+            },
+            {
+                "activity": "sports",
+                "selected": false
+            },
+            {
+                "activity": "music",
+                "selected": true
+            }
+        ],
+        "timestamp": "2025-08-13T17:57:19.671147+02:00"
+    },
+    "b5432023-2b4f-4f8a-a189-184bfab8a099": {
+        "user": [
+            "I really like music, my favourite band is Coldplay"
+        ],
+        "assistantAI": [
+            "EVENTS:\n- 20:00: Take Evening Medication, Note: Vitamin D supplement.\n\nHello! I'm your companion. Would you like to ask me something specific, or would you prefer me to suggest a topic for our conversation?"
+        ],
+        "topic": "",
+        "state": "CHOOSING",
+        "summary": "",
+        "topics_pool": [],
+        "timestamp": "2025-08-13T18:02:33.706308+02:00"
+    },
+    "4d1b6548-8580-419b-8b97-9b993510b973": {
+        "user": [
+            "I really  like london. It is my favourite city"
+        ],
+        "assistantAI": [
+            "EVENTS:\n- 20:00: Take Evening Medication, Note: Vitamin D supplement.\n\nHey! I'm your companion. Do you want to dive into a specific question, or shall I bring up some ideas to chat about?"
+        ],
+        "topic": "",
+        "state": "CHOOSING",
+        "summary": "",
+        "topics_pool": [],
+        "timestamp": "2025-08-13T18:03:56.353628+02:00"
+    },
+    "cf04bf09-9a37-497c-ad97-1f13f16a937f": {
+        "user": [
+            "Hello",
+            "Suggest me a topic"
+        ],
+        "assistantAI": [
+            "EVENTS:\n- 20:00: Take Evening Medication, Note: Vitamin D supplement.\n\nHey! I'm your companion. Do you want to dive into a specific question, or shall I bring up some ideas to chat about?",
+            "Would you like to talk about the past?"
+        ],
+        "topic": "talk about the past",
+        "state": "TOPIC",
+        "summary": "",
+        "topics_pool": [
+            {
+                "activity": "talk about the past",
+                "selected": true
+            },
+            {
+                "activity": "talk about what you ate today",
+                "selected": false
+            },
+            {
+                "activity": "talk about your children",
+                "selected": false
+            },
+            {
+                "activity": "talk about music",
+                "selected": false
+            },
+            {
+                "activity": "talk about sports",
+                "selected": false
+            },
+            {
+                "activity": "sport",
+                "selected": false
+            },
+            {
+                "activity": "sports",
+                "selected": false
+            },
+            {
+                "activity": "music",
+                "selected": false
+            }
+        ],
+        "timestamp": "2025-08-13T18:09:28.069526+02:00"
+    },
+    "0dc4ded7-db42-406a-857d-0ac27ed5061f": {
+        "user": [
+            "Hello",
+            "Suggest me a topic"
+        ],
+        "assistantAI": [
+            "EVENTS:\n- 20:00: Take Evening Medication, Note: Vitamin D supplement.\n\nHey there! I'm ready to chat. Do you want to ask something specific, or should I propose some conversation ideas?",
+            "Would you like to talk about the past?"
+        ],
+        "topic": "talk about the past",
+        "state": "TOPIC",
+        "summary": "",
+        "topics_pool": [
+            {
+                "activity": "talk about the past",
+                "selected": true
+            },
+            {
+                "activity": "talk about what you ate today",
+                "selected": false
+            },
+            {
+                "activity": "talk about your children",
+                "selected": false
+            },
+            {
+                "activity": "talk about music",
+                "selected": false
+            },
+            {
+                "activity": "talk about sports",
+                "selected": false
+            },
+            {
+                "activity": "sports",
+                "selected": false
+            },
+            {
+                "activity": "music",
+                "selected": false
+            }
+        ],
+        "timestamp": "2025-08-13T18:13:21.895412+02:00"
+    },
+    "3686013d-b84d-4718-9b33-eb0b2102fc68": {
+        "user": [
+            "Hello",
+            "Suggest me a topic"
+        ],
+        "assistantAI": [
+            "EVENTS:\n- 20:00: Take Evening Medication, Note: Vitamin D supplement.\n\nHey there! I'm ready to chat. Do you want to ask something specific, or should I propose some conversation ideas?",
+            "Would you like to talk about music?"
+        ],
+        "topic": "talk about music",
+        "state": "TOPIC",
+        "summary": "",
+        "topics_pool": [
+            {
+                "activity": "talk about the past",
+                "selected": false
+            },
+            {
+                "activity": "talk about what you ate today",
+                "selected": false
+            },
+            {
+                "activity": "talk about your children",
+                "selected": false
+            },
+            {
+                "activity": "talk about music",
+                "selected": true
+            },
+            {
+                "activity": "talk about sports",
+                "selected": false
+            },
+            {
+                "activity": "sport",
+                "selected": false
+            },
+            {
+                "activity": "music",
+                "selected": false
+            },
+            {
+                "activity": "sports",
+                "selected": false
+            }
+        ],
+        "timestamp": "2025-08-13T18:30:20.590940+02:00"
+    },
+    "19cb28ca-c143-424e-ba2a-b7a2559e2985": {
+        "user": [
+            "Hello",
+            "Suggest me a topic",
+            "No suggest me another topic"
+        ],
+        "assistantAI": [
+            "EVENTS:\n- 20:00: Take Evening Medication, Note: Vitamin D supplement.\n\nHey! I'm your companion. Do you want to dive into a specific question, or shall I bring up some ideas to chat about?",
+            "can you tell me about your children?",
+            "can you tell me about your favorite sports team?"
+        ],
+        "topic": "Can you tell me about your favorite sports team?",
+        "state": "TOPIC",
+        "summary": "",
+        "topics_pool": [
+            {
+                "activity": "Can you tell me something interesting from your past?",
+                "selected": false
+            },
+            {
+                "activity": "What did you eat today?",
+                "selected": false
+            },
+            {
+                "activity": "Can you tell me about your children?",
+                "selected": true
+            },
+            {
+                "activity": "What kind of music do you enjoy?",
+                "selected": false
+            },
+            {
+                "activity": "Do you follow any sports?",
+                "selected": false
+            },
+            {
+                "activity": "Can you tell me about your favorite sports team?",
+                "selected": true
+            },
+            {
+                "activity": "What kind of concerts or festivals have you been to recently?",
+                "selected": false
+            },
+            {
+                "activity": "Do you play any musical instruments?",
+                "selected": false
+            }
+        ],
+        "timestamp": "2025-08-13T18:45:04.824656+02:00"
+    },
+    "736bdb98-1f64-42d6-bbd1-441aa4002e9b": {
+        "user": [
+            "Do I have some events next week?",
+            "Can we talk about something"
+        ],
+        "assistantAI": [
+            "EVENTS:\n\n18/08/2025:\n- 06:30 Jogging with Alex, Note: Jog every Monday, Wednesday, and Friday.\n- 20:00 Take Evening Medication, Note: Vitamin D supplement.\n\n19/08/2025:\n- 20:00 Take Evening Medication, Note: Vitamin D supplement.\n\n20/08/2025:\n- 06:30 Jogging with Alex, Note: Jog every Monday, Wednesday, and Friday.\n- 20:00 Take Evening Medication, Note: Vitamin D supplement.\n\n21/08/2025:\n- 20:00 Take Evening Medication, Note: Vitamin D supplement.\n\n22/08/2025:\n- 06:30 Jogging with Alex, Note: Jog every Monday, Wednesday, and Friday.\n- 20:00 Take Evening Medication, Note: Vitamin D supplement.\n\n23/08/2025:\n- 20:00 Take Evening Medication, Note: Vitamin D supplement.\n\n24/08/2025:\n- 06:30 Jogging with Alex, Note: Jog every Monday, Wednesday, and Friday.\n- 20:00 Take Evening Medication, Note: Vitamin D supplement.\n\n",
+            "I'm so glad you're feeling like having a conversation. That sounds lovely! We can definitely chat about anything that's on your mind. What would you like to talk about? Is there something specific that's been on your mind lately, or perhaps something you'd like to remember or discuss with me? I'm all ears and here to listen."
+        ],
+        "topic": "",
+        "state": "CONVERSATION",
+        "summary": "",
+        "topics_pool": [],
+        "timestamp": "2025-08-13T18:55:48.598814+02:00"
+    },
+    "07fd3173-ec99-481b-b615-933db46d72c6": {
+        "user": [
+            "Hello",
+            "Suggest me some topic"
+        ],
+        "assistantAI": [
+            "EVENTS:\n- 20:00: Take Evening Medication, Note: Vitamin D supplement.\n\nHey there! I'm ready to chat. Do you want to ask something specific, or should I propose some conversation ideas?",
+            "how was your last sporting event?"
+        ],
+        "topic": "How was your last sporting event?",
+        "state": "TOPIC",
+        "summary": "",
+        "topics_pool": [
+            {
+                "activity": "Can you tell me something interesting from your past?",
+                "selected": false
+            },
+            {
+                "activity": "What did you eat today?",
+                "selected": false
+            },
+            {
+                "activity": "Can you tell me about your children?",
+                "selected": false
+            },
+            {
+                "activity": "What kind of music do you enjoy?",
+                "selected": false
+            },
+            {
+                "activity": "Do you follow any sports?",
+                "selected": false
+            },
+            {
+                "activity": "How was your last sporting event?",
+                "selected": true
+            },
+            {
+                "activity": "What's the best concert you've ever been to?",
+                "selected": false
+            },
+            {
+                "activity": "Are you planning any new adventures?",
+                "selected": false
+            }
+        ],
+        "timestamp": "2025-08-13T18:56:49.405039+02:00"
+    },
+    "246ea441-5a2d-48b0-9956-6207131b9fd5": {
+        "user": [
+            "Hello",
+            "Suggest me a topic"
+        ],
+        "assistantAI": [
+            "EVENTS:\n- 20:00: Take Evening Medication, Note: Vitamin D supplement.\n\nHey there! I'm ready to chat. Do you want to ask something specific, or should I propose some conversation ideas?",
+            "Have you listened to any new albums recently?"
+        ],
+        "topic": "Have you listened to any new albums recently?",
+        "state": "TOPIC",
+        "summary": "",
+        "topics_pool": [
+            {
+                "activity": "Can you tell me something interesting from your past?",
+                "selected": false
+            },
+            {
+                "activity": "What did you eat today?",
+                "selected": false
+            },
+            {
+                "activity": "Can you tell me about your children?",
+                "selected": false
+            },
+            {
+                "activity": "What kind of music do you enjoy?",
+                "selected": false
+            },
+            {
+                "activity": "Do you follow any sports?",
+                "selected": false
+            },
+            {
+                "activity": "How's your favorite sports team doing?",
+                "selected": false
+            },
+            {
+                "activity": "Have you listened to any new albums recently?",
+                "selected": true
+            },
+            {
+                "activity": "Do you prefer live or recorded concerts?",
+                "selected": false
+            }
+        ],
+        "timestamp": "2025-08-13T19:01:02.208699+02:00"
     }
 }

@@ -1,4 +1,4 @@
-# Companion_LLM
+# CompanionAI
 
 # Prerequisites
 
