@@ -12,7 +12,7 @@ def evaluate_init_msg(user_input, model):
                 f"Respond only with:\n"
                 f"INITIAL — if it is a simple greeting\n"
                 f"QUESTION — if it is a question or a message introducing a topic the user wants to discuss.\n"
-                f"EVENTS — If the user explicitly asks about their events or appointments for a specific period (e.g., events in August, events next week, events on August 15)\n"
+                f"EVENTS — If the user explicitly asks about any events or appointments they have already scheduled for a specific period (e.g., events in August, events next week, events on August 15)\n"
                 f"Do not include anything else in your reply, only INITIAL, EVENTS or QUESTION.\n"
 
                 f"User message: {user_input}"
@@ -29,7 +29,8 @@ def evaluate_type_topic(user_input, model):
                 f"Respond only with:\n"
                 f"LLM_TOPIC — if the user is asking for a suggestion about what to talk about.\n"
                 f"USER_TOPIC — If they introduce a topic they want to discuss or ask a question. \n"
-                f"Do not include anything else in your reply, only LLM_TOPIC or USER_TOPIC.\n"
+                f"EVENTS — If the user explicitly asks about any events or appointments they have already scheduled for a specific period (e.g., events in August, events next week, events on August 15)\n"
+                f"Do not include anything else in your reply, only LLM_TOPIC, EVENTS or USER_TOPIC.\n"
 
                 f"User message: {user_input}"
             )
@@ -64,7 +65,7 @@ def evaluate_general_msg(user_input, short_memory, model):
         "Respond only with one of the following options\n"
         "CONTINUE_TOPIC — If the user is continuing the current topic, expanding on it, replying to a question, or asking a related follow-up.\n"
         "NEW_QUESTION — if the user asks a new, open-ended question that is unrelated to the current topic.\n"
-        "EVENTS — If the user explicitly asks about their events or appointments for a specific period (e.g., events in August, events next week, events on August 15)\n"
+        "EVENTS — If the user explicitly asks about any events or appointments they have already scheduled for a specific period (e.g., events in August, events next week, events on August 15)\n"
         "Do not include anything else in your reply, only CONTINUE_TOPIC, EVENTS, or NEW_QUESTION\n\n"
     )
 

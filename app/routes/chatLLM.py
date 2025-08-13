@@ -256,25 +256,9 @@ def event_stream(session_id, prompt, retry=False):
         evaluation = proactiveLLM.evaluate_init_msg(prompt, config.MAIN_MODEL)
 
         if "INITIAL" in evaluation:
-            # Load scheduled events from file
-            with open(config.EVENTS_PATH, "r") as f:
-                events = json.load(f)
+            response = random.choice(config.SUGGEST_TOPIC_SENTENCES)
 
-            # Filter and get today's events
-            today_events = get_events_today(events)
-
-            response = ''
-            if today_events:
-                response += "EVENTS:\n" + "\n".join(today_events) + "\n\n"
-
-            # Add a random suggested topic sentence
-            response += random.choice(config.SUGGEST_TOPIC_SENTENCES)
-
-            # Format each line
-            sse_payload = ''.join(f"data: {line}\n" for line in response.strip().split('\n'))
-            sse_payload += "\n"
-
-            yield sse_payload
+            yield f"data: {response}\n\n"
             CHATS[session_id].set_chat_state(State.CHOOSING)
             CHATS[session_id].add_assistant_message(response, session_id, config.CHATS_FILE)
             return
@@ -362,6 +346,33 @@ def event_stream(session_id, prompt, retry=False):
                 yield f"data: {chunk}\n\n"
 
             CHATS[session_id].add_assistant_message(full_response, session_id, config.CHATS_FILE)
+            return
+        elif "EVENTS" in evaluation:
+            CHATS[session_id].set_chat_topic('')
+
+            # Extract time-related parameters from the user request
+            time_params = extract_time_parameters(prompt)
+            
+            with open(config.EVENTS_PATH, "r") as f:
+                events = json.load(f)
+            
+            # Get events for the requested period
+            future_events = get_events_for_period(events, time_params)
+            
+            response = ''
+            if future_events:
+                response += "EVENTS:\n" + "\n".join(future_events) + "\n\n"
+            else:
+                response += "There are no events for the requested period.\n\n"
+            
+            # Format each line for SSE (Server-Sent Events) streaming
+            sse_payload = ''.join(f"data: {line}\n" for line in response.strip().split('\n'))
+            sse_payload += "\n"
+            
+            # Send the SSE payload to the client
+            yield sse_payload
+
+            CHATS[session_id].add_assistant_message(response, session_id, config.CHATS_FILE)
             return
         else:
             if not retry:
@@ -542,80 +553,6 @@ def generate_session_id():
     return session_id
 
 
-def get_events_today(events):
-    """
-    Returns today's events as formatted strings.
-
-    Handles one-time and recurring events (daily, weekly, monthly, annual), 
-    skips past events for today, and sorts by time if available.
-    """
-    
-    now = datetime.now()
-    today = now.date()
-    weekday_name = today.strftime("%A")
-    event_list = []
-
-    for event in events:
-        event_date_str = event["date"]
-        recurrence = event.get("recurrence")
-
-        try:
-            event_datetime = datetime.fromisoformat(event_date_str)
-        except ValueError:
-            continue
-
-        event_date = event_datetime.date()
-        event_time = event_datetime.time()
-        time_str = event_time.strftime('%H:%M:') if "T" in event_date_str else ""
-
-        if time_str and event_time < now.time():
-            continue
-
-        if not recurrence:
-            if event_date == today:
-                event_list.append((event_time, f"- {time_str} {event['title']}, Note: {event['note']}"))
-            continue
-
-        end_date_str = recurrence.get("end")
-        if end_date_str:
-            try:
-                end_date = datetime.fromisoformat(end_date_str).date()
-                if today > end_date:
-                    continue
-            except ValueError:
-                continue
-
-        frequency = recurrence.get("frequency")
-
-        if frequency == "daily":
-            days = recurrence.get("days_of_week")
-            if days:
-                if weekday_name in days:
-                    event_list.append((event_time, f"- {time_str} {event['title']}, Note: {event['note']}"))
-            else:
-                event_list.append((event_time, f"- {time_str} {event['title']}, Note: {event['note']}"))
-
-        elif frequency == "weekly":
-            if today >= event_date and today.weekday() == event_date.weekday():
-                event_list.append((event_time, f"- {time_str} {event['title']}, Note: {event['note']}"))
-
-
-        elif frequency == "monthly":
-            if today.day == event_date.day and today >= event_date:
-                event_list.append((event_time, f"- {time_str} {event['title']}, Note: {event['note']}"))
-
-
-        elif frequency == "annual":
-            if (today.month, today.day) == (event_date.month, event_date.day):
-                event_list.append((event_time, f"- {time_str} {event['title']}, Note: {event['note']}"))
-
-
-    event_list.sort(key=lambda x: x[0] or datetime.min.time())
-
-    results = [entry[1] for entry in event_list]
-    return results
-
-
 def get_events_for_period(events, time_params):
     """
     Returns events for a given time period.
@@ -625,7 +562,22 @@ def get_events_for_period(events, time_params):
         return []
     
     now = datetime.now()
+    def _format_iso_datetime_for_display(raw_value: str) -> str:
+        try:
+            dt = datetime.fromisoformat(raw_value)
+            if dt.time() == datetime.min.time():
+                return dt.strftime('%Y-%m-%d')
+            return dt.strftime('%Y-%m-%d %H:%M')
+        except Exception:
+            safe = raw_value.replace('T', ' ')
+            if '.' in safe:
+                safe = safe.split('.', 1)[0]
+            parts = safe.split(':')
+            if len(parts) >= 2:
+                return ':'.join(parts[:2])
+            return safe
     event_list = []
+    daily_recurring_summaries = []
 
     # Determine the period of interest
     if time_params["type"] == "today":
@@ -693,16 +645,48 @@ def get_events_for_period(events, time_params):
         frequency = recurrence.get("frequency")
 
         if frequency == "daily":
+            # Build a single summary entry at the top instead of repeating per day
             days = recurrence.get("days_of_week")
-            current_date = start_date
-            while current_date <= end_date:
+
+            # Determine effective overlap window with requested period
+            effective_start = max(start_date, recurrence_start_date)
+            effective_end = min(end_date, datetime.max.date() if not recurrence_end_str else datetime.fromisoformat(recurrence_end_str).date())
+
+            # Check if at least one occurrence falls within the period
+            has_occurrence = False
+            probe_date = effective_start
+            while probe_date <= effective_end:
                 if days:
-                    weekday_name = current_date.strftime("%A")
-                    if weekday_name in days:
-                        event_list.append((current_date, event_time, f"- {time_str} {event['title']}, Note: {event['note']}"))
+                    if probe_date.strftime("%A") in days:
+                        has_occurrence = True
+                        break
                 else:
-                    event_list.append((current_date, event_time, f"- {time_str} {event['title']}, Note: {event['note']}"))
-                current_date += timedelta(days=1)
+                    has_occurrence = True
+                    break
+                probe_date += timedelta(days=1)
+
+            if has_occurrence:
+                # Compose summary
+                raw_start = recurrence.get("start", event_date_str)
+                raw_end = recurrence.get("end") or ""
+                start_str = _format_iso_datetime_for_display(raw_start)
+                end_str = _format_iso_datetime_for_display(raw_end) if raw_end else ""
+                if days:
+                    days_text = ", ".join(days)
+                else:
+                    days_text = "Every day"
+
+                # Include time if available
+                summary_time = time_str
+                details_parts = [f"Start: {start_str}"]
+                if end_str:
+                    details_parts.append(f"End: {end_str}")
+                details_parts.append(f"Days: {days_text}")
+                details = "; ".join(details_parts)
+
+                daily_recurring_summaries.append(f"- {summary_time} {event['title']}, Note: {event['note']} ({details})")
+
+            # Do not append to per-day event_list for daily events
 
         elif frequency == "weekly":
             days = recurrence.get("days_of_week")
@@ -741,6 +725,13 @@ def get_events_for_period(events, time_params):
 
     # Format results
     results = []
+
+    # Add daily recurring summaries at the top if present
+    if daily_recurring_summaries:
+        results.append("Daily recurring events:")
+        results.extend(daily_recurring_summaries)
+        results.append("")
+
     for date_str, events in grouped_events.items():
         results.append(f"\n{date_str}:")
         results.extend(events)
