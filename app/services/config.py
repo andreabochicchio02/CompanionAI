@@ -3,17 +3,17 @@ from enum import Enum, auto
 from sentence_transformers import SentenceTransformer
 
 # ----- PATHS ----- #
-EVENTS_PATH = "app/events.json"
-SERVER_LOG = "app/services/server_log.txt"
-MEMORY_LOG = "app/services/memory_log.txt"
-CONVERSATION_LOG_FOLD = "app/services/conversation_log.txt"
-CHATS_FILE = 'app/chats.json'
-DOCUMENT_PATHS = ["app/document.txt"]
+EVENTS_PATH = "app/resources/events.json"
+SERVER_LOG = "app/log/server_log.txt"
+MEMORY_LOG = "app/log/memory_log.txt"
+CONVERSATION_LOG_FOLD = "app/log/conversation_log.txt"
+CHATS_FILE = 'app/resources/chats.json'
+DOCUMENT_PATHS = ["app/resources/personal_info.txt"]
 QDRANT_DB_PATH = "app/qdrant_storage"
 DOCUMENTS_COLLECTION_NAME = "documents"
 MEMORY_COLLECTION_NAME = "memory"
 
-CONFIG_PATH = "app/config.json"
+CONFIG_PATH = "app/services/config.json"
 
 # ----- LOAD GENERAL CONFIG ----- #
 def load_config(path=CONFIG_PATH):

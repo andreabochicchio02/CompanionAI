@@ -178,7 +178,7 @@ def get_relevant_memory(query):
     
 #----- DETECT CHANGES IN FILES---------
 
-def has_file_changed(file_path, hash_store_path="file_hashes.json"):
+def has_file_changed(file_path, hash_store_path="log/file_hashes.json"):
     """Check if a file has changed by comparing its current hash with the saved hash."""
     try:
         with open(hash_store_path, 'r', encoding='utf-8') as f:
@@ -190,7 +190,7 @@ def has_file_changed(file_path, hash_store_path="file_hashes.json"):
     saved_hash = hashes.get(file_path)
     return current_hash != saved_hash  # Return True if the file has changed
     
-def have_files_changed(file_paths, hash_store_path="app/file_hashes.json"):
+def have_files_changed(file_paths, hash_store_path="app/log/file_hashes.json"):
     """Check if one or more files have changed by comparing their hashes with the saved hashes."""
     try:
         with open(hash_store_path, 'r', encoding='utf-8') as f:
@@ -215,7 +215,7 @@ def calculate_file_hash(file_path):
     except FileNotFoundError:
         return None
     
-def save_file_hash(file_paths, hash_store_path="app/file_hashes.json"):
+def save_file_hash(file_paths, hash_store_path="app/log/file_hashes.json"):
     """Save the hashes of the specified files to a JSON file."""
     try:
         if not os.path.exists(hash_store_path):

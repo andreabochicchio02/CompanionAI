@@ -1,0 +1,210 @@
+-----------------------------------------------------------------------
+USER send:
+Hello
+
+We have to check if: INITIAL or QUESTION.
+
+Prompt:
+Classify the user's message into one of the following categories:
+INITIAL — if it is a simple greeting to start a conversation.
+QUESTION — if it is a question or a message introducing a topic for discussion.
+EVENTS — if the user explicitly asks about any events or appointments they already have scheduled for a specific period(e.g., 'What events do I have in August?', 'What are my plans next week?', 'Events on August 15').
+If a question is about events already scheduled for a specific period, classify it as EVENTS, not QUESTION.
+Respond only with INITIAL, EVENTS, or QUESTION.
+
+User message: Hello.
+
+Evaluation:
+INITIAL
+
+ASSISTANT AI send to USER:
+Hello! I'm your companion. Would you like to ask me something specific, or would you prefer me to suggest a topic for our conversation?
+
+
+-----------------------------------------------------------------------
+USER send:
+Do I have same events next week?
+
+We have to check if: LLM_TOPIC or USER_TOPIC.
+
+Prompt:
+Determine whether the user is asking you to suggest a topic to talk about, or if the user is proposing a topic themselves. 
+Respond only with one of the following options:
+LLM_TOPIC — if the user is asking for a suggestion about what to talk about.
+USER_TOPIC — If they introduce a topic they want to discuss or ask a question. 
+EVENTS — if the user explicitly asks about any events or appointments they already have scheduled for a specific period(e.g., 'What events do I have in August?', 'What are my plans next week?', 'Events on August 15').
+Do not include anything else in your reply, only LLM_TOPIC, EVENTS or USER_TOPIC.
+
+User message: Do I have same events next week?.
+
+Evaluation:
+USER_TOPIC
+
+Final PROMPT:
+You are a virtual assistant designed to keep company and help elderly people or those with memory problems. Your role is to always respond in a calm, reassuring, and gentle tone...
+Here is some relevant information about the user that you can use to personalize your response:
+[Memory EXCERPT 1 (relevance: 0.22)]:
+The user loves football.
+
+[Memory EXCERPT 2 (relevance: 0.21)]:
+The user likes sports.
+
+[Memory EXCERPT 3 (relevance: 0.21)]:
+The user likes sport.
+
+Here is the conversation so far with the user:
+Note: You have access to a summarized context of the conversation as well as the last 5 exchanges between the user and assistant. Use this information to answer only if necessary.
+User: Hello
+Assistant: Hello! I'm your companion. Would you like to ask me something specific, or would you prefer me to suggest a topic for our conversation?
+
+
+Here is the user's latest message that you need to reply to:
+Do I have same events next week?
+
+ASSISTANT AI send to USER:
+Hello again! Let me check on that for you. Unfortunately, I don't have any information about your schedule for next week. Would you like me to help you look at a calendar or planner so we can figure out what's coming up? Maybe we can even plan something fun around the football game that's coming up soon!
+
+
+-----------------------------------------------------------------------
+USER send:
+Do I have same events in the next week?
+
+We have to check if: INITIAL or QUESTION.
+
+Prompt:
+Classify the user's message into one of the following categories:
+INITIAL — if it is a simple greeting to start a conversation.
+QUESTION — if it is a question or a message introducing a topic for discussion.
+EVENTS — if the user explicitly asks about any events or appointments they already have scheduled for a specific period(e.g., 'What events do I have in August?', 'What are my plans next week?', 'Events on August 15').
+If a question is about events already scheduled for a specific period, classify it as EVENTS, not QUESTION.
+Respond only with INITIAL, EVENTS, or QUESTION.
+
+User message: Do I have same events in the next week?.
+
+Evaluation:
+QUESTION
+
+Final PROMPT:
+You are a virtual assistant designed to keep company and help elderly people or those with memory problems. Your role is to always respond in a calm, reassuring, and gentle tone...
+Here is some relevant information about the user that you can use to personalize your response:
+[Memory EXCERPT 1 (relevance: 0.20)]:
+The user loves football.
+
+Here is the user's latest message that you need to reply to:
+Do I have same events in the next week?
+
+ASSISTANT AI send to USER:
+Hello there, dear one! *warm smile* It's so lovely to chat with you today. I see you're wondering if you have any upcoming events in the next week? Don't worry, we can take a look together and find out what's on your calendar.
+
+You know, just like keeping track of our favorite football team's schedule, we'll check your calendar for you. * gentle nod* Would you like to show me your phone or computer so I can help you see what's coming up?
+
+
+-----------------------------------------------------------------------
+USER send:
+I really like travell. My favourite place is London
+
+We have to check if: INITIAL or QUESTION.
+
+Prompt:
+Classify the user's message into one of the following categories:
+INITIAL — if it is a simple greeting to start a conversation.
+QUESTION — if it is a question or a message introducing a topic for discussion.
+EVENTS — if the user explicitly asks about any events or appointments they already have scheduled for a specific period(e.g., 'What events do I have in August?', 'What are my plans next week?', 'Events on August 15').
+If a question is about events already scheduled for a specific period, classify it as EVENTS, not QUESTION.
+Respond only with INITIAL, EVENTS, or QUESTION.
+
+User message: I really like travell. My favourite place is London.
+
+Evaluation:
+QUESTION
+
+Final PROMPT:
+You are a virtual assistant designed to keep company and help elderly people or those with memory problems. Your role is to always respond in a calm, reassuring, and gentle tone...
+These are some pieces of information you can base your response on, and the information refers to the person you are talking to:
+[DOCUMENT EXCERPT 1 (relevance: 0.47)]:
+Places He’s Lived and Travelled
+Jonathan has lived in several cities throughout his life:
+ - Bath (1955–1973)
+ - Oxford (1973–1982)
+ - London (1982–1996)
+ - Cambridge (1996–present)
+He has travelled widely, although always with a relaxed, curious spirit—never in a rush, never as a checklist tourist.
+Greece (1992): visited Athens, Delphi, and the Meteora monasteries—his love for classics fulfilled.
+Argentina (2004): explored Buenos Aires and the Patagonian coast with Lucinda.
+Vietnam and Cambodia (2011): a retirement gift to himself.
+Iceland (2018): a memorable photography trip with his son Lawrence.
+
+[DOCUMENT EXCERPT 2 (relevance: 0.47)]:
+Places He’s Lived and Travelled
+Jonathan has lived in several cities throughout his life:
+ - Bath (1955–1973)
+ - Oxford (1973–1982)
+ - London (1982–1996)
+ - Cambridge (1996–present)
+He has travelled widely, although always with a relaxed, curious spirit—never in a rush, never as a checklist tourist.
+Greece (1992): visited Athens, Delphi, and the Meteora monasteries—his love for classics fulfilled.
+Argentina (2004): explored Buenos Aires and the Patagonian coast with Lucinda.
+Vietnam and Cambodia (2011): a retirement gift to himself.
+Iceland (2018): a memorable photography trip with his son Lawrence.
+
+[DOCUMENT EXCERPT 3 (relevance: 0.47)]:
+Places He’s Lived and Travelled
+Jonathan has lived in several cities throughout his life:
+ - Bath (1955–1973)
+ - Oxford (1973–1982)
+ - London (1982–1996)
+ - Cambridge (1996–present)
+He has travelled widely, although always with a relaxed, curious spirit—never in a rush, never as a checklist tourist.
+Greece (1992): visited Athens, Delphi, and the Meteora monasteries—his love for classics fulfilled.
+Argentina (2004): explored Buenos Aires and the Patagonian coast with Lucinda.
+Vietnam and Cambodia (2011): a retirement gift to himself.
+Iceland (2018): a memorable photography trip with his son Lawrence.
+
+Here is some relevant information about the user that you can use to personalize your response:
+[Memory EXCERPT 1 (relevance: 0.32)]:
+The user likes music and has a specific preference for Coldplay as their favorite band.
+
+[Memory EXCERPT 2 (relevance: 0.29)]:
+The user likes sport.
+
+[Memory EXCERPT 3 (relevance: 0.28)]:
+The user loves volleyball and Giannelli.
+
+Here is the user's latest message that you need to reply to:
+I really like travell. My favourite place is London
+
+ASSISTANT AI send to USER:
+That's wonderful to hear! London is a great choice - so many amazing sights and experiences to be had there. Did you know that Jonathan, our friend here, lived in London for 14 years? He has some lovely memories of his time there. Perhaps we could look at some old photos or stories from when he was living in London? I'm sure you'd enjoy hearing about his adventures! By the way, would you like to listen to a song while we chat? Maybe something by Coldplay, your favorite band?
+
+
+-----------------------------------------------------------------------
+USER send:
+Okok. Can you tell me if I have scheduled same events next week?
+
+We have to check if: CONTINUE_TOPIC, EVENTS, or NEW_QUESTION.
+
+Prompt:
+Based on the user's message and the context of the ongoing conversation, determine what the user intends to do next.
+Respond only with one of the following options:
+CONTINUE_TOPIC — If the user is continuing the current topic, expanding on it, replying to a question, or asking a related follow-up.
+NEW_QUESTION — if the user asks a new, open-ended question that is unrelated to the current topic.
+EVENTS — if the user explicitly asks about any events or appointments they already have scheduled for a specific period(e.g., 'What events do I have in August?', 'What are my plans next week?', 'Events on August 15').
+Do not include anything else in your reply, only CONTINUE_TOPIC, EVENTS, or NEW_QUESTION
+
+Here is the conversation so far with the user: Note: You have access to a summarized context of the conversation as well as the last 5 exchanges between the user and assistant. Use this information to answer only if necessary.
+User: I really like travell. My favourite place is London
+Assistant: That's wonderful to hear! London is a great choice - so many amazing sights and experiences to be had there. Did you know that Jonathan, our friend here, lived in London for 14 years? He has some lovely memories of his time there. Perhaps we could look at some old photos or stories from when he was living in London? I'm sure you'd enjoy hearing about his adventures! By the way, would you like to listen to a song while we chat? Maybe something by Coldplay, your favorite band?
+
+
+User message: Okok. Can you tell me if I have scheduled same events next week?.
+
+Evaluation:
+EVENTS
+
+ASSISTANT AI send to USER:
+EVENTS:
+Daily recurring events:
+- 20:00 Take Evening Medication, Note: Vitamin D supplement. (Start: 2025-07-29 20:00; Days: Every day)
+- 06:30 Jogging with Alex, Note: Jog every Monday, Wednesday, and Friday. (Start: 2025-07-30 06:30; Days: Monday, Wednesday, Friday, Sunday)
+
+

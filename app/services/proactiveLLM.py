@@ -11,9 +11,8 @@ def evaluate_init_msg(user_input, model):
                 "Classify the user's message into one of the following categories:\n"
                 "INITIAL — if it is a simple greeting to start a conversation.\n"
                 "QUESTION — if it is a question or a message introducing a topic for discussion.\n"
-                "EVENTS — if the user explicitly asks about any events or appointments they already have scheduled "
-                "for a specific period (e.g., 'What events do I have in August?', 'What are my plans next week?', "
-                "'Events on August 15').\n"
+                "EVENTS — if the user explicitly asks about any events or appointments they already have scheduled for a specific period"
+                "(e.g., 'What events do I have in August?', 'What are my plans next week?', 'Events on August 15').\n"
                 "If a question is about events already scheduled for a specific period, classify it as EVENTS, not QUESTION.\n"
                 "Respond only with INITIAL, EVENTS, or QUESTION.\n\n"
                 f"User message: {user_input}"
@@ -26,15 +25,13 @@ def evaluate_init_msg(user_input, model):
 
 def evaluate_type_topic(user_input, model):
     prompt = ( 
-                f"Determine whether the user is asking you to suggest a topic to talk about, or if the user is proposing a topic themselves. \n"
-                f"Respond only with:\n"
-                f"LLM_TOPIC — if the user is asking for a suggestion about what to talk about.\n"
-                f"USER_TOPIC — If they introduce a topic they want to discuss or ask a question. \n"
-                f"EVENTS — if the user explicitly asks about any events or appointments they already have scheduled "
-                "for a specific period (e.g., 'What events do I have in August?', 'What are my plans next week?', "
-                "'Events on August 15').\n"
-                f"Do not include anything else in your reply, only LLM_TOPIC, EVENTS or USER_TOPIC.\n"
-
+                "Determine whether the user is asking you to suggest a topic to talk about, or if the user is proposing a topic themselves. \n"
+                "Respond only with one of the following options:\n"
+                "LLM_TOPIC — if the user is asking for a suggestion about what to talk about.\n"
+                "USER_TOPIC — If they introduce a topic they want to discuss or ask a question. \n"
+                "EVENTS — if the user explicitly asks about any events or appointments they already have scheduled for a specific period"
+                "(e.g., 'What events do I have in August?', 'What are my plans next week?', 'Events on August 15').\n"
+                "Do not include anything else in your reply, only LLM_TOPIC, EVENTS or USER_TOPIC.\n\n"
                 f"User message: {user_input}"
             )
 
@@ -45,15 +42,13 @@ def evaluate_type_topic(user_input, model):
 
 def evaluate_choose_topic(user_input, topic, model):
     prompt = ( 
-                f"Determine whether the user is wants to continue the conversation, or if they want to talk about something else.\n"
-                f"The user might say yes, express interest, or simply start responding with something related to the topic — all of these mean they want to continue.\n"
-                f"Respond only with:\n"
-                f"CONTINUE_TOPIC — if the user is fine with the suggested topic and either agrees explicitly or begins discussing something related to it.\n"
-                f"CHANGE_TOPIC — If the user asks you to suggest another topic to talk about.\n"
-                f"Do not include anything else in your reply, only CONTINUE_TOPIC or CHANGE_TOPIC.\n"
-
+                "Determine whether the user is wants to continue the conversation, or if they want to talk about something else.\n"
+                "The user might say yes, express interest, or simply start responding with something related to the topic — all of these mean they want to continue.\n"
+                "Respond only with one of the following options:\n"
+                "CONTINUE_TOPIC — if the user is fine with the suggested topic and either agrees explicitly or begins discussing something related to it.\n"
+                "CHANGE_TOPIC — If the user asks you to suggest another topic to talk about.\n"
+                "Do not include anything else in your reply, only CONTINUE_TOPIC or CHANGE_TOPIC.\n\n"
                 f"Topic proposed: {topic}\n"
-
                 f"User message: {user_input}"
             )
 
@@ -65,12 +60,11 @@ def evaluate_choose_topic(user_input, topic, model):
 def evaluate_general_msg(user_input, short_memory, model):
     prompt = (
                 "Based on the user's message and the context of the ongoing conversation, determine what the user intends to do next.\n"
-                "Respond only with one of the following options\n"
+                "Respond only with one of the following options:\n"
                 "CONTINUE_TOPIC — If the user is continuing the current topic, expanding on it, replying to a question, or asking a related follow-up.\n"
                 "NEW_QUESTION — if the user asks a new, open-ended question that is unrelated to the current topic.\n"
-                "EVENTS — if the user explicitly asks about any events or appointments they already have scheduled "
-                "for a specific period (e.g., 'What events do I have in August?', 'What are my plans next week?', "
-                "'Events on August 15').\n"
+                "EVENTS — if the user explicitly asks about any events or appointments they already have scheduled for a specific period"
+                "(e.g., 'What events do I have in August?', 'What are my plans next week?', 'Events on August 15').\n"
                 "Do not include anything else in your reply, only CONTINUE_TOPIC, EVENTS, or NEW_QUESTION\n\n"
             )
 
