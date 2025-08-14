@@ -4,6 +4,8 @@ let SESSION_ID = 0
 let TEXTAREACENTERED = true;
 let ENABLE_TTS = false;
 
+let evtSource;
+
 document.addEventListener('DOMContentLoaded', async () => {
     const textArea = document.getElementById('textarea');
     const sendButton = document.getElementById('send-button');
@@ -121,7 +123,7 @@ async function sendMessageToLLM(text) {
         }
 
         // Start receiving streamed assistant response via EventSource
-        const evtSource = new EventSource('/chatLLM/responseLLM?session_id=' + encodeURIComponent(SESSION_ID));
+        evtSource = new EventSource('/chatLLM/responseLLM?session_id=' + encodeURIComponent(SESSION_ID));
 
         let first_token = true;
 
@@ -256,6 +258,8 @@ async function loadChat(sessionId) {
  */
 async function createNewChat(event) {
     event.preventDefault();
+
+    evtSource.close();
 
     showTextArea();
 

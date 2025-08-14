@@ -1,6 +1,6 @@
 {
     "USER_RELIABLE": false,
-    "MAIN_MODEL": "llama3.2:3b",
+    "MAIN_MODEL": "gemma3:4b",
     "SUMMARIZER_MODEL": "gemma3:1b",
     "TOP_K": 3,
     "MIN_SCORE": 0.2,

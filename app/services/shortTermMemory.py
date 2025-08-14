@@ -36,9 +36,10 @@ class ChatManager:
         self.summary_lock = threading.Lock()
         self.is_summarizing = False
 
-    def add_user_message(self, user_message):
+    def add_user_message(self, user_message, session_id, file_path):
         """Appends a user message to the chat history."""
         self.chat['user'].append(user_message)
+        self.save_to_file(session_id, file_path)
         utils.append_conversation_log("-----------------------------------------------------------------------\n")
         utils.append_conversation_log(f"USER send:\n{user_message.strip()}\n\n")
 

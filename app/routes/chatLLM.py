@@ -99,7 +99,7 @@ def send_prompt():
         return jsonify({'success': False, 'message': 'Invalid session_id'})
 
     # Add the user's prompt to the chat history managed by ChatManager
-    CHATS[session_id].add_user_message(prompt)
+    CHATS[session_id].add_user_message(prompt, session_id, config.CHATS_FILE)
 
     # Return a success response
     return jsonify({'success': True, 'message': ''})
