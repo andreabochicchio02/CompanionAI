@@ -60,7 +60,7 @@ def add_new_event():
 @bp.route('/dashboard/getParagraphs', methods=['POST'])
 def get_paragraphs():
     try:
-        with open('app/document.txt', 'r', encoding='utf-8') as f:
+        with open('app/resources/personal_info.txt', 'r', encoding='utf-8') as f:
             content = f.read()
 
         raw_paragraphs = content.strip().split('\n\n\n')
@@ -92,7 +92,7 @@ def save_paragraphs():
         if not paragraphs:
             return jsonify({"success": False, "message": "No paragraphs provided."}), 400
 
-        with open('app/document.txt', 'w', encoding='utf-8') as f:
+        with open('app/resources/personal_info.txt', 'w', encoding='utf-8') as f:
             for p in paragraphs:
                 title = p.get('title', '').strip()
                 content = p.get('content', '').strip()

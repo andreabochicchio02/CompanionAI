@@ -1,5 +1,5 @@
 {
-    "USER_RELIABLE": false,
+    "USER_RELIABLE": true,
     "MAIN_MODEL": "llama3.2:3b",
     "SUMMARIZER_MODEL": "gemma3:1b",
     "TOP_K": 3,

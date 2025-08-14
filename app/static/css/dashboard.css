@@ -395,7 +395,7 @@ body {
 
 /* Chat popup */
 #chat-popup {
-    width: min(600px, 95vw);
+    width: min(900px, 95vw);
     max-height: 90vh;
     padding: 1.5rem;
     padding-right: 2rem;
@@ -447,7 +447,7 @@ body {
 
 /* Personal info popup */
 #personal-info-popup {
-    width: min(600px, 95vw);
+    width: min(900px, 95vw);
     max-height: 90vh;
     padding: 2rem;
     padding-right: 2.5rem;

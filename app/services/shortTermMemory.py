@@ -203,7 +203,6 @@ class ChatManager:
             'topic': self.chat['topic'],
             'state': self.chat['state'].name if hasattr(self.chat['state'], 'name') else str(self.chat['state']),
             'summary': self.summary,
-            'topics_pool': self.chat.get('topics_pool', []),
             'timestamp': datetime.datetime.now(ZoneInfo("Europe/Rome")).isoformat()
         }
 
