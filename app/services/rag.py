@@ -5,7 +5,6 @@ from qdrant_client import QdrantClient
 from qdrant_client.models import PointStruct, VectorParams, Distance
  
 import os, json, hashlib
-import time # monitoring file changes
 
 qdrant_client = None
 
@@ -232,19 +231,4 @@ def save_file_hash(file_paths, hash_store_path="app/log/file_hashes.json"):
             json.dump(hashes, f, indent=4)
     except Exception as e:
         print(f"Error saving file hashes: {e}")
-
-# !!! al momento non usato perchè thread disattivato, vedi app.py  !!!
-# def monitor_file_changes(interval=60):
-#     """Monitora periodicamente i file per rilevare modifiche."""
-#     while True:
-#         try:
-#             file_paths = config.DOCUMENT_PATHS  # Lista di file da monitorare
-#             if have_files_changed(file_paths):
-#                 utils.append_server_log("Detected changes in documents. Updating database...")
-#                 initialize_db()  # Aggiorna il database
-#             else:
-#                 utils.append_server_log("No changes detected in documents.")
-#         except Exception as e:
-#             utils.append_server_log(f"Error during file monitoring: {e}")
-#         time.sleep(interval)  # Intervallo di controllo (es. ogni 60 secondi)
 

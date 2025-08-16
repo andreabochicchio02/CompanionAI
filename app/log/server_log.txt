@@ -1,18 +1,9 @@
-[2025-08-14 15:24:56]	Initializing RAG service...
-[2025-08-14 15:24:56]	Attempting to create Qdrant client at path: app/qdrant_storage
-[2025-08-14 15:24:56]	Using Qdrant client at path: app/qdrant_storage
-[2025-08-14 15:24:56]	Documents have changed. Updating database...
-[2025-08-14 15:24:56]	File app/resources/personal_info.txt has changed. Updating related chunks...
-[2025-08-14 15:24:57]	Updated 11 chunks for file app/resources/personal_info.txt
-[2025-08-14 15:24:57]	RAG service initialized successfully.
-[2025-08-14 15:25:03]	/chatLLM/start request completed successfully.
-[2025-08-14 15:25:06]	/chatLLM/start request completed successfully.
-[2025-08-14 15:26:03]	Successfully retrieved relevant chunks from RAG
-[2025-08-14 15:26:10]	Response generated and sent successfully (stream=True)
-[2025-08-14 15:26:45]	/chatLLM/start request completed successfully.
-[2025-08-14 15:27:00]	Successfully retrieved relevant chunks from RAG
-[2025-08-14 15:27:11]	Response generated and sent successfully (stream=True)
-[2025-08-14 15:27:19]	/chatLLM/start request completed successfully.
-[2025-08-14 15:28:36]	Successfully retrieved relevant chunks from RAG
-[2025-08-14 15:28:49]	Response generated and sent successfully (stream=True)
-[2025-08-14 15:30:29]	/chatLLM/start request completed successfully.
+[2025-08-16 17:20:37]	Initializing RAG service...
+[2025-08-16 17:20:37]	Attempting to create Qdrant client at path: app/qdrant_storage
+[2025-08-16 17:20:38]	Using Qdrant client at path: app/qdrant_storage
+[2025-08-16 17:20:38]	Collection documents does not exist. Creating it...
+[2025-08-16 17:20:38]	Collection memory does not exist. Creating it...
+[2025-08-16 17:20:38]	Documents have changed. Updating database...
+[2025-08-16 17:20:38]	File app/resources/personal_info.txt has changed. Updating related chunks...
+[2025-08-16 17:20:38]	Updated 11 chunks for file app/resources/personal_info.txt
+[2025-08-16 17:20:38]	RAG service initialized successfully.

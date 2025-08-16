@@ -1,7 +1,3 @@
 __pycache__/
 
-# data structure index
-qdrant_storage
-file_hashes.json
-
 .vscode/
