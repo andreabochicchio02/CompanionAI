@@ -57,10 +57,8 @@ def keep_event(event):
     if 'T' in date_str:
         event_date = datetime.fromisoformat(date_str)
     else:
-        event_date = datetime.fromisoformat(date_str)
-        event_date = datetime.combine(event_date.date(), time(23, 59, 59))
-
-    event_date = datetime.fromisoformat(date_str)
+        base_date = datetime.fromisoformat(date_str)
+        event_date = datetime.combine(base_date.date(), time(23, 59, 59))
 
     if event_date >= now:
         return True
@@ -70,14 +68,11 @@ def keep_event(event):
 
     end_str = recurrence.get("end")
     if end_str:
-        if 'T' in date_str:
-            end_date = datetime.fromisoformat(date_str)
+        if 'T' in end_str:
+            end_date = datetime.fromisoformat(end_str)
         else:
-            end_date = datetime.fromisoformat(date_str)
-            end_date = datetime.combine(end_date.date(), time(23, 59, 59))
-        if end_date < now:
-            return False
-        else:
-            return True
-    else:
-        return True
+            base_end = datetime.fromisoformat(end_str)
+            end_date = datetime.combine(base_end.date(), time(23, 59, 59))
+        return end_date >= now
+
+    return True

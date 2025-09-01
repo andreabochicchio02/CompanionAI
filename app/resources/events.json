@@ -1,38 +1,49 @@
 [
   {
-    "id": "ba431a2c-1099-4e25-9c11-9ef1053034b5",
     "title": "Marta's Birthday",
-    "date": "2025-08-12",
-    "note": "Buy a gift before September 10th.",
+    "date": "2025-09-21",
+    "note": "Buy a gift before September 20th.",
     "recurrence": {
-      "frequency": "annual",
+      "frequency": "annually",
       "end": null
-    }
+    },
+    "id": "dac64709-b2f9-44fc-87d0-aeeec98fddd8"
   },
   {
-    "id": "d7477f79-ec9a-493e-bb8a-259927198270",
     "title": "Take Evening Medication",
-    "date": "2025-07-29T20:00:00",
+    "date": "2025-09-02T20:00:00",
     "note": "Vitamin D supplement.",
     "recurrence": {
       "frequency": "daily",
       "end": null
-    }
+    },
+    "id": "fdc06058-c6a8-4d96-a689-3d3d51a75165"
   },
   {
-    "id": "40388f0d-bf93-4d65-9d1f-6432acaf89d7",
-    "title": "Jogging with Alex",
-    "date": "2025-07-30T06:30:00",
-    "note": "Jog every Monday, Wednesday, and Friday.",
+    "title": "Doctor Visit",
+    "date": "2025-09-22T15:30:00",
+    "note": "1234 Main Street, Apt. 5B, New York",
+    "recurrence": null,
+    "id": "ea82fdca-49df-4797-a302-5d1952d60072"
+  },
+  {
+    "title": "Grocery Shopping",
+    "date": "2025-09-02T10:00:00",
+    "note": "List: milk, bread, apples, tea.",
     "recurrence": {
-      "frequency": "daily",
-      "days_of_week": [
-        "Monday",
-        "Wednesday",
-        "Friday",
-        "Sunday"
-      ],
+      "frequency": "weekly",
       "end": null
-    }
+    },
+    "id": "1f81d7e6-dccf-4c86-b3e1-94c1c8c315eb"
+  },
+  {
+    "title": "Morning Medication",
+    "date": "2025-08-06T20:40:00",
+    "note": "",
+    "recurrence": {
+      "frequency": "monthly",
+      "end": "2025-12-06"
+    },
+    "id": "942ec7f8-01e4-4251-86b3-65644c278682"
   }
 ]

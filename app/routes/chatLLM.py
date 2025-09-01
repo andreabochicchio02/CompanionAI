@@ -20,6 +20,7 @@ utils.clear_server_log()
 
 # Initialize vector database for RAG service
 utils.append_server_log("Initializing RAG service...")
+rag.create_structured_info()
 rag.initialize_db()
 utils.append_server_log("RAG service initialized successfully.")
 
@@ -504,6 +505,7 @@ def conversation_llm(input, session_id):
             prompt += (
                 f"\nThese are some pieces of information you can base your response on, and the information refers to the person you are talking to:\n"
                 f"{relevant_chunks}"
+                f"\nIMPORTANT: This info is about the user you are speaking to. When answering, always use you instead of he/she. Talk directly to them in the second person.\n"
             )
 
         if relevant_memory:
@@ -620,7 +622,7 @@ def get_events_for_period(events, time_params):
         # Handle single events
         if not recurrence:
             if start_date <= event_date <= end_date:
-                event_list.append((event_date, event_time, f"- {time_str} {event['title']}, Note: {event['note']}"))
+                event_list.append((current_date, event_time, f"- {time_str} {event['title']}" + (f", Note: {event['note']}" if event.get("note") else "")))
             continue
 
         # Handle recurring events
@@ -653,17 +655,7 @@ def get_events_for_period(events, time_params):
             effective_end = min(end_date, datetime.max.date() if not recurrence_end_str else datetime.fromisoformat(recurrence_end_str).date())
 
             # Check if at least one occurrence falls within the period
-            has_occurrence = False
-            probe_date = effective_start
-            while probe_date <= effective_end:
-                if days:
-                    if probe_date.strftime("%A") in days:
-                        has_occurrence = True
-                        break
-                else:
-                    has_occurrence = True
-                    break
-                probe_date += timedelta(days=1)
+            has_occurrence = effective_start <= effective_end
 
             if has_occurrence:
                 # Compose summary
@@ -684,7 +676,8 @@ def get_events_for_period(events, time_params):
                 details_parts.append(f"Days: {days_text}")
                 details = "; ".join(details_parts)
 
-                daily_recurring_summaries.append(f"- {summary_time} {event['title']}, Note: {event['note']} ({details})")
+                daily_recurring_summaries.append((f"- {summary_time} {event['title']}" + (f"({details}),  Note: {event['note']}" if event.get("note") else "({details})")))
+
 
             # Do not append to per-day event_list for daily events
 
@@ -692,26 +685,22 @@ def get_events_for_period(events, time_params):
             days = recurrence.get("days_of_week")
             current_date = start_date
             while current_date <= end_date:
-                if days:
-                    weekday_name = current_date.strftime("%A")
-                    if weekday_name in days:
-                        event_list.append((current_date, event_time, f"- {time_str} {event['title']}, Note: {event['note']}"))
-                elif current_date.weekday() == event_date.weekday():
-                    event_list.append((current_date, event_time, f"- {time_str} {event['title']}, Note: {event['note']}"))
+                if current_date.weekday() == event_date.weekday():
+                    event_list.append((current_date, event_time, f"- {time_str} {event['title']}" + (f", Note: {event['note']}" if event.get("note") else "")))
                 current_date += timedelta(days=1)
 
         elif frequency == "monthly":
             current_date = start_date
             while current_date <= end_date:
                 if current_date.day == event_date.day:
-                    event_list.append((current_date, event_time, f"- {time_str} {event['title']}, Note: {event['note']}"))
+                    event_list.append((current_date, event_time, f"- {time_str} {event['title']}" + (f", Note: {event['note']}" if event.get("note") else "")))
                 current_date += timedelta(days=1)
 
-        elif frequency == "annual":
+        elif frequency == "annually":
             current_date = start_date
             while current_date <= end_date:
                 if (current_date.month, current_date.day) == (event_date.month, event_date.day):
-                    event_list.append((current_date, event_time, f"- {time_str} {event['title']}, Note: {event['note']}"))
+                    event_list.append((current_date, event_time, f"- {time_str} {event['title']}" + (f", Note: {event['note']}" if event.get("note") else "")))
                 current_date += timedelta(days=1)
 
     # Sort by date and time

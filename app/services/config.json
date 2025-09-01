@@ -11,5 +11,5 @@
         "Hello! I'm at your service. Would you prefer to ask me something directly, or would you like me to offer some conversation starters?",
         "Hey! I'm your companion. Do you want to dive into a specific question, or shall I bring up some ideas to chat about?"
     ],
-    "INITIAL_PROMPT": "You are a virtual assistant designed to keep company and help elderly people or those with memory problems. Your role is to always respond in a calm, reassuring, and gentle tone..."
+    "INITIAL_PROMPT": "You are a virtual assistant designed to keep company and help elderly people or those with memory problems. Your role is to always respond in a calm, reassuring, and gentle tone... Do not include role-play markers such as (pausing), (smiles), (laughs), etc."
 }

@@ -1,5 +1,7 @@
 import app.services.config as config
 import app.services.utils as utils
+import app.routes.dashboard as dashboard
+import app.services.ollama as ollama
 
 from qdrant_client import QdrantClient
 from qdrant_client.models import PointStruct, VectorParams, Distance
@@ -76,6 +78,64 @@ def initialize_db():
         utils.append_server_log(f"Failed to initialize Qdrant client: {e}")
         qdrant_client = None
 
+
+def create_structured_info(input_file="app/resources/personal_info.txt", output_file="app/resources/structured_info.txt"):
+    """
+    Reads paragraphs from input_file, sends them to the LLM for structuring,
+    and saves the structured output into a text file.
+    """
+    try:
+        with open(input_file, 'r', encoding='utf-8') as f:
+            content = f.read()
+
+        raw_paragraphs = content.strip().split('\n\n\n')
+        paragraphs = []
+
+        for p in raw_paragraphs:
+            lines = p.strip().split('\n', 1)
+            title = lines[0].strip()
+            body = lines[1].strip()
+            paragraphs.append({
+                "title": title,
+                "content": body
+            })
+    except Exception as e:
+        raise RuntimeError(f"Error while reading the file {input_file}: {e}")
+
+    structured_results = []
+
+    for idx, p in enumerate(paragraphs, 1):
+        title = p["title"]
+        content = p["content"]
+
+        prompt = f"""
+            Create a structured summary that extracts the fundamental concepts from the following text.
+            Rules:
+            - Each entry must be a key-value pair in the form "- Key: Value".
+            - Output must contain ONLY structured information, no explanations or commentary.
+
+            Example:
+            Full Name: Jonathan Andrews
+            Date of Birth: 16 February 1955
+            Birth Place: Bath, England
+
+            Here is the text: {content}
+
+            Return ONLY structured information as simple key-value pairs.
+        """
+
+        response_text = ollama.query_ollama_no_stream(prompt, config.MAIN_MODEL)
+        structured_results.append(f"### {title}\n{response_text}\n")
+
+
+    os.makedirs(os.path.dirname(output_file), exist_ok=True)
+    with open(output_file, "w", encoding="utf-8") as f:
+        f.write("\n\n".join(structured_results))
+
+    return output_file
+
+
+
 def load_chunks(file_path):
     """Loads chunks from a text file, splitting by double newlines.
     :param file_path: Path to the text file containing chunks
@@ -129,7 +189,7 @@ def get_relevant_chunks(query):
         else:
             formatted_chunks = []
             for i, (chunk, score) in enumerate(zip(selected_chunks, selected_scores)):
-                formatted_chunks.append(f"[DOCUMENT EXCERPT {i+1} (relevance: {score:.2f})]:\n{chunk}\n")
+                formatted_chunks.append(f"[(relevance: {score:.2f})]:\n{chunk}\n")
             return "\n".join(formatted_chunks)
     except Exception as e:
         utils.append_server_log(f"Error retrieving chunks: {e}")

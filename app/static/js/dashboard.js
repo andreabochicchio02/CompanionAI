@@ -189,9 +189,10 @@ async function sendNewBio(event) {
 async function addNewEvent(event) {
     event.preventDefault();
 
-    const title = document.getElementById('title').value;
-    const date = document.getElementById('date').value;
-    const note = document.getElementById('note').value;
+    const title = document.getElementById('title').value.trim();
+    const date = document.getElementById('date').value;         // required 
+    const time = document.getElementById('time').value;         // optional
+    const note = document.getElementById('note').value.trim();
     const frequency = document.getElementById('recurrence').value;
     const recurrenceEnd = document.getElementById('recurrence-end').value;
 
@@ -201,12 +202,18 @@ async function addNewEvent(event) {
     }
 
     if (!date) {
-        alert("To add a new event, you must enter the date and time!");
+        alert("To add a new event, you must enter the date!");
         return;
     }
 
-    const inputValue = date.value;
-    const selectedDate = new Date(inputValue);
+    let dateToSave;
+    if (time) {
+        dateToSave = `${date}T${time}:00`;
+    } else {
+        dateToSave = date;
+    }
+
+    const selectedDate = new Date(dateToSave);
     const now = new Date();
     if (selectedDate < now) {
         alert('The selected date and time must be in the future.');
@@ -215,7 +222,7 @@ async function addNewEvent(event) {
 
     const newEvent = {
         title,
-        date,
+        date: dateToSave,
         note,
         recurrence: frequency ? { frequency, end: recurrenceEnd || null } : null
     };
@@ -238,11 +245,14 @@ async function addNewEvent(event) {
 
         renderEvents();
         closeEventPopup(event);
+        
+        document.getElementById('event-form').reset();
 
     } catch (error) {
         console.error('Fetch error:', error);
     }
 }
+
 
 function addEventToList(event, index) {
     const eventsOutput = document.getElementById('events-output');
@@ -258,15 +268,21 @@ function addEventToList(event, index) {
 
     const content = document.createElement('div');
     content.className = 'event-content';
-    content.innerHTML = '<strong>' + event.title + '</strong><br>' + formattedDate + '<br>' + '<em>' + event.note + '</em>';
-
+    content.innerHTML = '<strong>' + event.title + '</strong><br>' + formattedDate + (event.note ? '<br><em>' + event.note + '</em>' : '');
+    
     if (event.recurrence) {
         const freq = event.recurrence.frequency;
-        const endDate = event.recurrence.end ? new Date(event.recurrence.end).toLocaleDateString() : 'no end';
-
-        const recurrenceInfo = '<br><span class="event-recurrence">Repeats every ' + freq +
-        (event.recurrence.days_of_week ? ' (' + event.recurrence.days_of_week.join(', ') + ')' : '') + ' until ' + endDate + '</span>';
-
+        const end = event.recurrence.end;
+        let recurrenceText = '';
+    
+        if (end) {
+            const endDate = new Date(end).toLocaleDateString();
+            recurrenceText = `Repeats ${freq} until ${endDate}`;
+        } else {
+            recurrenceText = `Repeats ${freq}`;
+        }
+    
+        const recurrenceInfo = `<br><span class="event-recurrence">${recurrenceText}</span>`;
         content.innerHTML += recurrenceInfo;
     }
 
