@@ -1,14 +1,22 @@
 import app.services.config as config
 import app.services.utils as utils
-import app.routes.dashboard as dashboard
 import app.services.ollama as ollama
 
 from qdrant_client import QdrantClient
 from qdrant_client.models import PointStruct, VectorParams, Distance
+import time
  
 import os, json, hashlib
 
 qdrant_client = None
+
+def deterministic_id(file_path: str, i: int) -> int:
+    """
+    Genera un ID deterministico a 64 bit a partire dal file path e dall'indice del chunk.
+    Così gli stessi chunk avranno sempre lo stesso ID, anche tra sessioni diverse.
+    """
+    key = f"{file_path}_{i}".encode("utf-8")
+    return int.from_bytes(hashlib.md5(key).digest()[:8], "big")
 
 def initialize_db():
     """
@@ -57,19 +65,19 @@ def initialize_db():
                     # Use deterministic IDs based on file and index to avoid duplicates
                     points = [
                         PointStruct(
-                            id=hash(f"{file_path}_{i}") % (2**31),
+                            id=deterministic_id(file_path, i),
                             vector=embedding,
                             payload={"chunk": chunk, "file": file_path, "chunk_id": i}
                         )
                         for i, (embedding, chunk) in enumerate(zip(embeddings, chunk_list))
                     ]
                     # Upsert substitutes points with the same IDs automatically
-                    qdrant_client.upsert(collection_name=config.DOCUMENTS_COLLECTION_NAME, points=points)
+                    qdrant_client.upsert(collection_name=config.DOCUMENTS_COLLECTION_NAME, points=points, wait=True)
                     utils.append_server_log(f"Updated {len(points)} chunks for file {file_path}")
         else:
             utils.append_server_log("No changes detected in documents. Skipping update.")
 
-        save_file_hash(file_paths)
+        update_file_hashes()
         
     except FileNotFoundError as e:
         utils.append_server_log(f"Error: {e}")
@@ -237,7 +245,7 @@ def get_relevant_memory(query):
     
 #----- DETECT CHANGES IN FILES---------
 
-def has_file_changed(file_path, hash_store_path="log/file_hashes.json"):
+def has_file_changed(file_path, hash_store_path="app/log/file_hashes.json"):
     """Check if a file has changed by comparing its current hash with the saved hash."""
     try:
         with open(hash_store_path, 'r', encoding='utf-8') as f:
@@ -292,3 +300,9 @@ def save_file_hash(file_paths, hash_store_path="app/log/file_hashes.json"):
     except Exception as e:
         print(f"Error saving file hashes: {e}")
 
+def update_file_hashes():
+    """
+    Aggiorna i file_hashes.json con i nuovi hash dei file.
+    """
+    save_file_hash(config.DOCUMENT_PATHS)
+    utils.append_server_log("File hashes updated for personal_info.txt and structured_info.txt")

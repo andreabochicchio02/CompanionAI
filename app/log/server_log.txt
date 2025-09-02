@@ -1,9 +1,56 @@
-[2025-08-16 17:20:37]	Initializing RAG service...
-[2025-08-16 17:20:37]	Attempting to create Qdrant client at path: app/qdrant_storage
-[2025-08-16 17:20:38]	Using Qdrant client at path: app/qdrant_storage
-[2025-08-16 17:20:38]	Collection documents does not exist. Creating it...
-[2025-08-16 17:20:38]	Collection memory does not exist. Creating it...
-[2025-08-16 17:20:38]	Documents have changed. Updating database...
-[2025-08-16 17:20:38]	File app/resources/personal_info.txt has changed. Updating related chunks...
-[2025-08-16 17:20:38]	Updated 11 chunks for file app/resources/personal_info.txt
-[2025-08-16 17:20:38]	RAG service initialized successfully.
+[2025-09-02 19:48:30]	Initializing RAG service...
+[2025-09-02 19:48:30]	Attempting to create Qdrant client at path: app/qdrant_storage
+[2025-09-02 19:48:30]	Using Qdrant client at path: app/qdrant_storage
+[2025-09-02 19:48:30]	No changes detected in documents. Skipping update.
+[2025-09-02 19:48:30]	File hashes updated for personal_info.txt and structured_info.txt
+[2025-09-02 19:48:30]	RAG service initialized successfully.
+[2025-09-02 19:50:09]	/chatLLM/start request completed successfully.
+[2025-09-02 19:50:21]	Checking if message is useful: hi
+[2025-09-02 19:50:21]	Extracting entities from text: hi
+[2025-09-02 19:50:21]	Message is not useful: no entities, preferences, relations or events found.
+[2025-09-02 19:50:40]	Checking if message is useful: i really love chocolate
+[2025-09-02 19:50:40]	Extracting entities from text: i really love chocolate
+[2025-09-02 19:50:40]	Message is possibly useful with entities: [], preferences: ['love chocolate', 'chocolate'], relations: [{'subject': 'i', 'verb': 'love', 'object': 'chocolate'}]
+[2025-09-02 19:50:40]	Rewriting extracted info for text: i really love chocolate
+[2025-09-02 19:50:41]	Rewritten info: The user loves chocolate.
+[2025-09-02 19:50:41]	Message processed and stored: The user loves chocolate.
+[2025-09-02 19:50:44]	Successfully retrieved relevant chunks from RAG
+[2025-09-02 19:50:49]	Response generated and sent successfully (stream=True)
+[2025-09-02 19:51:06]	Checking if message is useful: in particular i prefer dark chocolate
+[2025-09-02 19:51:06]	Extracting entities from text: in particular i prefer dark chocolate
+[2025-09-02 19:51:06]	Message is possibly useful with entities: [], preferences: ['dark chocolate', 'chocolate'], relations: [{'subject': 'i', 'verb': 'prefer', 'object': 'chocolate'}]
+[2025-09-02 19:51:06]	Rewriting extracted info for text: in particular i prefer dark chocolate
+[2025-09-02 19:51:07]	Rewritten info: The user prefers dark chocolate.
+[2025-09-02 19:51:07]	Message processed and stored: The user prefers dark chocolate.
+[2025-09-02 19:51:10]	Successfully retrieved relevant chunks from RAG
+[2025-09-02 19:51:15]	Response generated and sent successfully (stream=True)
+[2025-09-02 19:52:13]	/chatLLM/start request completed successfully.
+[2025-09-02 19:52:15]	Checking if message is useful: hi
+[2025-09-02 19:52:15]	Extracting entities from text: hi
+[2025-09-02 19:52:15]	Message is not useful: no entities, preferences, relations or events found.
+[2025-09-02 19:52:23]	Checking if message is useful: what type of chocolate i prefer?
+[2025-09-02 19:52:23]	Extracting entities from text: what type of chocolate i prefer?
+[2025-09-02 19:52:23]	Message is possibly useful with entities: [], preferences: ['type chocolate', 'chocolate prefer'], relations: [{'subject': 'i', 'verb': 'prefer', 'object': 'type'}]
+[2025-09-02 19:52:23]	Rewriting extracted info for text: what type of chocolate i prefer?
+[2025-09-02 19:52:24]	Rewritten info: No personal information found.
+[2025-09-02 19:52:24]	Rewritten info indicates no useful information, skipping insert: what type of chocolate i prefer?
+[2025-09-02 19:52:38]	Checking if message is useful: what type of chocolate i prefer?
+[2025-09-02 19:52:38]	Extracting entities from text: what type of chocolate i prefer?
+[2025-09-02 19:52:38]	Message is possibly useful with entities: [], preferences: ['type chocolate', 'chocolate prefer'], relations: [{'subject': 'i', 'verb': 'prefer', 'object': 'type'}]
+[2025-09-02 19:52:38]	Rewriting extracted info for text: what type of chocolate i prefer?
+[2025-09-02 19:52:39]	Rewritten info: No personal information found.
+[2025-09-02 19:52:39]	Rewritten info indicates no useful information, skipping insert: what type of chocolate i prefer?
+[2025-09-02 19:52:56]	Checking if message is useful: talk about chocolate
+[2025-09-02 19:52:56]	Extracting entities from text: talk about chocolate
+[2025-09-02 19:52:56]	Message is possibly useful with entities: [], preferences: ['talk chocolate', 'chocolate'], relations: []
+[2025-09-02 19:52:56]	Rewriting extracted info for text: talk about chocolate
+[2025-09-02 19:52:57]	Rewritten info: No personal information found.
+[2025-09-02 19:52:57]	Rewritten info indicates no useful information, skipping insert: talk about chocolate
+[2025-09-02 19:53:07]	Checking if message is useful: what type of chocolate i prefer?
+[2025-09-02 19:53:07]	Extracting entities from text: what type of chocolate i prefer?
+[2025-09-02 19:53:07]	Message is possibly useful with entities: [], preferences: ['type chocolate', 'chocolate prefer'], relations: [{'subject': 'i', 'verb': 'prefer', 'object': 'type'}]
+[2025-09-02 19:53:07]	Rewriting extracted info for text: what type of chocolate i prefer?
+[2025-09-02 19:53:08]	Rewritten info: No personal information found.
+[2025-09-02 19:53:08]	Rewritten info indicates no useful information, skipping insert: what type of chocolate i prefer?
+[2025-09-02 19:53:10]	Successfully retrieved relevant chunks from RAG
+[2025-09-02 19:53:14]	Response generated and sent successfully (stream=True)

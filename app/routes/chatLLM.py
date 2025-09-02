@@ -20,7 +20,11 @@ utils.clear_server_log()
 
 # Initialize vector database for RAG service
 utils.append_server_log("Initializing RAG service...")
-rag.create_structured_info()
+
+if rag.has_file_changed("app/resources/personal_info.txt"):
+    utils.append_server_log("personal_info file changed, recreating structured info...")
+    rag.create_structured_info( )
+
 rag.initialize_db()
 utils.append_server_log("RAG service initialized successfully.")
 

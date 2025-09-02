@@ -1,4 +1,5 @@
 from flask import Blueprint, render_template, jsonify, request
+from app.services.rag import create_structured_info, update_file_hashes
 import os, json
 import app.services.config as config
 import app.services.utils as utils
@@ -98,6 +99,9 @@ def save_paragraphs():
                 content = p.get('content', '').strip()
                 if title and content:
                     f.write(f"{title}\n{content}\n\n\n")
+
+        create_structured_info()
+        update_file_hashes()
 
         return jsonify({"success": True, "message": "Document saved successfully."})
 
