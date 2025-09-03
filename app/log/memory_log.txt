@@ -1,14 +1,2 @@
 [2025-09-02 19:50:41]	The user loves chocolate.
 [2025-09-02 19:51:07]	The user prefers dark chocolate.
-[2025-09-03 17:13:13]	The user enjoys discussing movies and has an interest in classic films.
-
-No additional personal information was extracted from the message.
-[2025-09-03 17:20:36]	The user loves Oppenheimer and Christopher Nolan. The user finds Oppenheimer fascinating, especially due to its mix of history, science, and human drama. The user admires how Christopher Nolan directed the film.
-[2025-09-03 17:31:53]	The user wants to visit Thailand.
-
-The user loves Thailand.
-[2025-09-03 17:48:00]	The user mentions that they are not remembering much about their family at the moment. They seem to be seeking clarification or guidance about their family situation, but no specific details are provided.
-[2025-09-03 17:54:07]	The user wants to know more about Eleanor.
-[2025-09-03 17:56:30]	The user expresses interest in discussing their partner, indicating that they have a significant other.
-
-No additional information is revealed beyond the mention of their partner.

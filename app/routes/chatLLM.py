@@ -18,13 +18,13 @@ bp = Blueprint('chatLLM', __name__)
 
 utils.clear_server_log()
 
-# Initialize vector database for RAG service
 utils.append_server_log("Initializing RAG service...")
 
 if rag.has_file_changed("app/resources/personal_info.txt"):
     utils.append_server_log("personal_info file changed, recreating structured info...")
     rag.create_structured_info( )
 
+# Initialize vector database for RAG service
 rag.initialize_db()
 utils.append_server_log("RAG service initialized successfully.")
 
@@ -496,6 +496,7 @@ def event_stream(session_id, prompt, retry=False):
 
 
 def conversation_llm(input, session_id):
+    '''Generates a conversation prompt for the LLM based on user input and context.'''
 
     prompt = config.INITIAL_PROMPT
 
@@ -681,10 +682,7 @@ def get_events_for_period(events, time_params):
                 details = "; ".join(details_parts)
 
                 daily_recurring_summaries.append((f"- {summary_time} {event['title']}" + (f"({details}),  Note: {event['note']}" if event.get("note") else "({details})")))
-
-
-            # Do not append to per-day event_list for daily events
-
+        
         elif frequency == "weekly":
             days = recurrence.get("days_of_week")
             current_date = start_date

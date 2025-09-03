@@ -2,12 +2,8 @@ import app.services.config as config
 from datetime import datetime, time
 
 def append_server_log(message):
-    """
-    Appends a line to the specified text file with the current date and time followed by the given message.
-    
-    :param message: The message to write to the file
-    :param filename: The name of the text file (default is 'log.txt')
-    """
+    """ Appends a line to the server log with the current date and time followed by the given message."""
+
     # Get current date and time as a formatted string
     timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     
@@ -16,6 +12,7 @@ def append_server_log(message):
         file.write(f"[{timestamp}]\t{message}\n")
 
 def append_memory_log(message):
+    """ Appends a line to the memory log with the current date and time followed by the given message."""
 
     # Get current date and time as a formatted string
     timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -33,23 +30,24 @@ def clear_server_log():
         pass  # Opening in write mode with no content truncates the file
 
 def clear_memory_log():
+    """ Clears all contents of the memory log file by opening it in write mode. """
     with open(config.MEMORY_LOG, "w", encoding="utf-8") as file:
         pass  # Opening in write mode with no content truncates the file
 
 def append_conversation_log(message):
-    # Append the message to the single log file
+    """ Appends a line to the conversation log. """
     with open(config.CONVERSATION_LOG_FOLD, "a", encoding="utf-8") as file:
         file.write(message)
 
-
 def clear_conversation_log():
-    # Opening the file in write mode truncates its contents
+    """ Clears all contents of the conversation log file by opening it in write mode. """
     with open(config.CONVERSATION_LOG_FOLD, "w", encoding="utf-8") as file:
         pass
 
-
-
 def keep_event(event):
+    """
+    Determines if an event should be kept based on its date and recurrence.
+    """
     now = datetime.now()
     date_str = event.get("date")
     recurrence = event.get("recurrence")

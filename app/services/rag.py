@@ -12,8 +12,8 @@ qdrant_client = None
 
 def deterministic_id(file_path: str, i: int) -> int:
     """
-    Genera un ID deterministico a 64 bit a partire dal file path e dall'indice del chunk.
-    Così gli stessi chunk avranno sempre lo stesso ID, anche tra sessioni diverse.
+    Generate a deterministic 64-bit ID from the file path and chunk index.
+    This way, the same chunks will always have the same ID, even across different sessions.
     """
     key = f"{file_path}_{i}".encode("utf-8")
     return int.from_bytes(hashlib.md5(key).digest()[:8], "big")
@@ -89,8 +89,7 @@ def initialize_db():
 
 def create_structured_info(input_file="app/resources/personal_info.txt", output_file="app/resources/structured_info.txt"):
     """
-    Reads paragraphs from input_file, sends them to the LLM for structuring,
-    and saves the structured output into a text file.
+    Reads paragraphs from input_file, sends them to the LLM for structuring, and saves the structured output into a text file.
     """
     try:
         with open(input_file, 'r', encoding='utf-8') as f:
@@ -145,10 +144,7 @@ def create_structured_info(input_file="app/resources/personal_info.txt", output_
 
 
 def load_chunks(file_path):
-    """Loads chunks from a text file, splitting by double newlines.
-    :param file_path: Path to the text file containing chunks
-    :return: List of text chunks
-    """
+    """ Loads chunks from a text file, splitting by double newlines. """
     with open(file_path, 'r', encoding='utf-8') as file:
         text = file.read()
     return [chunk.strip() for chunk in text.split('\n\n') if chunk.strip()]
@@ -191,7 +187,6 @@ def get_relevant_chunks(query):
         
         selected_chunks, selected_scores = search_chunks(qdrant_client, config.DOCUMENTS_COLLECTION_NAME, query_embedding, config.TOP_K, config.MIN_SCORE)
 
-        # Migliorato il prompt del RAG per estrarre meglio le informazioni
         if not selected_chunks:
             return ""
         else:
@@ -204,7 +199,7 @@ def get_relevant_chunks(query):
         return ""
 
 def get_relevant_memory(query):
-    """Retrieves relevant chunks from the Qdrant collection based on the query."""
+    """Retrieves relevant memory entries from the Qdrant collection based on the query."""
     try:
         if not qdrant_client:
             utils.append_server_log("Qdrant client not available, returning empty chunks")
@@ -212,7 +207,6 @@ def get_relevant_memory(query):
             
         query_embedding = config.EMBEDDING_MODEL.encode([query])[0]
         
-        # Recupera anche i payload completi per formattazione avanzata
         search_result = qdrant_client.search(
             collection_name=config.MEMORY_COLLECTION_NAME,
             query_vector=query_embedding,
@@ -242,9 +236,9 @@ def get_relevant_memory(query):
     except Exception as e:
         utils.append_server_log(f"Error retrieving memory: {e}")
         return ""
-    
-#----- DETECT CHANGES IN FILES---------
 
+
+#----- DETECT CHANGES IN FILES---------
 def has_file_changed(file_path, hash_store_path="app/log/file_hashes.json"):
     """Check if a file has changed by comparing its current hash with the saved hash."""
     try:
@@ -302,7 +296,52 @@ def save_file_hash(file_paths, hash_store_path="app/log/file_hashes.json"):
 
 def update_file_hashes():
     """
-    Aggiorna i file_hashes.json con i nuovi hash dei file.
+    Update the file hashes for the specified document paths.
     """
     save_file_hash(config.DOCUMENT_PATHS)
     utils.append_server_log("File hashes updated for personal_info.txt and structured_info.txt")
+
+def update_db():
+    """
+    Updates the Qdrant database if documents have changed.
+    Assumes qdrant_client is already initialized.
+    """
+    global qdrant_client
+    try:
+        if qdrant_client is None:
+            raise RuntimeError("Qdrant client is not initialized. Please initialize before calling update_db.")
+
+        file_paths = config.DOCUMENT_PATHS
+
+        # Check if files have changed
+        if have_files_changed(file_paths):  # fast check
+            utils.append_server_log("Documents have changed. Updating database...")
+
+            for file_path in file_paths:
+                if has_file_changed(file_path):  # detailed check
+                    utils.append_server_log(f"File {file_path} has changed. Updating related chunks...")
+
+                    chunk_list = load_chunks(file_path)
+                    embeddings = compute_embeddings(config.EMBEDDING_MODEL, chunk_list)
+
+                    # Use deterministic IDs based on file and index to avoid duplicates
+                    points = [
+                        PointStruct(
+                            id=deterministic_id(file_path, i),
+                            vector=embedding,
+                            payload={"chunk": chunk, "file": file_path, "chunk_id": i}
+                        )
+                        for i, (embedding, chunk) in enumerate(zip(embeddings, chunk_list))
+                    ]
+                    # Upsert substitutes points with the same IDs automatically
+                    qdrant_client.upsert(collection_name=config.DOCUMENTS_COLLECTION_NAME, points=points, wait=True)
+                    utils.append_server_log(f"Updated {len(points)} chunks for file {file_path}")
+        else:
+            utils.append_server_log("No changes detected in documents. Skipping update.")
+
+        update_file_hashes()
+
+    except FileNotFoundError as e:
+        utils.append_server_log(f"Error: {e}")
+    except Exception as e:
+        utils.append_server_log(f"Failed to update Qdrant database: {e}")

@@ -1,3 +1,4 @@
+// Event listener for DOMContentLoaded
 document.addEventListener('DOMContentLoaded', async () => {
     const closePopupBtn = document.getElementById('close-btn');
     const closePersonalInfoPopupBtn = document.getElementById('close-personal-info-btn');
@@ -20,23 +21,38 @@ document.addEventListener('DOMContentLoaded', async () => {
     await uploadHistoryChats();
 });
 
+/**
+ * Shows the event creation popup.
+ */
 function showEventPopup(){
     document.getElementById('overlay').classList.remove('hidden');
     document.getElementById('add-event-popup').classList.remove('hidden');
 }
 
+/**
+ * Closes the event creation popup.
+ * @param {*} event 
+ */
 function closeEventPopup(event){
     event.preventDefault();
     document.getElementById('overlay').classList.add('hidden');
     document.getElementById('add-event-popup').classList.add('hidden');
 }
 
+/**
+ * Closes the personal information popup.
+ * @param {*} event 
+ */
 function closePersonalInfoPopup(event){
     event.preventDefault();
     document.getElementById('overlay').classList.add('hidden');
     document.getElementById('personal-info-popup').classList.add('hidden');
 }
 
+/**
+ * Shows the personal information popup.
+ * @param {*} event 
+ */
 async function showPersonalInfoPopUp(event){
     event.preventDefault();
 
@@ -139,11 +155,19 @@ async function showPersonalInfoPopUp(event){
     }
 }
 
+/**
+ * Sends the new biography information to the server.
+ * @param {*} event 
+ */
 async function sendNewBio(event) {
     event.preventDefault();
 
     const form = document.getElementById('bio-form');
-    
+    const submitButton = document.getElementById('submit-personal-info-btn');
+
+    submitButton.disabled = true;
+    submitButton.textContent = 'Processing...';
+
     const labels = form.querySelectorAll('label[for]');
     const paragraphs = [];
 
@@ -175,17 +199,32 @@ async function sendNewBio(event) {
         const data = await response.json();
 
         if (data.success) {
-            alert('Biography saved successfully!');
+            submitButton.textContent = '✅ Saved!';
+            submitButton.style.backgroundColor = '#4CAF50';
+            setTimeout(() => {
+                closePersonalInfoPopup(event);
+            }, 1500);
+            //alert('Biography saved successfully!');
         } else {
             alert('Error saving biography: ' + data.message);
+            submitButton.disabled = false;
+            submitButton.textContent = 'Submit Biography Info';
+            submitButton.style.backgroundColor = '';
         }
 
     } catch (error) {
         console.error('Submission error:', error);
         alert('An error occurred during submission.');
+        submitButton.disabled = false;
+        submitButton.textContent = 'Submit Biography Info';
+        submitButton.style.backgroundColor = '';
     }
 }
 
+/**
+ * Adds a new event to the calendar.
+ * @param {*} event 
+ */
 async function addNewEvent(event) {
     event.preventDefault();
 
@@ -253,7 +292,11 @@ async function addNewEvent(event) {
     }
 }
 
-
+/**
+ * Adds an event to the list of events.
+ * @param {*} event 
+ * @param {*} index 
+ */
 function addEventToList(event, index) {
     const eventsOutput = document.getElementById('events-output');
 
@@ -331,6 +374,10 @@ async function renderEvents() {
     }
 }
 
+/**
+ * Deletes an event from the calendar.
+ * @param {*} button 
+ */
 async function deleteEvent(button) {
     const eventId = button.id;
 

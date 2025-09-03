@@ -6,6 +6,7 @@ let ENABLE_TTS = false;
 
 let evtSource;
 
+// Event listener for DOMContentLoaded
 document.addEventListener('DOMContentLoaded', async () => {
     const textArea = document.getElementById('textarea');
     const sendButton = document.getElementById('send-button');
@@ -304,8 +305,8 @@ async function cleanHistory(event) {
 
         await createSessionKey();
 
-        cleanChatArea();       // Clear the current chat messages (if defined)
-        moveUpTextArea();  // Adjust textarea position after clearing
+        cleanChatArea();    // Clear the current chat messages (if defined)
+        moveUpTextArea();   // Adjust textarea position after clearing
     } catch (error) {
         console.error('Error cleaning chat history:', error);
     }

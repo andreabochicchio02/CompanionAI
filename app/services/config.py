@@ -4,11 +4,13 @@ from sentence_transformers import SentenceTransformer
 
 # ----- PATHS ----- #
 EVENTS_PATH = "app/resources/events.json"
+CHATS_FILE = "app/resources/chats.json"
+DOCUMENT_PATHS = ["app/resources/personal_info.txt", "app/resources/structured_info.txt"]
+
 SERVER_LOG = "app/log/server_log.txt"
 MEMORY_LOG = "app/log/memory_log.txt"
 CONVERSATION_LOG_FOLD = "app/log/conversation_log.txt"
-CHATS_FILE = 'app/resources/chats.json'
-DOCUMENT_PATHS = ["app/resources/personal_info.txt", "app/resources/structured_info.txt"]
+
 QDRANT_DB_PATH = "app/qdrant_storage"
 DOCUMENTS_COLLECTION_NAME = "documents"
 MEMORY_COLLECTION_NAME = "memory"
@@ -49,7 +51,7 @@ def set_user_reliable(value: bool):
         json.dump(config, f, indent=4)
     USER_RELIABLE = value
 
-
+# ----- PREDEFINED ACTIVITIES ----- #
 ACTIVITIES = [
     {"activity": "Can you tell me something interesting from your past?", "selected": False},
     {"activity": "What did you eat today?", "selected": False},

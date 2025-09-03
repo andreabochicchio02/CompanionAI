@@ -7,6 +7,9 @@ import random
 import json
 
 def evaluate_init_msg(user_input, model):
+    """ Evaluates the initial message from the user. 
+        Classifies it as INITIAL, QUESTION, or EVENTS.
+    """
     prompt = (
                 "Classify the user's message into one of the following categories:\n"
                 "INITIAL — if it is a simple greeting to start a conversation.\n"
@@ -24,7 +27,10 @@ def evaluate_init_msg(user_input, model):
 
 
 def evaluate_type_topic(user_input, model):
-    prompt = ( 
+    """
+    Evaluates the type of topic the user is referring to.(LLM_TOPIC, USER_TOPIC, EVENTS)
+    """
+    prompt = (
                 "Determine whether the user is asking you to suggest a topic to talk about, or if the user is proposing a topic themselves. \n"
                 "Respond only with one of the following options:\n"
                 "LLM_TOPIC — if the user is asking for a suggestion about what to talk about.\n"
@@ -41,7 +47,10 @@ def evaluate_type_topic(user_input, model):
 
 
 def evaluate_choose_topic(user_input, topic, model):
-    prompt = ( 
+    """
+    Evaluates whether the user wants to continue the conversation on the given topic or change it.
+    """
+    prompt = (
                 "Determine whether the user is wants to continue the conversation, or if they want to talk about something else.\n"
                 "The user might say yes, express interest, or simply start responding with something related to the topic — all of these mean they want to continue.\n"
                 "Respond only with one of the following options:\n"
@@ -58,6 +67,9 @@ def evaluate_choose_topic(user_input, topic, model):
 
 
 def evaluate_general_msg(user_input, short_memory, model):
+    """
+    Evaluates the user's message in the context of the ongoing conversation.
+    """
     prompt = (
                 "Based on the user's message and the context of the ongoing conversation, determine what the user intends to do next.\n"
                 "Respond only with one of the following options:\n"

@@ -1,25 +1,26 @@
 import spacy
 from app.services import config
 from app.services.rag import compute_embeddings
-from qdrant_client.models import PointStruct
 import app.services.utils as utils
+
+from qdrant_client.models import PointStruct
 from keybert import KeyBERT
 import subprocess
-import json
 
 
 kw_model = KeyBERT()
 nlp = spacy.load("en_core_web_sm")
 
 def extract_preferences(text):
-    # extract only representative keywords/phrases with KeyBERT (top 2, can be adjusted)
-    keywords = [k[0] for k in kw_model.extract_keywords(text, keyphrase_ngram_range=(1,2), stop_words='english', top_n=2)]
+    '''Extracts user preferences from the text.'''
+    keywords = [k[0] for k in kw_model.extract_keywords(text, keyphrase_ngram_range=(1,2), stop_words='english', top_n=2)] # extract only representative keywords/phrases with KeyBERT (top 2, can be adjusted)
+
     # Filter banal keywords
     stop_keywords = {"hi", "hello", "ok", "thanks", "thank you", "please"}
     return [kw for kw in keywords if kw and kw.lower() not in stop_keywords]
 
-# Relation Extraction: subject-verb-object triples
 def extract_relations(text):
+    '''Extracts subject-verb-object relations from the text.'''
     doc = nlp(text)
     relations = []
     for token in doc:
@@ -36,6 +37,7 @@ def extract_relations(text):
     return relations
 
 def extract_entities(text):
+    '''Extracts named entities from the text.'''
     utils.append_server_log(f"Extracting entities from text: {text}")
     doc = nlp(text)
     return [(ent.text, ent.label_) for ent in doc.ents]
@@ -112,6 +114,7 @@ def is_useful_message(text):
         return False, [], [], []
 
 def process_and_store_message(text, qdrant_client,embedding_model=config.EMBEDDING_MODEL, llm_model=config.MAIN_MODEL):
+    """ Process a user message: check if it's useful, rewrite extracted info, and store in Qdrant if relevant. """
     is_useful, entities, preferences, relations = is_useful_message(text)
     if is_useful:
         # Check if similar message already exists in Qdrant (similarity > 0.9)
@@ -129,7 +132,6 @@ def process_and_store_message(text, qdrant_client,embedding_model=config.EMBEDDI
         rewrited_info = rewrite_extracted_info(
             entities, preferences, relations, text, llm_model
         )
-        #! testing
         utils.append_server_log(f"Rewritten info: {rewrited_info}")
         # Filter: save only if the rewritten info contains relevant information (not generic questions)
         if not rewrited_info:
@@ -138,7 +140,7 @@ def process_and_store_message(text, qdrant_client,embedding_model=config.EMBEDDI
         # if the message is generic (the user asks something) skip it
         info_str = str(rewrited_info).lower()
 
-        # Blocca risposte che indicano nessuna informazione utile
+        # Block responses that indicate no useful information
         no_info_indicators = [
             "no extracted information",
             "no useful information", 
