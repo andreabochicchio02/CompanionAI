@@ -1,56 +1,192 @@
-[2025-09-02 19:48:30]	Initializing RAG service...
-[2025-09-02 19:48:30]	Attempting to create Qdrant client at path: app/qdrant_storage
-[2025-09-02 19:48:30]	Using Qdrant client at path: app/qdrant_storage
-[2025-09-02 19:48:30]	No changes detected in documents. Skipping update.
-[2025-09-02 19:48:30]	File hashes updated for personal_info.txt and structured_info.txt
-[2025-09-02 19:48:30]	RAG service initialized successfully.
-[2025-09-02 19:50:09]	/chatLLM/start request completed successfully.
-[2025-09-02 19:50:21]	Checking if message is useful: hi
-[2025-09-02 19:50:21]	Extracting entities from text: hi
-[2025-09-02 19:50:21]	Message is not useful: no entities, preferences, relations or events found.
-[2025-09-02 19:50:40]	Checking if message is useful: i really love chocolate
-[2025-09-02 19:50:40]	Extracting entities from text: i really love chocolate
-[2025-09-02 19:50:40]	Message is possibly useful with entities: [], preferences: ['love chocolate', 'chocolate'], relations: [{'subject': 'i', 'verb': 'love', 'object': 'chocolate'}]
-[2025-09-02 19:50:40]	Rewriting extracted info for text: i really love chocolate
-[2025-09-02 19:50:41]	Rewritten info: The user loves chocolate.
-[2025-09-02 19:50:41]	Message processed and stored: The user loves chocolate.
-[2025-09-02 19:50:44]	Successfully retrieved relevant chunks from RAG
-[2025-09-02 19:50:49]	Response generated and sent successfully (stream=True)
-[2025-09-02 19:51:06]	Checking if message is useful: in particular i prefer dark chocolate
-[2025-09-02 19:51:06]	Extracting entities from text: in particular i prefer dark chocolate
-[2025-09-02 19:51:06]	Message is possibly useful with entities: [], preferences: ['dark chocolate', 'chocolate'], relations: [{'subject': 'i', 'verb': 'prefer', 'object': 'chocolate'}]
-[2025-09-02 19:51:06]	Rewriting extracted info for text: in particular i prefer dark chocolate
-[2025-09-02 19:51:07]	Rewritten info: The user prefers dark chocolate.
-[2025-09-02 19:51:07]	Message processed and stored: The user prefers dark chocolate.
-[2025-09-02 19:51:10]	Successfully retrieved relevant chunks from RAG
-[2025-09-02 19:51:15]	Response generated and sent successfully (stream=True)
-[2025-09-02 19:52:13]	/chatLLM/start request completed successfully.
-[2025-09-02 19:52:15]	Checking if message is useful: hi
-[2025-09-02 19:52:15]	Extracting entities from text: hi
-[2025-09-02 19:52:15]	Message is not useful: no entities, preferences, relations or events found.
-[2025-09-02 19:52:23]	Checking if message is useful: what type of chocolate i prefer?
-[2025-09-02 19:52:23]	Extracting entities from text: what type of chocolate i prefer?
-[2025-09-02 19:52:23]	Message is possibly useful with entities: [], preferences: ['type chocolate', 'chocolate prefer'], relations: [{'subject': 'i', 'verb': 'prefer', 'object': 'type'}]
-[2025-09-02 19:52:23]	Rewriting extracted info for text: what type of chocolate i prefer?
-[2025-09-02 19:52:24]	Rewritten info: No personal information found.
-[2025-09-02 19:52:24]	Rewritten info indicates no useful information, skipping insert: what type of chocolate i prefer?
-[2025-09-02 19:52:38]	Checking if message is useful: what type of chocolate i prefer?
-[2025-09-02 19:52:38]	Extracting entities from text: what type of chocolate i prefer?
-[2025-09-02 19:52:38]	Message is possibly useful with entities: [], preferences: ['type chocolate', 'chocolate prefer'], relations: [{'subject': 'i', 'verb': 'prefer', 'object': 'type'}]
-[2025-09-02 19:52:38]	Rewriting extracted info for text: what type of chocolate i prefer?
-[2025-09-02 19:52:39]	Rewritten info: No personal information found.
-[2025-09-02 19:52:39]	Rewritten info indicates no useful information, skipping insert: what type of chocolate i prefer?
-[2025-09-02 19:52:56]	Checking if message is useful: talk about chocolate
-[2025-09-02 19:52:56]	Extracting entities from text: talk about chocolate
-[2025-09-02 19:52:56]	Message is possibly useful with entities: [], preferences: ['talk chocolate', 'chocolate'], relations: []
-[2025-09-02 19:52:56]	Rewriting extracted info for text: talk about chocolate
-[2025-09-02 19:52:57]	Rewritten info: No personal information found.
-[2025-09-02 19:52:57]	Rewritten info indicates no useful information, skipping insert: talk about chocolate
-[2025-09-02 19:53:07]	Checking if message is useful: what type of chocolate i prefer?
-[2025-09-02 19:53:07]	Extracting entities from text: what type of chocolate i prefer?
-[2025-09-02 19:53:07]	Message is possibly useful with entities: [], preferences: ['type chocolate', 'chocolate prefer'], relations: [{'subject': 'i', 'verb': 'prefer', 'object': 'type'}]
-[2025-09-02 19:53:07]	Rewriting extracted info for text: what type of chocolate i prefer?
-[2025-09-02 19:53:08]	Rewritten info: No personal information found.
-[2025-09-02 19:53:08]	Rewritten info indicates no useful information, skipping insert: what type of chocolate i prefer?
-[2025-09-02 19:53:10]	Successfully retrieved relevant chunks from RAG
-[2025-09-02 19:53:14]	Response generated and sent successfully (stream=True)
+[2025-09-03 17:07:27]	Initializing RAG service...
+[2025-09-03 17:07:27]	personal_info file changed, recreating structured info...
+[2025-09-03 17:07:31]	Error: Cannot connect to Ollama. Is it running?
+[2025-09-03 17:07:35]	Error: Cannot connect to Ollama. Is it running?
+[2025-09-03 17:07:39]	Error: Cannot connect to Ollama. Is it running?
+[2025-09-03 17:07:43]	Error: Cannot connect to Ollama. Is it running?
+[2025-09-03 17:07:47]	Error: Cannot connect to Ollama. Is it running?
+[2025-09-03 17:07:52]	Error: Cannot connect to Ollama. Is it running?
+[2025-09-03 17:07:56]	Error: Cannot connect to Ollama. Is it running?
+[2025-09-03 17:08:00]	Error: Cannot connect to Ollama. Is it running?
+[2025-09-03 17:08:04]	Error: Cannot connect to Ollama. Is it running?
+[2025-09-03 17:08:08]	Error: Cannot connect to Ollama. Is it running?
+[2025-09-03 17:08:12]	Error: Cannot connect to Ollama. Is it running?
+[2025-09-03 17:08:12]	Attempting to create Qdrant client at path: app/qdrant_storage
+[2025-09-03 17:08:12]	Using Qdrant client at path: app/qdrant_storage
+[2025-09-03 17:08:12]	Documents have changed. Updating database...
+[2025-09-03 17:08:12]	File app/resources/personal_info.txt has changed. Updating related chunks...
+[2025-09-03 17:08:14]	Updated 11 chunks for file app/resources/personal_info.txt
+[2025-09-03 17:08:14]	File app/resources/structured_info.txt has changed. Updating related chunks...
+[2025-09-03 17:08:14]	Updated 11 chunks for file app/resources/structured_info.txt
+[2025-09-03 17:08:14]	File hashes updated for personal_info.txt and structured_info.txt
+[2025-09-03 17:08:14]	RAG service initialized successfully.
+[2025-09-03 17:09:21]	/chatLLM/start request completed successfully.
+[2025-09-03 17:09:49]	Checking if message is useful: Hello, I’m not really feeling great today.
+[2025-09-03 17:09:49]	Extracting entities from text: Hello, I’m not really feeling great today.
+[2025-09-03 17:09:50]	Message is possibly useful with entities: [('today', 'DATE')], preferences: ['feeling great', 'great today'], relations: []
+[2025-09-03 17:09:50]	Rewriting extracted info for text: Hello, I’m not really feeling great today.
+[2025-09-03 17:09:52]	Rewritten info: 
+[2025-09-03 17:09:52]	Rewritten info is empty, skipping insert: Hello, I’m not really feeling great today.
+[2025-09-03 17:10:05]	Successfully retrieved relevant chunks from RAG
+[2025-09-03 17:10:20]	Response generated and sent successfully (stream=True)
+[2025-09-03 17:10:58]	Checking if message is useful: Honestly, I’d love a distraction right now. Can we chat about something fun, like movies or travel?
+[2025-09-03 17:10:58]	Extracting entities from text: Honestly, I’d love a distraction right now. Can we chat about something fun, like movies or travel?
+[2025-09-03 17:10:59]	Message is possibly useful with entities: [], preferences: ['chat fun', 'chat'], relations: [{'subject': 'I', 'verb': 'love', 'object': 'distraction'}]
+[2025-09-03 17:10:59]	Rewriting extracted info for text: Honestly, I’d love a distraction right now. Can we chat about something fun, like movies or travel?
+[2025-09-03 17:11:15]	Rewritten info: The user loves a distraction.
+
+No personal information found.
+[2025-09-03 17:11:15]	Rewritten info indicates no useful information, skipping insert: Honestly, I’d love a distraction right now. Can we chat about something fun, like movies or travel?
+[2025-09-03 17:11:31]	Successfully retrieved relevant chunks from RAG
+[2025-09-03 17:12:02]	Response generated and sent successfully (stream=True)
+[2025-09-03 17:12:55]	Checking if message is useful: Movies sound great! I’d love to chat about some classic films—maybe something uplifting or adventurous.
+[2025-09-03 17:12:55]	Extracting entities from text: Movies sound great! I’d love to chat about some classic films—maybe something uplifting or adventurous.
+[2025-09-03 17:12:55]	Message is possibly useful with entities: [], preferences: ['classic films', 'movies'], relations: []
+[2025-09-03 17:12:55]	Rewriting extracted info for text: Movies sound great! I’d love to chat about some classic films—maybe something uplifting or adventurous.
+[2025-09-03 17:13:13]	Rewritten info: The user enjoys discussing movies and has an interest in classic films.
+
+No additional personal information was extracted from the message.
+[2025-09-03 17:13:13]	Message processed and stored: The user enjoys discussing movies and has an interest in classic films.
+
+No additional personal information was extracted from the message.
+[2025-09-03 17:13:36]	Successfully retrieved relevant chunks from RAG
+[2025-09-03 17:14:23]	Response generated and sent successfully (stream=True)
+[2025-09-03 17:15:12]	Checking if message is useful: I’d really like to talk about The Adventures of Robin Hood. I’ve always found the whole Robin Hood legend fascinating, but I don’t know much about the background of the film itself. Could you tell me a bit more about how it was made or what makes it such a classic?
+[2025-09-03 17:15:12]	Extracting entities from text: I’d really like to talk about The Adventures of Robin Hood. I’ve always found the whole Robin Hood legend fascinating, but I don’t know much about the background of the film itself. Could you tell me a bit more about how it was made or what makes it such a classic?
+[2025-09-03 17:15:12]	Message is possibly useful with entities: [('Robin Hood', 'PERSON'), ('Robin Hood', 'PERSON')], preferences: ['robin hood', 'adventures robin'], relations: [{'subject': 'you', 'verb': 'tell', 'object': 'more'}]
+[2025-09-03 17:15:13]	Rewriting extracted info for text: I’d really like to talk about The Adventures of Robin Hood. I’ve always found the whole Robin Hood legend fascinating, but I don’t know much about the background of the film itself. Could you tell me a bit more about how it was made or what makes it such a classic?
+[2025-09-03 17:15:31]	Rewritten info: No personal information found.
+[2025-09-03 17:15:31]	Rewritten info indicates no useful information, skipping insert: I’d really like to talk about The Adventures of Robin Hood. I’ve always found the whole Robin Hood legend fascinating, but I don’t know much about the background of the film itself. Could you tell me a bit more about how it was made or what makes it such a classic?
+[2025-09-03 17:16:03]	Successfully retrieved relevant chunks from RAG
+[2025-09-03 17:16:51]	Response generated and sent successfully (stream=True)
+[2025-09-03 17:20:12]	Checking if message is useful: Actually, speaking of films, I’d love to switch gears and talk about something more recent. Have you seen Oppenheimer? I found it fascinating, not just for the story itself but also for how Christopher Nolan directed it—the mix of history, science, and human drama really stuck with me.
+[2025-09-03 17:20:12]	Extracting entities from text: Actually, speaking of films, I’d love to switch gears and talk about something more recent. Have you seen Oppenheimer? I found it fascinating, not just for the story itself but also for how Christopher Nolan directed it—the mix of history, science, and human drama really stuck with me.
+[2025-09-03 17:20:13]	Message is possibly useful with entities: [('Oppenheimer', 'PERSON'), ('Christopher Nolan', 'PERSON')], preferences: ['oppenheimer fascinating', 'nolan directed'], relations: [{'subject': 'you', 'verb': 'see', 'object': 'Oppenheimer'}]
+[2025-09-03 17:20:13]	Rewriting extracted info for text: Actually, speaking of films, I’d love to switch gears and talk about something more recent. Have you seen Oppenheimer? I found it fascinating, not just for the story itself but also for how Christopher Nolan directed it—the mix of history, science, and human drama really stuck with me.
+[2025-09-03 17:20:36]	Rewritten info: The user loves Oppenheimer and Christopher Nolan. The user finds Oppenheimer fascinating, especially due to its mix of history, science, and human drama. The user admires how Christopher Nolan directed the film.
+[2025-09-03 17:20:36]	Message processed and stored: The user loves Oppenheimer and Christopher Nolan. The user finds Oppenheimer fascinating, especially due to its mix of history, science, and human drama. The user admires how Christopher Nolan directed the film.
+[2025-09-03 17:21:18]	Successfully retrieved relevant chunks from RAG
+[2025-09-03 17:22:22]	Response generated and sent successfully (stream=True)
+[2025-09-03 17:23:01]	Checking if message is useful: By the way, could we talk a bit about the director, Christopher Nolan? I know he’s made some incredible films, but I’d love to hear more about his career and what makes his style so unique.
+[2025-09-03 17:23:01]	Extracting entities from text: By the way, could we talk a bit about the director, Christopher Nolan? I know he’s made some incredible films, but I’d love to hear more about his career and what makes his style so unique.
+[2025-09-03 17:23:01]	Message is possibly useful with entities: [('Christopher Nolan', 'PERSON')], preferences: ['christopher nolan', 'nolan'], relations: []
+[2025-09-03 17:23:01]	Rewriting extracted info for text: By the way, could we talk a bit about the director, Christopher Nolan? I know he’s made some incredible films, but I’d love to hear more about his career and what makes his style so unique.
+[2025-09-03 17:23:21]	Rewritten info: The user mentions Christopher Nolan as a person of interest, indicating their appreciation for his work. No specific information about the user themselves is revealed in this message. 
+
+No personal information found
+[2025-09-03 17:23:21]	Rewritten info indicates no useful information, skipping insert: By the way, could we talk a bit about the director, Christopher Nolan? I know he’s made some incredible films, but I’d love to hear more about his career and what makes his style so unique.
+[2025-09-03 17:24:18]	Successfully retrieved relevant chunks from RAG
+[2025-09-03 17:25:52]	Response generated and sent successfully (stream=True)
+[2025-09-03 17:26:43]	Checking if message is useful: That’s great, thank you! That’s all I needed for now. As a last thing, could you tell me what events or appointments I have scheduled for tomorrow?
+[2025-09-03 17:26:43]	Extracting entities from text: That’s great, thank you! That’s all I needed for now. As a last thing, could you tell me what events or appointments I have scheduled for tomorrow?
+[2025-09-03 17:26:43]	Message is possibly useful with entities: [('tomorrow', 'DATE')], preferences: ['appointments scheduled', 'events appointments'], relations: [{'subject': 'you', 'verb': 'tell', 'object': 'me'}]
+[2025-09-03 17:26:43]	Rewriting extracted info for text: That’s great, thank you! That’s all I needed for now. As a last thing, could you tell me what events or appointments I have scheduled for tomorrow?
+[2025-09-03 17:27:00]	Rewritten info: No personal information found.
+[2025-09-03 17:27:00]	Rewritten info indicates no useful information, skipping insert: That’s great, thank you! That’s all I needed for now. As a last thing, could you tell me what events or appointments I have scheduled for tomorrow?
+[2025-09-03 17:28:46]	/chatLLM/start request completed successfully.
+[2025-09-03 17:29:10]	Checking if message is useful: Hello
+[2025-09-03 17:29:10]	Extracting entities from text: Hello
+[2025-09-03 17:29:10]	Message is not useful: no entities, preferences, relations or events found.
+[2025-09-03 17:30:05]	Checking if message is useful: Sure, go ahead and propose something!
+[2025-09-03 17:30:05]	Extracting entities from text: Sure, go ahead and propose something!
+[2025-09-03 17:30:05]	Message is possibly useful with entities: [], preferences: ['propose', 'ahead propose'], relations: []
+[2025-09-03 17:30:06]	Rewriting extracted info for text: Sure, go ahead and propose something!
+[2025-09-03 17:30:21]	Rewritten info: No personal information found.
+[2025-09-03 17:30:21]	Rewritten info indicates no useful information, skipping insert: Sure, go ahead and propose something!
+[2025-09-03 17:31:34]	Checking if message is useful: Yes, I do! I’ve always wanted to visit Thailand—it seems like such an amazing place with beautiful landscapes, rich culture, and delicious food.
+[2025-09-03 17:31:34]	Extracting entities from text: Yes, I do! I’ve always wanted to visit Thailand—it seems like such an amazing place with beautiful landscapes, rich culture, and delicious food.
+[2025-09-03 17:31:35]	Message is possibly useful with entities: [('Thailand', 'GPE')], preferences: ['visit thailand', 'thailand like'], relations: []
+[2025-09-03 17:31:36]	Rewriting extracted info for text: Yes, I do! I’ve always wanted to visit Thailand—it seems like such an amazing place with beautiful landscapes, rich culture, and delicious food.
+[2025-09-03 17:31:53]	Rewritten info: The user wants to visit Thailand.
+
+The user loves Thailand.
+[2025-09-03 17:31:53]	Message processed and stored: The user wants to visit Thailand.
+
+The user loves Thailand.
+[2025-09-03 17:32:03]	Successfully retrieved relevant chunks from RAG
+[2025-09-03 17:32:37]	Response generated and sent successfully (stream=True)
+[2025-09-03 17:33:34]	Checking if message is useful: That sounds amazing! Out of all the things you mentioned—the temples, festivals, food, or natural scenery—which one are you most excited to experience first in Thailand?
+[2025-09-03 17:33:34]	Extracting entities from text: That sounds amazing! Out of all the things you mentioned—the temples, festivals, food, or natural scenery—which one are you most excited to experience first in Thailand?
+[2025-09-03 17:33:35]	Message is possibly useful with entities: [('first', 'ORDINAL'), ('Thailand', 'GPE')], preferences: ['experience thailand', 'thailand'], relations: []
+[2025-09-03 17:33:35]	Rewriting extracted info for text: That sounds amazing! Out of all the things you mentioned—the temples, festivals, food, or natural scenery—which one are you most excited to experience first in Thailand?
+[2025-09-03 17:33:52]	Rewritten info: No personal information found.
+[2025-09-03 17:33:52]	Rewritten info indicates no useful information, skipping insert: That sounds amazing! Out of all the things you mentioned—the temples, festivals, food, or natural scenery—which one are you most excited to experience first in Thailand?
+[2025-09-03 17:34:12]	Successfully retrieved relevant chunks from RAG
+[2025-09-03 17:34:49]	Response generated and sent successfully (stream=True)
+[2025-09-03 17:35:39]	Checking if message is useful: I’m having a bit of a memory blank—I can’t quite remember where I’ve traveled or the trips I’ve taken in the past. Could you help remind me a bit about the places I’ve visited?
+[2025-09-03 17:35:39]	Extracting entities from text: I’m having a bit of a memory blank—I can’t quite remember where I’ve traveled or the trips I’ve taken in the past. Could you help remind me a bit about the places I’ve visited?
+[2025-09-03 17:35:40]	Message is possibly useful with entities: [], preferences: ['traveled trips', 've visited'], relations: []
+[2025-09-03 17:35:41]	Rewriting extracted info for text: I’m having a bit of a memory blank—I can’t quite remember where I’ve traveled or the trips I’ve taken in the past. Could you help remind me a bit about the places I’ve visited?
+[2025-09-03 17:35:57]	Rewritten info: No personal information found.
+[2025-09-03 17:35:57]	Rewritten info indicates no useful information, skipping insert: I’m having a bit of a memory blank—I can’t quite remember where I’ve traveled or the trips I’ve taken in the past. Could you help remind me a bit about the places I’ve visited?
+[2025-09-03 17:36:22]	Successfully retrieved relevant chunks from RAG
+[2025-09-03 17:37:34]	Response generated and sent successfully (stream=True)
+[2025-09-03 17:38:15]	Checking if message is useful: Yes, I’d love to hear more about London. Maybe talking about it will help me remember some of the experiences I had there.
+[2025-09-03 17:38:15]	Extracting entities from text: Yes, I’d love to hear more about London. Maybe talking about it will help me remember some of the experiences I had there.
+[2025-09-03 17:38:15]	Message is possibly useful with entities: [('London', 'GPE')], preferences: ['hear london', 'london'], relations: []
+[2025-09-03 17:38:16]	Rewriting extracted info for text: Yes, I’d love to hear more about London. Maybe talking about it will help me remember some of the experiences I had there.
+[2025-09-03 17:38:32]	Rewritten info: No personal information found.
+[2025-09-03 17:38:32]	Rewritten info indicates no useful information, skipping insert: Yes, I’d love to hear more about London. Maybe talking about it will help me remember some of the experiences I had there.
+[2025-09-03 17:39:17]	Successfully retrieved relevant chunks from RAG
+[2025-09-03 17:40:41]	Response generated and sent successfully (stream=True)
+[2025-09-03 17:41:12]	Checking if message is useful: Could you tell me a bit about London in general? I’d love to hear more about the city—its history, landmarks, and what makes it special.
+[2025-09-03 17:41:12]	Extracting entities from text: Could you tell me a bit about London in general? I’d love to hear more about the city—its history, landmarks, and what makes it special.
+[2025-09-03 17:41:12]	Message is possibly useful with entities: [('London', 'GPE')], preferences: ['london', 'city history'], relations: [{'subject': 'you', 'verb': 'tell', 'object': 'bit'}]
+[2025-09-03 17:41:13]	Rewriting extracted info for text: Could you tell me a bit about London in general? I’d love to hear more about the city—its history, landmarks, and what makes it special.
+[2025-09-03 17:41:31]	Rewritten info: No personal information found.
+[2025-09-03 17:41:31]	Rewritten info indicates no useful information, skipping insert: Could you tell me a bit about London in general? I’d love to hear more about the city—its history, landmarks, and what makes it special.
+[2025-09-03 17:42:20]	Successfully retrieved relevant chunks from RAG
+[2025-09-03 17:44:00]	Response generated and sent successfully (stream=True)
+[2025-09-03 17:44:54]	/chatLLM/start request completed successfully.
+[2025-09-03 17:45:37]	Checking if message is useful: Hello! I don’t remember much about my family at the moment. Could you remind me a bit about them?
+[2025-09-03 17:45:37]	Extracting entities from text: Hello! I don’t remember much about my family at the moment. Could you remind me a bit about them?
+[2025-09-03 17:45:37]	Message is possibly useful with entities: [], preferences: ['remember family', 'family'], relations: [{'subject': 'I', 'verb': 'remember', 'object': 'much'}, {'subject': 'you', 'verb': 'remind', 'object': 'me'}]
+[2025-09-03 17:45:38]	Rewriting extracted info for text: Hello! I don’t remember much about my family at the moment. Could you remind me a bit about them?
+[2025-09-03 17:46:04]	Rewritten info: The user is unsure about their family and would like to be reminded about them. This suggests that the user may have a complicated or traumatic experience with their family in the past, or they may be dealing with stress and anxiety related to family dynamics.
+
+The user's message reveals information about:
+
+- Personal experiences: "I don’t remember much about my family at the moment"
+- Characteristics: emotional state (unsureness, stress, anxiety)
+
+No personal information is found.
+[2025-09-03 17:46:04]	Rewritten info indicates no useful information, skipping insert: Hello! I don’t remember much about my family at the moment. Could you remind me a bit about them?
+[2025-09-03 17:46:14]	Successfully retrieved relevant chunks from RAG
+[2025-09-03 17:46:59]	Response generated and sent successfully (stream=True)
+[2025-09-03 17:47:32]	/chatLLM/start request completed successfully.
+[2025-09-03 17:47:37]	Checking if message is useful: Hello! I don’t remember much about my family at the moment. Could you remind me a bit about them?
+[2025-09-03 17:47:37]	Extracting entities from text: Hello! I don’t remember much about my family at the moment. Could you remind me a bit about them?
+[2025-09-03 17:47:38]	Message is possibly useful with entities: [], preferences: ['remember family', 'family'], relations: [{'subject': 'I', 'verb': 'remember', 'object': 'much'}, {'subject': 'you', 'verb': 'remind', 'object': 'me'}]
+[2025-09-03 17:47:39]	Rewriting extracted info for text: Hello! I don’t remember much about my family at the moment. Could you remind me a bit about them?
+[2025-09-03 17:48:00]	Rewritten info: The user mentions that they are not remembering much about their family at the moment. They seem to be seeking clarification or guidance about their family situation, but no specific details are provided.
+[2025-09-03 17:48:00]	Message processed and stored: The user mentions that they are not remembering much about their family at the moment. They seem to be seeking clarification or guidance about their family situation, but no specific details are provided.
+[2025-09-03 17:48:10]	Successfully retrieved relevant chunks from RAG
+[2025-09-03 17:48:59]	Response generated and sent successfully (stream=True)
+[2025-09-03 17:51:29]	Checking if message is useful: Yes, I’d love to hear about my children. Could you tell me more about them and what they’re up to?
+[2025-09-03 17:51:29]	Extracting entities from text: Yes, I’d love to hear about my children. Could you tell me more about them and what they’re up to?
+[2025-09-03 17:51:30]	Message is possibly useful with entities: [], preferences: ['hear children', 'children'], relations: [{'subject': 'you', 'verb': 'tell', 'object': 'more'}]
+[2025-09-03 17:51:31]	Rewriting extracted info for text: Yes, I’d love to hear about my children. Could you tell me more about them and what they’re up to?
+[2025-09-03 17:51:48]	Rewritten info: No personal information found.
+[2025-09-03 17:51:48]	Rewritten info indicates no useful information, skipping insert: Yes, I’d love to hear about my children. Could you tell me more about them and what they’re up to?
+[2025-09-03 17:52:07]	Successfully retrieved relevant chunks from RAG
+[2025-09-03 17:53:14]	Response generated and sent successfully (stream=True)
+[2025-09-03 17:53:50]	Checking if message is useful: Tell me more about Eleanor
+[2025-09-03 17:53:50]	Extracting entities from text: Tell me more about Eleanor
+[2025-09-03 17:53:50]	Message is possibly useful with entities: [('Eleanor', 'ORG')], preferences: ['eleanor', 'tell eleanor'], relations: []
+[2025-09-03 17:53:51]	Rewriting extracted info for text: Tell me more about Eleanor
+[2025-09-03 17:54:06]	Rewritten info: The user wants to know more about Eleanor.
+[2025-09-03 17:54:07]	Message processed and stored: The user wants to know more about Eleanor.
+[2025-09-03 17:54:37]	Successfully retrieved relevant chunks from RAG
+[2025-09-03 17:55:55]	Response generated and sent successfully (stream=True)
+[2025-09-03 17:56:09]	Checking if message is useful: Thank you! Could we also talk a bit about my wife or partner? I’d love to hear more about her and our life together.
+[2025-09-03 17:56:09]	Extracting entities from text: Thank you! Could we also talk a bit about my wife or partner? I’d love to hear more about her and our life together.
+[2025-09-03 17:56:10]	Message is possibly useful with entities: [], preferences: ['wife partner', 'partner love'], relations: []
+[2025-09-03 17:56:11]	Rewriting extracted info for text: Thank you! Could we also talk a bit about my wife or partner? I’d love to hear more about her and our life together.
+[2025-09-03 17:56:29]	Rewritten info: The user expresses interest in discussing their partner, indicating that they have a significant other.
+
+No additional information is revealed beyond the mention of their partner.
+[2025-09-03 17:56:30]	Message processed and stored: The user expresses interest in discussing their partner, indicating that they have a significant other.
+
+No additional information is revealed beyond the mention of their partner.
+[2025-09-03 17:57:13]	Successfully retrieved relevant chunks from RAG
+[2025-09-03 17:58:49]	Response generated and sent successfully (stream=True)

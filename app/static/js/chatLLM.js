@@ -163,6 +163,8 @@ async function sendMessageToLLM(text) {
         removeThinkingDots();
         console.error("Prompt request failed:", error);
     }
+
+    textAreaResize();
 }
 
 function hideTextArea() {
