@@ -595,7 +595,7 @@ def get_events_for_period(events, time_params):
         start_date = end_date = datetime.fromisoformat(time_params["date"]).date()
     elif time_params["type"] == "month":
         year = time_params.get("year", now.year)
-        month = time_params["month"]
+        month = time_params.get("month", now.month)
         start_date = date(year, month, 1)
         if month == 12:
             end_date = date(year + 1, 1, 1) - timedelta(days=1)
@@ -627,7 +627,7 @@ def get_events_for_period(events, time_params):
         # Handle single events
         if not recurrence:
             if start_date <= event_date <= end_date:
-                event_list.append((current_date, event_time, f"- {time_str} {event['title']}" + (f", Note: {event['note']}" if event.get("note") else "")))
+                event_list.append((start_date, event_time, f"- {time_str} {event['title']}" + (f", Note: {event['note']}" if event.get("note") else "")))
             continue
 
         # Handle recurring events

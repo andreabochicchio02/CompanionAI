@@ -1,15 +1,7 @@
-[2025-09-03 19:34:10]	Initializing RAG service...
-[2025-09-03 19:34:10]	Attempting to create Qdrant client at path: app/qdrant_storage
-[2025-09-03 19:34:10]	Using Qdrant client at path: app/qdrant_storage
-[2025-09-03 19:34:10]	No changes detected in documents. Skipping update.
-[2025-09-03 19:34:10]	File hashes updated for personal_info.txt and structured_info.txt
-[2025-09-03 19:34:10]	RAG service initialized successfully.
-[2025-09-03 19:34:17]	Starting background processing...
-[2025-09-03 19:35:12]	Documents have changed. Updating database...
-[2025-09-03 19:35:12]	File app/resources/personal_info.txt has changed. Updating related chunks...
-[2025-09-03 19:35:12]	Updated 11 chunks for file app/resources/personal_info.txt
-[2025-09-03 19:35:12]	File app/resources/structured_info.txt has changed. Updating related chunks...
-[2025-09-03 19:35:13]	Updated 11 chunks for file app/resources/structured_info.txt
-[2025-09-03 19:35:13]	File hashes updated for personal_info.txt and structured_info.txt
-[2025-09-03 19:35:13]	File hashes updated for personal_info.txt and structured_info.txt
-[2025-09-03 19:35:13]	Background processing completed successfully
+[2025-09-07 13:23:05]	Initializing RAG service...
+[2025-09-07 13:23:05]	Attempting to create Qdrant client at path: app/qdrant_storage
+[2025-09-07 13:23:05]	Using Qdrant client at path: app/qdrant_storage
+[2025-09-07 13:23:05]	No changes detected in documents. Skipping update.
+[2025-09-07 13:23:05]	File hashes updated for personal_info.txt and structured_info.txt
+[2025-09-07 13:23:05]	RAG service initialized successfully.
+[2025-09-07 13:23:16]	/chatLLM/start request completed successfully.
