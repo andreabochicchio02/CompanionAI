@@ -2,6 +2,10 @@
 
 CompanionAI is a prototype AI system designed to provide friendly companionship, adaptive support, and practical assistance — all while keeping your data private and fully offline. The project is built with *Flask* to showcase its features through a simple web application.
 
+## Project Presentation: [CompanionAI Presentation](CompanionAI_Presentation-Gambelli_Bochicchio_Pipitone.pdf)
+
+## Project Documentation: [CompanionAI Documentation](CompanionAI_Documentation-Gambelli_Bochicchio_Pipitone.pdf)
+
 ## Features
 
 ### 1. Friendly Companionship
