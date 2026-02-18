@@ -1,6 +1,6 @@
 # CompanionAI
 
-CompanionAI is a prototype AI system designed to provide friendly companionship, adaptive support, and practical assistance — all while keeping your data private and fully offline. The project is built with *Flask* to showcase its features through a simple web application.
+CompanionAI is a prototype AI system designed to provide friendly companionship, adaptive support, and practical assistance. The project is built with *Flask* to showcase its features through a simple web application.
 
 ---
 
@@ -23,29 +23,17 @@ CompanionAI is a prototype AI system designed to provide friendly companionship,
 
 ## Functionalities
 
-### 1. Friendly Companionship
+**1. Friendly Companionship:** Engage in warm, reassuring conversations that make you feel supported and less alone. The system is designed to respond naturally and provide a comforting presence.
 
-Engage in warm, reassuring conversations that make you feel supported and less alone. The system is designed to respond naturally and provide a comforting presence.
+**2. Smart Adaptation:** CompanionAI continuously learns from your interactions, adjusting to your habits, preferences, and emotional needs. Over time, it becomes more personalized and aligned with your lifestyle.
 
-### 2. Smart Adaptation
+**3. Event & Reminder Tracking:** Stay on top of your daily life. CompanionAI remembers important events, medications, and appointments, sending reminders so you never miss what matters.
 
-CompanionAI continuously learns from your interactions, adjusting to your habits, preferences, and emotional needs. Over time, it becomes more personalized and aligned with your lifestyle.
+**4. Family Access Dashboard:** Relatives and caregivers can securely access a dedicated dashboard (example password: `1234`). From there, they can add personal details, schedule reminders, and review chat history to stay updated on the user’s wellbeing.
 
-### 3. Event & Reminder Tracking
+**5. Works Completely Offline:** All features are available without internet. No cloud services are involved — your data remains on your device only.
 
-Stay on top of your daily life. CompanionAI remembers important events, medications, and appointments, sending reminders so you never miss what matters.
-
-### 4. Family Access Dashboard
-
-Relatives and caregivers can securely access a dedicated dashboard (example password: `1234`). From there, they can add personal details, schedule reminders, and review chat history to stay updated on the user’s wellbeing.
-
-### 5. Works Completely Offline
-
-All features are available without internet. No cloud services are involved — your data remains on your device only.
-
-### 6. Guaranteed Privacy
-
-Privacy is at the core of CompanionAI. Nothing is transmitted or shared; your conversations and personal information stay fully private.
+**6. Guaranteed Privacy:** Privacy is at the core of CompanionAI. Nothing is transmitted or shared; your conversations and personal information stay fully private.
 
 ---
 
@@ -117,5 +105,6 @@ You will find:
 
 
 This project is released under the MIT License.
+
 
 
