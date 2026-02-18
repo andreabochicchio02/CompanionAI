@@ -2,10 +2,6 @@
 
 CompanionAI is a prototype AI system designed to provide friendly companionship, adaptive support, and practical assistance — all while keeping your data private and fully offline. The project is built with *Flask* to showcase its features through a simple web application.
 
-**Project Presentation:** [CompanionAI Presentation](CompanionAI_Presentation-Gambelli_Bochicchio_Pipitone.pdf)
-
-**Project Documentation:** [CompanionAI Documentation](CompanionAI_Documentation-Gambelli_Bochicchio_Pipitone.pdf)
-
 ---
 
 ## Key Features
@@ -18,6 +14,10 @@ CompanionAI is a prototype AI system designed to provide friendly companionship,
 - **Speech I/O** — speech-to-text (STT) input and text-to-speech (TTS) output for accessibility
 - **Caregiver dashboard** — password-protected interface for biography management, event entry, and conversation monitoring
 
+
+**Project Presentation:** [CompanionAI Presentation](CompanionAI_Presentation-Gambelli_Bochicchio_Pipitone.pdf)
+
+**Project Documentation:** [CompanionAI Documentation](CompanionAI_Documentation-Gambelli_Bochicchio_Pipitone.pdf)
 
 ---
 
@@ -117,4 +117,5 @@ You will find:
 
 
 This project is released under the MIT License.
+
 
